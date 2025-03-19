@@ -3,7 +3,7 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Cookieland - Contacto</title>
+	<title>Maicookies - Contacto</title>
 	<link rel="stylesheet" href="{{ url_for('static', filename='css/output.css') }}">
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
@@ -17,7 +17,7 @@
     <nav class="bg-gradient-to-b from-black/50 bg-[#D2B48C]  fixed top-0 left-0 w-full z-50 py-6">
         <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto px-6">
             <a href="https://flowbite.com/" class="flex items-center space-x-3 rtl:space-x-reverse">
-                <span class="self-center text-2xl tracking-tight font-extrabold whitespace-nowrap text-gray-900 dark:text-white">🍪CookieLand</span>
+                <span class="self-center text-2xl tracking-tight font-extrabold whitespace-nowrap text-gray-900 dark:text-white">🍪Maicookies</span>
             </a>
             <div class="flex items-center md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
                 <div class="flex items-center space-x-4">
@@ -127,12 +127,13 @@
 
 
 
-	<!-- Footer -->
+
+    <!-- Footer -->
     <footer class="bg-[#D2B48C] text-dark ">
         <div class="mx-auto w-full max-w-screen-xl">
             <div class="grid grid-cols-2 gap-8 px-4 py-6 lg:py-8 md:grid-cols-4">
                 <div>
-                    <h2 class="mb-6 text-sm font-semibold uppercase"><strong>Cookiesland</strong></h2>
+                    <h2 class="mb-6 text-sm font-semibold uppercase"><strong>Maicookies</strong></h2>
                     <ul class="text-dark-200 font-medium">
                         <li class="mb-4">
                             <a href="#" class="hover:underline">Nosotros</a>
@@ -147,31 +148,34 @@
                 </div>
                 <div>
                     <h2 class="mb-6 text-sm font-semibold uppercase"><strong>Síguenos</strong></h2>
-                    <ul class="text-dark-200 font-medium">
-                        <li class="mb-4">
+                    <ul class="text-dark-200 font-medium space-y-4">
+                        <li class="flex items-center space-x-2">
+                            <i class="fab fa-tiktok text-lg"></i>
                             <a href="#" class="hover:underline">TikTok</a>
                         </li>
-                        <li class="mb-4">
+                        <li class="flex items-center space-x-2">
+                            <i class="fab fa-instagram text-lg"></i>
                             <a href="#" class="hover:underline">Instagram</a>
                         </li>
-                        <li class="mb-4">
+                        <li class="flex items-center space-x-2">
+                            <i class="fab fa-facebook text-lg"></i>
                             <a href="#" class="hover:underline">Facebook</a>
                         </li>
-                    </ul>
+                    </ul>                    
                 </div>
                 <div>
                     <h2 class="mb-6 text-sm font-semibold uppercase"><strong>Legal</strong></h2>
                     <ul class="text-dark-200 font-medium">
                         <li class="mb-4">
-                            <a href="#" class="hover:underline">Política de Privacidad</a>
+                            <a href="{{ url_for('cliente_bp.avisodeprivacidad') }}" class="hover:underline">Política de Privacidad</a>
                         </li>
                         <li class="mb-4">
-                            <a href="#" class="hover:underline">Términos &amp; Condiciones</a>
+                            <a href="{{ url_for('cliente_bp.terminosycondiciones') }}" class="hover:underline">Términos &amp; Condiciones</a>
                         </li>
                     </ul>
                 </div>
                 <div>
-                    <h2 class="mb-6 text-sm font-semibold uppercase"><strong>Legal</strong></h2>
+                    <h2 class="mb-6 text-sm font-semibold uppercase"><strong>Ubicación</strong></h2>
                     <ul class="text-dark-200 font-medium">
                         <li class="mb-4">
                             <a href="https://maps.app.goo.gl/trkCNgv9YEPkRMcq6" target="_blank" class="hover:underline">
@@ -182,11 +186,10 @@
                 </div>
             </div>
             <div class="px-4 py-6 bg-[#D2B48C] text-center">
-                <span class="text-sm text-dark-200">© 2025 <a href="#" class="hover:underline">Cookiesland™</a>. Todos los derechos reservados.</span>
+                <span class="text-sm text-dark-200">© 2025 <a href="#" class="hover:underline">Maicookies™</a>. Todos los derechos reservados.</span>
             </div>
         </div>
     </footer>
-
 
     <!-- FontAwesome (Verifica que este enlace esté presente) -->
     <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>

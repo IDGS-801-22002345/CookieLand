@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Iniciar Sesión | Cookieland</title>
+    <title>Iniciar Sesión | Maicookies</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/output.css') }}">
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
@@ -27,37 +27,35 @@
         </div>
 
         <form action="{{ url_for('auth_bp.login') }}" method="POST" class="space-y-4 mt-6">
+            {{ form.hidden_tag() }}  <!-- 🔥 Protección CSRF -->
+        
             <div>
-                <input type="email" name="email" placeholder="Correo Electrónico" 
-                    class="block text-sm py-3 px-4 rounded-lg w-full border border-[#8B5A2B] 
-                    focus:outline-none focus:ring-2 focus:ring-[#A0522D]" required>
+                {{ form.email(class="block text-sm py-3 px-4 rounded-lg w-full border border-[#8B5A2B] focus:outline-none focus:ring-2 focus:ring-[#A0522D]") }}
             </div>
-
+        
             <div>
-                <input type="password" name="password" placeholder="Contraseña" 
-                    class="block text-sm py-3 px-4 rounded-lg w-full border border-[#8B5A2B] 
-                    focus:outline-none focus:ring-2 focus:ring-[#A0522D]" required>
+                {{ form.password(class="block text-sm py-3 px-4 rounded-lg w-full border border-[#8B5A2B] focus:outline-none focus:ring-2 focus:ring-[#A0522D]") }}
             </div>
-
+        
             <div class="flex justify-between items-center mt-4">
                 <label class="flex items-center text-sm text-gray-900 dark:text-gray-600">
-                    <input type="checkbox" name="remember" class="mr-2 w-4 h-4 border border-gray-300 rounded-sm focus:ring-[#A0522D]">
+                    {{ form.remember(class="mr-2 w-4 h-4 border border-gray-300 rounded-sm focus:ring-[#A0522D]") }}
                     Recordarme
                 </label>
-                <a href="{{ url_for('auth_bp.resetpassword') }}" class="text-sm text-[#A0522D] hover:text-[#8B5A2B]">
+                <a href="{{ url_for('auth_bp.reset_password') }}" class="text-sm text-[#A0522D] hover:text-[#8B5A2B]">
                     ¿Olvidaste tu contraseña?
-                </a>
+                </a>                
             </div>
-
+        
             <div class="text-center mt-6">
                 <button type="submit" class="btn-custom">
                     Iniciar Sesión
                 </button>
                 <p class="mt-4 text-sm text-gray-600">¿No tienes cuenta? 
-                    <a href="{{ url_for('auth_bp.register') }}" class="link-custom">Regístrate aquí</a>
+                    <a href="{{ url_for('auth_bp.register_user') }}" class="link-custom">Regístrate aquí</a>
                 </p>
             </div>   
-        </form>     
+        </form>                  
     </div>
 
     <style>
