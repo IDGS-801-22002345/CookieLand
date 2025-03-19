@@ -4,6 +4,8 @@ from flask_wtf.csrf import CSRFProtect
 # Importar rutas correctamente desde el módulo 'routes'
 from routes.cliente_routes import cliente_bp
 from routes.auth_routes import auth_bp
+from routes.galletas_routes import recetas_bp
+
 
 app = Flask(__name__)
 
@@ -13,6 +15,8 @@ csrf = CSRFProtect()
 # Rutas importadas
 app.register_blueprint(cliente_bp)
 app.register_blueprint(auth_bp)
+app.register_blueprint(recetas_bp)
+
 
 if __name__ == '__main__':
     csrf.init_app(app)

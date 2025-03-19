@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Recetas{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/output.css') }}">
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+</head>
+<body class="bg-[#FAF3E0] text-gray-900 flex flex-col min-h-screen">
+
+    <nav class="bg-gradient-to-b from-black/50 bg-[#D2B48C] fixed top-0 left-0 w-full z-50 py-6">
+        <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto px-6">
+            <a href="https://flowbite.com/" class="flex items-center space-x-3 rtl:space-x-reverse">
+                <span class="self-center text-2xl tracking-tight font-extrabold whitespace-nowrap text-gray-900 dark:text-white">🍪Maicookie</span>
+            </a>
+            <div class="flex items-center md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
+                <div class="flex items-center space-x-4">
+                    <!-- Icono de Usuario -->
+                    <button type="button" class="relative text-black text-2xl focus:outline-none
+                    id="user-menu-button" aria-expanded="false" data-dropdown-toggle="user-dropdown" data-dropdown-placement="bottom">
+                    <i class="fas fa-user text-lg"></i>
+                    </button>
+                    <!-- Icono de Carrito de Compras -->
+                    <button type="button" class="relative text-black text-2xl focus:outline-none">
+                        <i class="fas fa-shopping-cart"></i>
+                        <!-- Contador de artículos en el carrito -->
+                        <span class="absolute top-(-2) right-(-2) left-5 bg-red-500 text-white text-xs font-bold rounded-full px-2">3</span>
+                    </button>
+                </div>                
+            </div>
+            <div class="items-center justify-between hidden w-full md:flex md:w-auto md:order-1" id="navbar-user">
+                <ul class="flex flex-col tracking-tight text-lg p-4 md:p-0 mt-4 rounded-lg bg-transparent md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0">
+                    <li>
+                        <a href="{{ url_for('cliente_bp.index')}}" class="block py-3 px-4 text-dark hover:underline md:p-0">Inicio</a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('cliente_bp.nosotros')}}" class="block py-3 px-4 text-dark hover:underline md:p-0">Nosotros</a>
+                    </li>
+                    <li>
+                        <a href="" class="block py-3 px-4 text-dark hover:underline md:p-0">Pide en Línea</a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('cliente_bp.geleria')}}" class="block py-3 px-4 text-dark hover:underline md:p-0">Galería</a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('cliente_bp.contacto') }}" class="block py-3 px-4 text-dark hover:underline md:p-0">Contacto</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Contenedor principal -->
+    <div class="flex justify-between mt-24 px-6 gap-8">
+        <!-- Agregar una receta -->
+        <div class="w-2/3 bg-white p-6 rounded-lg shadow-md">
+            <h2 class="text-2xl font-semibold text-center mb-4">Agregar Receta</h2>
+            <form action="{{ url_for('recetas_bp.mostrar_recetas') }}" method="POST">
+                <div class="mb-4">
+                    <label for="nombre" class="block text-sm font-medium text-gray-700">Nombre de la Receta</label>
+                    <input type="text" id="nombre" name="nombre" required placeholder="Nombre de la receta"
+                        class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                </div>
+                <!-- Sección de insumos -->
+                 <div id="insumos-section" class="mb-4   ">
+                    <label class="block text-sm font-medium text-gray-700">Insumos</label>
+                        <div class="insumo-entry mb-2 flex flex-row gap-5">
+                            <select name="insumos" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                                <option value="">Selecciona un insumo</option>
+                                    <option value="1" >Cocos</option>
+                            </select>
+                            <input type="number" name="cant" placeholder="Cantidad" value="0" required
+                                class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                        </div>
+                        <div class="flex justify-center">
+                     <button type="submit"
+                     class="inline-flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                      Agregar Insumo
+                     </button></div>
+
+                </div>
+                <!-- <div id="insumos-section" class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700">Insumos</label>
+                    {% for insumo in insumos %}
+                        <div class="insumo-entry mb-2">
+                            <select name="insumos[{{ loop.index0 }}][id]" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                                <option value="">Selecciona un insumo</option>
+                                {% for material in materiales %}
+                                    <option value="{{ material.id }}" {% if material.id == insumo.id %}selected{% endif %}>{{ material.nombre }}</option>
+                                {% endfor %}
+                            </select>
+                            <input type="number" name="insumos[{{ loop.index0 }}][cantidad]" placeholder="Cantidad" value="{{ insumo.cantidad }}" required
+                                class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                        </div>
+                    {% endfor %}
+                </div> -->
+                    <div class="flex justify-center">
+                    <button type="submit"
+                        class="inline-flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        Crear Receta
+                    </button>
+                </div>
+            </form>
+        </div>
+
+    
+
+<div class="relative overflow-x-auto shadow-md sm:rounded-lg">
+    <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+        <thead class="text-xs text-gray-700 uppercase dark:text-gray-400">
+            <tr>
+                <th scope="col" class="px-6 py-3 bg-gray-50 dark:bg-gray-800">
+                    Nombre
+                </th>
+                <th scope="col" class="px-6 py-3">
+                    Acciones
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr class="border-b border-gray-200 dark:border-gray-700">
+                <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap bg-gray-50 dark:text-white dark:bg-gray-800">
+                    Apple MacBook Pro 17"
+                </th>
+                <td class="px-6 py-4">
+                    Silver
+                </td>
+            </tr>
+            <tr class="border-b border-gray-200 dark:border-gray-700">
+                <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap bg-gray-50 dark:text-white dark:bg-gray-800">
+                    Microsoft Surface Pro
+                </th>
+                <td class="px-6 py-4">
+                    White
+                </td>
+            </tr>
+            <tr class="border-b border-gray-200 dark:border-gray-700">
+                <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap bg-gray-50 dark:text-white dark:bg-gray-800">
+                    Magic Mouse 2
+                </th>
+                <td class="px-6 py-4">
+                    Black
+                </td>
+            </tr>
+            <tr class="border-b border-gray-200 dark:border-gray-700">
+                <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap bg-gray-50 dark:text-white dark:bg-gray-800">
+                    Google Pixel Phone
+                </th>
+                <td class="px-6 py-4">
+                    Gray
+                </td>
+                <td class="px-6 py-4 bg-gray-50 dark:bg-gray-800">
+                    Phone
+                </td>
+                <td class="px-6 py-4">
+                    $799
+                </td>
+            </tr>
+            <tr>
+                <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap bg-gray-50 dark:text-white dark:bg-gray-800">
+                    Apple Watch 5
+                </th>
+                <td class="px-6 py-4">
+                    Red
+                </td>
+                <td class="px-6 py-4 bg-gray-50 dark:bg-gray-800">
+                    Wearables
+                </td>
+                <td class="px-6 py-4">
+                    $999
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+    
+        </div>
+
+</body>
+</html>
