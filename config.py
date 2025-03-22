@@ -11,3 +11,4 @@ class DevelopmentConfig(Config):
     DEBUG = True
     SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:Deadmau6@localhost/bdidgs801'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+
