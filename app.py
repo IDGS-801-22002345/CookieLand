@@ -8,9 +8,10 @@ from routes.auth_routes import auth_bp
 from routes.personal_routes import personal_bp
 from routes.registro_compras_routes import registro_compras_bp
 from routes.inventario_routes import inventario_bp
-
+from models.db import db
 from routes.proveedor_routes import provedor_bp
-from models.proveedor_model import db
+# from models.proveedor_model import db
+# from models.materia_prima_model import db
 app = Flask(__name__)
 
 # Protección contra CSRF
@@ -33,4 +34,4 @@ app.register_blueprint(provedor_bp)
 
 if __name__ == '__main__':
     app = create_app()
-    app.run(port=5000, debug=True)  # Ahora puede llamar a app.run() correctamente
+    app.run(port=5000, debug=True)
