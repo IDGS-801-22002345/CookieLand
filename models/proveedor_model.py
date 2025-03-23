@@ -1,7 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy  # type: ignore
 import datetime
-
-db = SQLAlchemy()
+from .db import db
+# db = SQLAlchemy()
 
 class Proveedores(db.Model):  # Cambiamos de Alumnos a Proveedores
     __tablename__ = 'proveedores'  # Cambiamos el nombre de la tabla
