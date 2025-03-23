@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flowbite Flask</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/output.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+</head>
+
+<body>
+
+    <!-- Barra lateral fija -->
+    <div id="sidebar" class="bg-white h-screen mt-19 fixed rounded-none border-none z-20">
+        <!-- Contenedor del logo -->
+        <div class="flex justify-center items-center p-4 mt-[-75px]">
+            <img src="{{ url_for('static', filename='img/logo.png') }}" 
+                 alt="Logo de la empresa" 
+                 class="w-19 h-auto">
+        </div>
+   
+        <!-- Items -->
+        <div class="p-2 space-y-4  ">
+
+            <!-- Inicio -->
+            <button class="relative px-3 py-3 flex items-center space-x-4 justify-start text-gray-500 rounded-lg group">
+                <i class="fas fa-home text-lg"></i>
+                <span class="font-medium">Inicio</span>
+            </button>
+
+            <!-- Dashboard -->
+            <button class="relative px-3 py-3 flex items-center space-x-4 justify-start text-gray-500 rounded-lg group">
+                <i class="fas fa-tachometer-alt"></i>
+                <span class="font-medium">Dashboard</span>
+            </button>
+
+            <!-- Usuarios -->
+            <button class="relative px-3 py-3 flex items-center space-x-4 justify-start text-gray-500 rounded-lg group">
+                <i class="fas fa-users"></i>
+                <span class="font-medium">Usuarios</span>
+            </button>
+
+            <!-- Proveedores -->
+            <button class="relative px-3 py-3 flex items-center space-x-4 justify-start text-gray-500 rounded-lg group">
+                <i class="fas fa-truck"></i>
+                <span class="font-medium">Proveedores</span>
+            </button>
+
+            <!-- Ventas -->
+            <button class="relative px-3 py-3 flex items-center space-x-4 justify-start text-gray-500 rounded-lg group">
+                <i class="fas fa-shopping-cart"></i>
+                <span class="font-medium">Ventas</span>
+            </button>
+
+            <!-- Compras -->
+            <button class="relative px-3 py-3 flex items-center space-x-4 justify-start text-gray-500 rounded-lg group">
+                <i class="fas fa-shopping-bag"></i>
+                <span class="font-medium">Compras</span>
+            </button>
+
+            <!-- Recetas -->
+            <button class="relative px-3 py-3 flex items-center space-x-4 justify-start text-gray-500 rounded-lg group">
+                <i class="fas fa-utensils"></i>
+                <span class="font-medium">Recetas</span>
+            </button>
+
+            <!-- Inventario Insumos -->
+            <button class="relative px-3 py-3 flex items-center space-x-4 justify-start text-gray-500 rounded-lg group">
+                <i class="fas fa-boxes"></i>
+                <span class="font-medium">Inventario Insumos</span>
+            </button>
+
+            <!-- Inventario Producción -->
+            <button class="relative px-3 py-3 flex items-center space-x-4 justify-start text-gray-500 rounded-lg group">
+                <i class="fas fa-industry"></i>
+                <span class="font-medium">Inventario Producción</span>
+            </button>
+
+            <!-- Cerrar sesión -->
+            <button class="relative px-3 py-3 flex items-center space-x-4 justify-start text-gray-500 rounded-lg group">
+                <i class="fas fa-sign-out-alt"></i>
+                <span class="font-medium">Cerrar sesión</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Contenido principal -->
+    <div class="flex items-center justify-center min-h-screen">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="absolute top-5 right-5 z-50 space-y-4">
+                    {% for category, message in messages %}
+                        <!-- Usando clases de Flowbite para notificaciones -->
+                        <div class="flex items-center p-4 mb-4 text-sm font-medium text-white rounded-lg 
+                            {% if category == 'success' %} 
+                                bg-green-500 
+                            {% elif category == 'error' %}
+                                bg-red-500
+                            {% elif category == 'info' %}
+                                bg-blue-500
+                            {% elif category == 'warning' %}
+                                bg-yellow-500
+                            {% endif %}
+                            animate__animated animate__slideInRight animate__fadeOut animate__duration-1000ms notification">
+                            <!-- Icono dependiendo del tipo de mensaje -->
+                            {% if category == 'success' %}
+                                <svg class="w-5 h-5 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" 
+                                     viewBox="0 0 24 24" stroke-width="2">
+                                    <path d="M9 12l2 2l4-4"></path>
+                                </svg>
+                            {% elif category == 'error' %}
+                                <svg class="w-5 h-5 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" 
+                                     viewBox="0 0 24 24" stroke-width="2">
+                                    <path d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
+                            {% elif category == 'info' %}
+                                <svg class="w-5 h-5 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" 
+                                     viewBox="0 0 24 24" stroke-width="2">
+                                    <path d="M12 4v16m8-8H4"></path>
+                                </svg>
+                            {% elif category == 'warning' %}
+                                <svg class="w-5 h-5 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" 
+                                     viewBox="0 0 24 24" stroke-width="2">
+                                    <path d="M12 2L2 22h20L12 2z"></path>
+                                </svg>
+                            {% endif %}
+                            <!-- Mensaje -->
+                            <p>{{ message }}</p>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}
+        {% endblock %}
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
+    <script>
+        // Eliminar las notificaciones después de 5 segundos (5000ms)
+        setTimeout(function() {
+            const notifications = document.querySelectorAll('.notification');
+            notifications.forEach(notification => {
+                notification.remove();
+            });
+        }, 5000);
+    </script>
+
+</body>
+
+</html>

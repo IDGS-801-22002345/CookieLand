@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registro | Cookieland</title>
+    <title>Registro | Maicookies</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/output.css') }}">
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
@@ -25,43 +25,70 @@
             <i class="fas fa-user-plus text-6xl text-[#5A3E1B]"></i>
             <h1 class="text-3xl font-bold text-[#5A3E1B] mt-4">Registro</h1>
         </div>
-
-        <form class="space-y-4 mt-6">
+        <form method="POST" class="space-y-4 mt-6">
+            {{ form.hidden_tag() }}
+        
             <div class="grid grid-cols-2 gap-4">
-                <input type="text" placeholder="Nombre" class="block text-sm py-3 px-4 rounded-lg w-full border border-[#8B5A2B] focus:outline-none focus:ring-2 focus:ring-[#A0522D]" required />
-                <input type="text" placeholder="Apellido" class="block text-sm py-3 px-4 rounded-lg w-full border border-[#8B5A2B] focus:outline-none focus:ring-2 focus:ring-[#A0522D]" required />
+                <div>
+                    {{ form.nombre(class="block text-sm py-3 px-4 rounded-lg w-full border border-[#8B5A2B] focus:outline-none focus:ring-2 focus:ring-[#A0522D]", placeholder="Nombre") }}
+                    {% for error in form.nombre.errors %}
+                        <p class="text-red-500 text-xs">{{ error }}</p>
+                    {% endfor %}
+                </div>
+                <div>
+                    {{ form.telefono(class="block text-sm py-3 px-4 rounded-lg w-full border border-[#8B5A2B] focus:outline-none focus:ring-2 focus:ring-[#A0522D]", placeholder="Teléfono") }}
+                    {% for error in form.telefono.errors %}
+                        <p class="text-red-500 text-xs">{{ error }}</p>
+                    {% endfor %}
+                </div>
             </div>
-
-            <input type="tel" placeholder="Número de Teléfono" class="block text-sm py-3 px-4 rounded-lg w-full border border-[#8B5A2B] focus:outline-none focus:ring-2 focus:ring-[#A0522D]" required />
-
-            <input type="email" placeholder="Correo Electrónico" class="block text-sm py-3 px-4 rounded-lg w-full border border-[#8B5A2B] focus:outline-none focus:ring-2 focus:ring-[#A0522D]" required />
-
-            <input type="password" placeholder="Contraseña" class="block text-sm py-3 px-4 rounded-lg w-full border border-[#8B5A2B] focus:outline-none focus:ring-2 focus:ring-[#A0522D]" required />
-
+        
+            <div>
+                {{ form.correo(class="block text-sm py-3 px-4 rounded-lg w-full border border-[#8B5A2B] focus:outline-none focus:ring-2 focus:ring-[#A0522D]", placeholder="Correo Electrónico") }}
+                {% for error in form.correo.errors %}
+                    <p class="text-red-500 text-xs">{{ error }}</p>
+                {% endfor %}
+            </div>
+        
+            <div>
+                {{ form.username(class="block text-sm py-3 px-4 rounded-lg w-full border border-[#8B5A2B] focus:outline-none focus:ring-2 focus:ring-[#A0522D]", placeholder="Nombre de Usuario") }}
+                {% for error in form.username.errors %}
+                    <p class="text-red-500 text-xs">{{ error }}</p>
+                {% endfor %}
+            </div>
+        
+            <div>
+                {{ form.password(class="block text-sm py-3 px-4 rounded-lg w-full border border-[#8B5A2B] focus:outline-none focus:ring-2 focus:ring-[#A0522D]", placeholder="Contraseña") }}
+                {% for error in form.password.errors %}
+                    <p class="text-red-500 text-xs">{{ error }}</p>
+                {% endfor %}
+            </div>
+        
             <div class="flex items-center">
                 <input type="checkbox" id="terms" class="w-4 h-4 border border-gray-300 rounded-sm focus:ring-[#A0522D]" required>
                 <label for="terms" class="ml-2 text-sm text-gray-700">
-                    Acepto los <a href="{{ url_for('cliente_bp.terminosycondiciones') }}" class="text-[#A0522D] hover:text-[#8B5A2B]">términos y condiciones</a>.
+                    Acepto los 
+                    <a href="{{ url_for('cliente_bp.terminosycondiciones') }}" class="text-[#A0522D] hover:text-[#8B5A2B]">términos y condiciones</a>.
                 </label>
             </div>
-
+        
             <div class="text-center mt-6">
-                <button type="submit" class="btn-register">
-                    Registrarse
+                <button type="submit" class="btn-custom">
+                    Registrarme
                 </button>
                 <p class="mt-4 text-sm text-gray-600">¿Ya tienes cuenta? 
-                    <a href="{{ url_for('auth_bp.login') }}" class="link-custom">Inicia sesión aquí</a>
+                    <a href="{{ url_for('auth_bp.login') }}" class="text-[#A0522D] hover:text-[#8B5A2B]">Inicia sesión aquí</a>
                 </p>
-            </div>            
-        </form>        
+            </div>
+        </form>             
     </div>
 
     <style>
-        /* Estilos personalizados para el botón de registro */
-        .btn-register {
+        /* Estilos personalizados para el botón */
+        .btn-custom {
             background-color: #8B5A2B; /* Café cálido */
-            color: white;
-            font-size: 1.25rem;
+            color: white; /* Texto en blanco */
+            font-size: 1.25rem; /* Tamaño de texto grande */
             font-weight: bold;
             padding: 10px 20px;
             border-radius: 8px;
@@ -69,23 +96,23 @@
             text-align: center;
             transition: background-color 0.3s ease-in-out, transform 0.2s ease-in-out;
         }
-
-        .btn-register:hover {
-            background-color: #976433; /* Café más oscuro al pasar el cursor */
+        
+        .btn-custom:hover {
+            background-color: #966232; /* Café oscuro al pasar el cursor */
             transform: scale(1.03); /* Efecto de ligera expansión */
         }
-
-        .btn-register:active {
+        
+        .btn-custom:active {
             transform: scale(0.98); /* Efecto de presión */
         }
-
+        
         /* Estilos para el enlace */
         .link-custom {
             color: #A0522D;
             text-decoration: underline;
             transition: color 0.3s ease-in-out;
         }
-
+        
         .link-custom:hover {
             color: #8B5A2B;
         }

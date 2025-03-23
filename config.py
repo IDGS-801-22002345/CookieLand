@@ -4,8 +4,8 @@ from sqlalchemy import create_engine
 import urllib
 
 class Config(object):
-    SECRET_KEY='Clave nueva'
-    SESSION_COOCKE_SECRET=False
+    SECRET_KEY = 'Clave Nueva'
+    SESSION_COOKIE_SECURE = False
 
 class DevelopmentConfig(Config):
     DEBUG= True
