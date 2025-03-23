@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
 from forms.materia_prima_form import MateriaPrimaForm
-from models.materia_prima_model import MateriaPrima, InventarioMateria, db
+from models.models import MateriaPrima, InventarioMateria, db
 
 inventario_bp = Blueprint('inventario_bp', __name__, url_prefix='/')
 
