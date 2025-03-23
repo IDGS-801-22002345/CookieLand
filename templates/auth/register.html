@@ -1,33 +1,48 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registro | Maicookies</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/output.css') }}">
-    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
-    
-    <!-- FontAwesome para iconos -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/js/all.min.js"></script>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Registro | Maicookies</title>
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/output.css') }}">
+	<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
+    <script src="https://www.google.com/recaptcha/api.js"></script>
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/js/all.min.js"></script>
 </head>
 <body class="bg-[#D2B48C] flex items-center justify-center min-h-screen">
 
-    <!-- Contenedor del formulario -->
-    <div class="bg-white py-12 px-12 rounded-2xl shadow-xl w-96 max-w-md mx-auto relative">
-        
-        <!-- Botón para regresar al inicio -->
-        <a href="{{ url_for('cliente_bp.index') }}" class="absolute top-4 left-4 text-[#8B5A2B] hover:text-[#A0522D] transition-all">
-            <i class="fas fa-home text-2xl"></i>
-        </a>
+	<!-- Contenedor del formulario -->
+	<div class="bg-white py-12 px-12 rounded-2xl shadow-xl w-96 max-w-md mx-auto relative">
 
-        <div class="text-center">
-            <i class="fas fa-user-plus text-6xl text-[#5A3E1B]"></i>
-            <h1 class="text-3xl font-bold text-[#5A3E1B] mt-4">Registro</h1>
-        </div>
-        <form method="POST" class="space-y-4 mt-6">
+		<!-- Botón para regresar al inicio -->
+		<a href="{{ url_for('cliente_bp.index') }}" class="absolute top-4 left-4 text-[#8B5A2B] hover:text-[#A0522D] transition-all">
+			<i class="fas fa-home text-2xl"></i>
+		</a>
+
+		{% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="space-y-4 mb-6">
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }} p-4 rounded-lg shadow-md">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+		<div class="text-center">
+			<i class="fas fa-user-plus text-6xl text-[#5A3E1B]"></i>
+			<h1 class="text-3xl font-bold text-[#5A3E1B] mt-4">Registro</h1>
+		</div>
+
+        <form method="POST" class="space-y-6 mt-6">
             {{ form.hidden_tag() }}
-        
+            
+            <!-- Campos Nombre y Teléfono -->
             <div class="grid grid-cols-2 gap-4">
                 <div>
                     {{ form.nombre(class="block text-sm py-3 px-4 rounded-lg w-full border border-[#8B5A2B] focus:outline-none focus:ring-2 focus:ring-[#A0522D]", placeholder="Nombre") }}
@@ -43,6 +58,7 @@
                 </div>
             </div>
         
+            <!-- Campo Correo -->
             <div>
                 {{ form.correo(class="block text-sm py-3 px-4 rounded-lg w-full border border-[#8B5A2B] focus:outline-none focus:ring-2 focus:ring-[#A0522D]", placeholder="Correo Electrónico") }}
                 {% for error in form.correo.errors %}
@@ -50,6 +66,7 @@
                 {% endfor %}
             </div>
         
+            <!-- Campo Usuario -->
             <div>
                 {{ form.username(class="block text-sm py-3 px-4 rounded-lg w-full border border-[#8B5A2B] focus:outline-none focus:ring-2 focus:ring-[#A0522D]", placeholder="Nombre de Usuario") }}
                 {% for error in form.username.errors %}
@@ -57,6 +74,7 @@
                 {% endfor %}
             </div>
         
+            <!-- Campo Contraseña -->
             <div>
                 {{ form.password(class="block text-sm py-3 px-4 rounded-lg w-full border border-[#8B5A2B] focus:outline-none focus:ring-2 focus:ring-[#A0522D]", placeholder="Contraseña") }}
                 {% for error in form.password.errors %}
@@ -64,6 +82,7 @@
                 {% endfor %}
             </div>
         
+            <!-- Checkbox de términos y condiciones -->
             <div class="flex items-center">
                 <input type="checkbox" id="terms" class="w-4 h-4 border border-gray-300 rounded-sm focus:ring-[#A0522D]" required>
                 <label for="terms" class="ml-2 text-sm text-gray-700">
@@ -71,63 +90,97 @@
                     <a href="{{ url_for('cliente_bp.terminosycondiciones') }}" class="text-[#A0522D] hover:text-[#8B5A2B]">términos y condiciones</a>.
                 </label>
             </div>
-        
+
+
+            <!-- Botón de envío y enlace de inicio de sesión -->
             <div class="text-center mt-6">
                 <button type="submit" class="btn-custom">
                     Registrarme
                 </button>
-                <p class="mt-4 text-sm text-gray-600">¿Ya tienes cuenta? 
-                    <a href="{{ url_for('auth_bp.login') }}" class="text-[#A0522D] hover:text-[#8B5A2B]">Inicia sesión aquí</a>
+                <p class="mt-4 text-sm text-gray-600">¿No tienes cuenta? 
+                    <a href="{{ url_for('auth_bp.login') }}" class="link-custom">Inicia Sesión</a>
                 </p>
             </div>
-        </form>             
-    </div>
+        </form>
 
-    <style>
-        /* Estilos personalizados para el botón */
-        .btn-custom {
-            background-color: #8B5A2B; /* Café cálido */
-            color: white; /* Texto en blanco */
-            font-size: 1.25rem; /* Tamaño de texto grande */
-            font-weight: bold;
-            padding: 10px 20px;
-            border-radius: 8px;
-            width: 100%;
-            text-align: center;
-            transition: background-color 0.3s ease-in-out, transform 0.2s ease-in-out;
-        }
         
-        .btn-custom:hover {
-            background-color: #966232; /* Café oscuro al pasar el cursor */
-            transform: scale(1.03); /* Efecto de ligera expansión */
-        }
+        <style>
+            /* Estilos personalizados para el botón */
+            .btn-custom {
+                background-color: #8B5A2B; /* Café cálido */
+                color: white; /* Texto en blanco */
+                font-size: 1.25rem; /* Tamaño de texto grande */
+                font-weight: bold;
+                padding: 10px 20px;
+                border-radius: 8px;
+                width: 100%;
+                text-align: center;
+                transition: background-color 0.3s ease-in-out, transform 0.2s ease-in-out;
+            }
         
-        .btn-custom:active {
-            transform: scale(0.98); /* Efecto de presión */
-        }
+            .btn-custom:hover {
+                background-color: #966232; /* Café oscuro al pasar el cursor */
+                transform: scale(1.03); /* Efecto de ligera expansión */
+            }
         
-        /* Estilos para el enlace */
-        .link-custom {
-            color: #A0522D;
-            text-decoration: underline;
-            transition: color 0.3s ease-in-out;
-        }
+            .btn-custom:active {
+                transform: scale(0.98); /* Efecto de presión */
+            }
         
-        .link-custom:hover {
-            color: #8B5A2B;
-        }
+            /* Estilos para el enlace */
+            .link-custom {
+                color: #A0522D;
+                text-decoration: underline;
+                transition: color 0.3s ease-in-out;
+            }
+        
+            .link-custom:hover {
+                color: #8B5A2B;
+            }
+        
+            /* Estilos para el checkbox */
+            .checkbox-custom {
+                border-radius: 4px;
+            }
+        
+            /* Estilo general para las alertas */
+            .alert {
+                background-color: #FEE2E2;
+                border-left: 4px solid #EF4444;
+            }
+        
+            .alert-success {
+                background-color: #D1FAE5;
+                border-left: 4px solid #10B981;
+            }
+        
+            /* Estilos de los campos del formulario */
+            input, select, textarea {
+                transition: all 0.3s ease;
+            }
+        
+            /* Focus en los campos */
+            input:focus, select:focus, textarea:focus {
+                border-color: #8B5A2B;
+                outline: none;
+                box-shadow: 0 0 0 2px rgba(139, 90, 43, 0.2);
+            }
+        
+            /* Estilos para los mensajes de error */
+            .text-red-500 {
+                color: #F87171;
+            }
+        
+            /* Espaciado entre los campos */
+            .space-y-6 > div {
+                margin-bottom: 1.5rem;
+            }
+        </style>        
 
-        /* Estilos para el botón de regreso al inicio */
-        .fa-home {
-            transition: transform 0.3s ease-in-out;
-        }
 
-        .fa-home:hover {
-            transform: scale(1.2);
-        }
-    </style>
+	<!-- Scripts -->
+	<script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
 
-    <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
 </body>
 </html>

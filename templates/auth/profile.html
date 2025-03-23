@@ -1,0 +1,44 @@
+{% extends "cliente/layout.html" %} {% block title %}Mi Perfil - Maicookies{% endblock %} {% block content %}
+
+<section class="min-h-screen py-16">
+	<div class="max-w-3xl mx-auto bg-white rounded-xl shadow-md p-8">
+		<div class="flex items-center justify-between mb-6">
+			<div>
+				<a href="{{ url_for('cliente_bp.index') }}" class="text-dark">
+					<i class="fas fa-home text-2xl"></i>
+				</a>
+			</div>
+			<h1 class="text-4xl font-extrabold text-center text-[#5A3E1B] flex-1">Mi perfil</h1>
+		</div>
+		
+        <!-- Datos del cliente -->
+		<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 mt-10">
+			<div>
+				<label class="block text-sm font-medium text-gray-600 mb-1">Nombre</label>
+				<p class="bg-gray-100 p-3 rounded text-[#333]">Juan Pérez</p>
+			</div>
+			<div>
+				<label class="block text-sm font-medium text-gray-600 mb-1">Teléfono</label>
+				<p class="bg-gray-100 p-3 rounded text-[#333]">+52 477 123 4567</p>
+			</div>
+			<div>
+				<label class="block text-sm font-medium text-gray-600 mb-1">Correo Electrónico</label>
+				<p class="bg-gray-100 p-3 rounded text-[#333]">juanperez@gmail.com</p>
+			</div>
+			<div>
+				<label class="block text-sm font-medium text-gray-600 mb-1">Nombre de Usuario</label>
+				<p class="bg-gray-100 p-3 rounded text-[#333]">juanito_pz</p>
+			</div>
+		</div>
+
+		<hr class="my-6">
+		<!-- Acciones -->
+		<div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+            <button class="bg-[#5A3E1B] text-white px-6 py-2 rounded-lg font-semibold hover:bg-[#4E3417] transition">
+            Editar Perfil
+            </button>
+		</div>
+	</div>
+</section>
+
+{% endblock %}
