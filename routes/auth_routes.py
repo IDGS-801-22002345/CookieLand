@@ -1,12 +1,11 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session, make_response
-import requests
 from werkzeug.security import generate_password_hash, check_password_hash
 from forms.auth_forms import LoginForm, RegisterFormLandingPage
 from models.models import db, Usuario, Role
 from sqlalchemy.exc import IntegrityError
 from functools import wraps
 
-auth_bp = Blueprint('auth_bp', _name_, url_prefix='/auth')
+auth_bp = Blueprint('auth_bp', __name__, url_prefix='/auth')
 
 # Decorador para requerir login como Cliente
 def login_required_cliente(f):
