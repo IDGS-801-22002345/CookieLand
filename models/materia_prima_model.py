@@ -1,7 +1,8 @@
+# models/materia_prima_model.py
 from flask_sqlalchemy import SQLAlchemy
 import datetime
 from .db import db
-
+from .receta_model import detalle_recetas  # Importa la tabla de asociación
 
 class MateriaPrima(db.Model):  
     __tablename__ = 'materia_prima' 
@@ -12,8 +13,15 @@ class MateriaPrima(db.Model):
     create_date = db.Column(db.DateTime, default=datetime.datetime.now, server_default=db.func.now())
     update_date = db.Column(db.DateTime, default=datetime.datetime.now, server_default=db.func.now())
     
+    # Relación con InventarioMateria
     inventario = db.relationship('InventarioMateria', back_populates='materia_prima', uselist=False)
 
+    # Relación many-to-many con Receta
+    recetas = db.relationship(
+        'Receta',  # Nombre del modelo de Receta
+        secondary=detalle_recetas,  # Tabla de asociación
+        back_populates='insumos'  # Nombre de la relación en el modelo de Receta
+    )
 
 class InventarioMateria(db.Model):  
     __tablename__ = 'inventario_materia' 
