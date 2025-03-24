@@ -8,7 +8,7 @@ from routes.auth_routes import auth_bp
 from routes.personal_routes import personal_bp
 from routes.registro_compras_routes import registro_compras_bp
 from routes.inventario_routes import inventario_bp
-from models.db import db
+from models.models import db
 from routes.proveedor_routes import provedor_bp
 from routes.galletas_routes import recetas_bp
 # from models.proveedor_model import db

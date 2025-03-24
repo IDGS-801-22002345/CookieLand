@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
 from forms.proveedores_form import ProveedorForm
-from models.proveedor_model import Proveedores, db
+from models.models import Proveedores, db
  
 provedor_bp = Blueprint('provedor_bp', __name__, url_prefix='/proveedores')
  
