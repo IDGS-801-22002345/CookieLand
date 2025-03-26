@@ -1,61 +1,73 @@
+{% import "cliente/_macros.html" as macros %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Iniciar Sesión | Maicookies</title>
+    <title>Iniciar Sesión - Maicookies</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/output.css') }}">
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
-    
-    <!-- FontAwesome para iconos -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/js/all.min.js"></script>
 </head>
 <body class="bg-[#D2B48C] flex items-center justify-center min-h-screen">
     
-    <!-- Contenedor del formulario -->
+    {{ macros.mostrar_flash() }}  
     <div class="bg-white py-12 px-12 rounded-2xl shadow-xl w-96 max-w-md mx-auto relative">
-
-        <!-- Botón para regresar al inicio -->
         <a href="{{ url_for('cliente_bp.index') }}" class="absolute top-4 left-4 text-[#8B5A2B] hover:text-[#A0522D] transition-all">
             <i class="fas fa-home text-2xl"></i>
         </a>
-
+                
         <div class="text-center">
             <i class="fas fa-user-circle text-6xl text-[#5A3E1B]"></i>
             <h1 class="text-3xl font-bold text-[#5A3E1B] mt-4">Iniciar Sesión</h1>
         </div>
 
-        <form action="{{ url_for('auth_bp.login') }}" method="POST" class="space-y-4 mt-6">
-            {{ form.hidden_tag() }}  <!-- 🔥 Protección CSRF -->
-        
+        <form method="POST" class="space-y-6 mt-6">
+            {{ form.hidden_tag() }}            
             <div>
-                {{ form.email(class="block text-sm py-3 px-4 rounded-lg w-full border border-[#8B5A2B] focus:outline-none focus:ring-2 focus:ring-[#A0522D]") }}
+                {{ form.email(class="block text-sm py-3 px-4 rounded-lg w-full border border-[#8B5A2B] focus:outline-none focus:ring-2 focus:ring-[#A0522D]", placeholder="Correo Electrónico") }}
+                {% for error in form.email.errors %}
+                    <p class="text-red-500 text-xs">{{ error }}</p>
+                {% endfor %}
             </div>
-        
             <div>
-                {{ form.password(class="block text-sm py-3 px-4 rounded-lg w-full border border-[#8B5A2B] focus:outline-none focus:ring-2 focus:ring-[#A0522D]") }}
-            </div>
-        
-            <div class="flex justify-between items-center mt-4">
-                <label class="flex items-center text-sm text-gray-900 dark:text-gray-600">
-                    {{ form.remember(class="mr-2 w-4 h-4 border border-gray-300 rounded-sm focus:ring-[#A0522D]") }}
-                    Recordarme
-                </label>
-                <a href="{{ url_for('auth_bp.reset_password') }}" class="text-sm text-[#A0522D] hover:text-[#8B5A2B]">
+                {{ form.password(class="block text-sm py-3 px-4 rounded-lg w-full border border-[#8B5A2B] focus:outline-none focus:ring-2 focus:ring-[#A0522D]", placeholder="Contraseña") }}
+                {% for error in form.password.errors %}
+                    <p class="text-red-500 text-xs">{{ error }}</p>
+                {% endfor %}
+            </div>        
+            <div class="flex justify-between items-center mt-4 px-16">    
+                <a href="{{ url_for('auth_bp.resetpassword') }}" class="text-sm text-[#A0522D] hover:text-[#8B5A2B]">
                     ¿Olvidaste tu contraseña?
                 </a>                
             </div>
+
+            <!-- Agrega este código en el formulario antes del botón de envío
+            <div class="g-recaptcha" data-sitekey="6LepM_sqAAAAAPdE89CYgtsoPAT0DMLXNOyRnvd6"></div> -->
         
             <div class="text-center mt-6">
                 <button type="submit" class="btn-custom">
                     Iniciar Sesión
                 </button>
                 <p class="mt-4 text-sm text-gray-600">¿No tienes cuenta? 
-                    <a href="{{ url_for('auth_bp.register_user') }}" class="link-custom">Regístrate aquí</a>
+                    <a href="{{ url_for('auth_bp.register_landing') }}" class="link-custom">Regístrate aquí</a>
                 </p>
             </div>   
-        </form>                  
+        </form>
+        <script>
+            // Elimina automáticamente el contenedor a los 4 segundos
+            setTimeout(() => {
+              const flash = document.getElementById("flash-container");
+              if (flash) {
+                flash.style.opacity = "0";
+                flash.style.transition = "opacity 0.5s ease-out";
+                setTimeout(() => flash.remove(), 500);
+              }
+            }, 4000);
+          </script> 
+        
+    <!-- <script src="https://www.google.com/recaptcha/api.js" async defer></script> -->
     </div>
 
     <style>

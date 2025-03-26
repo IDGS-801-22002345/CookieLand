@@ -1,0 +1,443 @@
+{% extends "layout.html" %} {% block content %} {% import "cliente/_macros.html" as macros %}
+
+<div class="flex flex-col self-start mt-10 w-[1200px]">
+	<h1 class="text-3xl font-bold text-center mb-4">Administración de usuarios</h1>
+	<div class="ml-28 w-full p-4 text-center bg-white border border-gray-300 rounded-lg shadow-sm sm:p-8 dark:bg-gray-800 dark:border-gray-700">
+
+		{{ macros.mostrar_flash() }}
+
+		<div class="flex justify-end">
+			<button id="open-modal-btn" class="flex items-center gap-2 text-white bg-green-500 hover:bg-green-500 focus:outline-none focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-1 transition-colors duration-200 ease-in-out">
+                <i class="fas fa-user-plus"></i> Agregar
+            </button>
+		</div>
+
+		<div class="flex items-center border border-gray-300 rounded-md w-96 p-2">
+			<i class="fas fa-search text-gray-500 px-2"></i>
+			<input type="search" id="search-input" class="w-full outline-none" placeholder="Buscar usuario">
+		</div>
+
+		<div class="overflow-x-auto overflow-y-auto max-h-[500px] mt-4">
+			<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+			<table id="proveedores-table" class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+				<thead class="text-xs text-white uppercase sticky top-0 dark:bg-gray-700 dark:text-gray-400" style="background-color: #7c5454 !important; z-index: 10;">
+					<tr>
+						<th scope="col" class="px-6 py-3">Nombre</th>
+						<th scope="col" class="px-6 py-3">Teléfono</th>
+						<th scope="col" class="px-6 py-3">Correo</th>
+						<th scope="col" class="px-6 py-3">Username</th>
+						<th scope="col" class="px-6 py-3">Estatus</th>
+						<th scope="col" class="px-6 py-3">Rol</th>
+						<th scope="col" class="px-6 py-3 text-center align-middle">Acciones</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for usuario in usuarios %}
+					<tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200 relative">
+						<td class="px-6 py-4">{{ usuario.nombre }}</td>
+						<td class="px-6 py-4">{{ usuario.telefono }}</td>
+						<td class="px-6 py-4">{{ usuario.correo }}</td>
+						<td class="px-6 py-4">{{ usuario.username }}</td>
+						<td class="px-6 py-4">{{ usuario.estatus }}</td>
+						<td class="px-6 py-4">{{ usuario.rol.role_name }}</td>
+						<td class="px-6 py-4 text-center flex justify-center items-center space-x-4">
+							<form method="POST" action="{{ url_for('personal_bp.cargar_usuario') }}">
+								{{ form.csrf_token }}
+								<input type="hidden" name="id" value="{{ usuario.id }}">
+								<button type="submit" class="text-yellow-500 hover:text-yellow-600 text-lg">
+                                  <i class="fas fa-edit"></i>
+                                </button>
+							</form>
+							<button class="btn-eliminar text-red-500 hover:text-red-700 text-lg" data-id="{{ usuario.id }}">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+						</td>
+					</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+	</div>
+
+	<!-- Modal para agregar usuarios -->
+	<div id="crud-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center w-full h-full" aria-hidden="true" role="dialog">
+		<div class="relative p-4 w-full max-w-2xl max-h-screen">
+			<div class="relative bg-white rounded-lg shadow-lg">
+				<div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t border-gray-300 mb-4">
+					<h3 class="text-xl font-semibold text-gray-800 text-center w-full">
+                        Agregar usuario
+                    </h3>
+					<button type="button" class="text-gray-600 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center" id="close-modal-btn">
+                        <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+                        </svg>
+                        <span class="sr-only">Cerrar</span>
+                    </button>
+				</div>
+				<form method="POST" novalidate class="p-4 md:p-6">
+					{{ form.csrf_token }}
+					<div class="grid grid-cols-2 gap-6 mb-4">
+
+						<div>
+							<label for="nombre" class="block text-sm font-medium text-gray-700 text-left">Nombre</label> {{ form.nombre(class="mt-1 p-2 w-full border border-gray-300 rounded-md", placeholder="Ingrese el nombre") }} {% for error in form.nombre.errors %}
+							<p class="text-red-500 text-xs">{{ error }}</p>
+							{% endfor %}
+						</div>
+						<div>
+							<label for="username" class="text-sm font-medium text-gray-700 text-left">Nombre de Usuario</label> {{ form.username(class="mt-1 p-2 w-full border border-gray-300 rounded-md", placeholder="Usuario") }} {% for error in form.username.errors %}
+							<p class="text-red-500 text-xs">{{ error }}</p>
+							{% endfor %}
+						</div>
+
+						<div>
+							<label for="correo" class="text-sm font-medium text-gray-700 text-left">Correo Electrónico</label> {{ form.correo(class="mt-1 p-2 w-full border border-gray-300 rounded-md", placeholder="ejemplo@correo.com", type="email") }} {% for error in form.correo.errors %}
+							<p class="text-red-500 text-xs">{{ error }}</p>
+							{% endfor %}
+						</div>
+						<div>
+							<label for="telefono" class="text-sm font-medium text-gray-700 text-left">Teléfono</label> {{ form.telefono(class="mt-1 p-2 w-full border border-gray-300 rounded-md", placeholder="Ingrese número", type="number") }} {% for error in form.telefono.errors %}
+							<p class="text-red-500 text-xs">{{ error }}</p>
+							{% endfor %}
+						</div>
+
+						<div>
+							<label for="rol" class="text-sm font-medium text-gray-700 text-left">Rol</label> {{ form.rol(class="mt-1 p-2 w-full border border-gray-300 rounded-md") }} {% for error in form.rol.errors %}
+							<p class="text-red-500 text-xs">{{ error }}</p>
+							{% endfor %}
+						</div>
+						<div>
+							<label for="contrasenia" class="text-sm font-medium text-gray-700 text-left">Contraseña</label> {{ form.contrasenia(class="mt-1 p-2 w-full border border-gray-300 rounded-md", placeholder="Ingrese la contraseña", type="password") }} {% for error in form.contrasenia.errors %}
+							<p class="text-red-500 text-xs">{{ error }}</p>
+							{% endfor %}
+						</div>
+					</div>
+
+					{{ form.estatus(value=1, class="hidden") }} {% for error in form.estatus.errors %}
+					<p class="text-red-500 text-xs">{{ error }}</p>
+					{% endfor %}
+
+					<!-- Botones -->
+					<div class="flex justify-center mt-6 gap-4">
+						<button type="submit" style="background-color: #24985a !important;" class="text-white bg-green-500 hover:bg-green-600 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center">
+                            Guardar
+                        </button>
+						<button type="button" id="cancel-btn" style="background-color:#c90704 !important;" class="text-white bg-red-500 hover:bg-red-600 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm w-1/2 sm:w-auto px-5 py-2.5 text-center ml-2">
+                            Cancelar
+                        </button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+
+
+	<!-- Modal para editar usuarios -->
+	<div id="editar-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center w-full h-full" aria-hidden="true" role="dialog">
+		<div class="relative p-4 w-full max-w-2xl max-h-screen">
+			<div class="relative bg-white rounded-lg shadow-lg">
+				<div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t border-gray-300 mb-4">
+					<h3 class="text-xl font-semibold text-gray-800 text-center w-full">
+            Editar usuario
+          </h3>
+					<button type="button" class="text-gray-600 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center" id="cerrar-editar-btn">
+            <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+            </svg>
+            <span class="sr-only">Cerrar</span>
+          </button>
+				</div>
+				<form method="POST" action="{{ url_for('personal_bp.modificar_usuario') }}" id="form-editar-usuario" novalidate class="p-4 md:p-6">
+					{{ form.csrf_token }} {{ form.id }}
+					<div class="grid grid-cols-2 gap-6 mb-4">
+
+						<input type="hidden" name="nueva_contrasenia" id="nueva_contrasenia">
+
+						<div>
+							<label for="edit_nombre" class="block text-sm font-medium text-gray-700 text-left">Nombre</label> {{ form.nombre(class="mt-1 p-2 w-full border border-gray-300 rounded-md", id="edit_nombre") }}
+						</div>
+
+						<div>
+							<label for="edit_username" class="text-sm font-medium text-gray-700 text-left">Nombre de Usuario</label> {{ form.username(class="mt-1 p-2 w-full border border-gray-300 rounded-md", id="edit_username") }}
+						</div>
+
+						<div>
+							<label for="edit_correo" class="text-sm font-medium text-gray-700 text-left">Correo Electrónico</label> {{ form.correo(class="mt-1 p-2 w-full border border-gray-300 rounded-md", id="edit_correo") }}
+						</div>
+
+						<div>
+							<label for="edit_telefono" class="text-sm font-medium text-gray-700 text-left">Teléfono</label> {{ form.telefono(class="mt-1 p-2 w-full border border-gray-300 rounded-md", id="edit_telefono") }}
+						</div>
+
+						<div>
+							<label for="edit_rol" class="text-sm font-medium text-gray-700 text-left">Rol</label> {{ form.rol(class="mt-1 p-2 w-full border border-gray-300 rounded-md", id="edit_rol") }}
+						</div>
+
+						<div>
+							<label for="edit_estatus" class="text-sm font-medium text-gray-700 text-left">Estatus</label> {{ form.estatus(class="mt-1 p-2 w-full border border-gray-300 rounded-md", id="edit_estatus") }}
+						</div>
+
+						<div class="col-span-2">
+							<label for="edit_contrasenia" class="text-sm font-medium text-gray-700 text-left">Nueva Contraseña</label>
+							<input type="password" name="nueva_contrasenia" id="edit_contrasenia" placeholder="Ingrese nueva contraseña (opcional)" class="mt-1 p-2 w-full border border-gray-300 rounded-md">
+						</div>
+					</div>
+
+					<div class="flex justify-center mt-6 gap-4">
+						<button type="submit" style="background-color: #24985a !important;" class="text-white bg-green-500 hover:bg-green-600 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center">
+                        Guardar cambios
+                    </button>
+						<button type="button" id="cancelar-editar" style="background-color:#c90704 !important;" class="text-white bg-red-500 hover:bg-red-600 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm w-1/2 sm:w-auto px-5 py-2.5 text-center ml-2">
+                        Cancelar
+                    </button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+
+	<!-- Modal de confirmación de actualización -->
+	<div id="actualizar-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60">
+		<div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8 animate-fade-in relative">
+
+			<div class="flex justify-center mb-4">
+				<div class="bg-yellow-100 text-yellow-400 rounded-full p-4 shadow-md">
+					<svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M13 16h-1v-4h-1m1-4h.01M12 18a6 6 0 100-12 6 6 0 000 12z"/>
+          </svg>
+				</div>
+			</div>
+
+			<h2 class="text-2xl font-bold text-gray-800 text-center mb-2">Confirmar actualización</h2>
+			<p class="text-gray-600 text-sm text-center mb-6">Estas a punto de modificar la información de este usuario.</p>
+
+			<div class="flex justify-center gap-4">
+				<button type="button" id="cancelar-actualizacion" class="px-5 py-2 rounded-md bg-gray-200 text-gray-700 hover:bg-gray-300 transition font-medium">
+          Cancelar
+        </button>
+				<button type="button" id="confirmar-actualizacion" class="px-5 py-2 rounded-md bg-green-600 text-white hover:bg-green-700 transition font-medium shadow-sm">
+          Confirmar
+        </button>
+			</div>
+
+			<button id="cerrar-actualizar-modal" type="button" class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 text-lg">
+        &times;
+      </button>
+		</div>
+	</div>
+	<style>
+		.animate-fade-in {
+		      animation: fadeIn 0.25s ease-out;
+		    }
+		  
+		    @keyframes fadeIn {
+		      from {
+		        opacity: 0;
+		        transform: scale(0.95);
+		      }
+		  
+		      to {
+		        opacity: 1;
+		        transform: scale(1);
+		      }
+		    }
+		
+	</style>
+
+
+	<!-- Modal de eliminación -->
+	<div id="eliminar-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60">
+		<div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8 animate-fade-in relative">
+
+			<div class="flex justify-center mb-4">
+				<div class="bg-red-100 text-red-600 rounded-full p-4 shadow-md">
+					<svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.054 0 1.643-1.14 1.057-2.054L13.057 4.946a1.25 1.25 0 00-2.114 0L3.025 16.946C2.44 17.86 3.028 19 4.083 19z"/>
+          </svg>
+				</div>
+			</div>
+
+			<h2 class="text-2xl font-bold text-gray-800 text-center mb-2">¿Eliminar usuario?</h2>
+			<p class="text-gray-600 text-sm text-center mb-6">Esta acción es permanente y no se puede deshacer.</p>
+
+			<form id="form-eliminar-usuario" method="POST" class="flex justify-center gap-4">
+				<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+				<button type="button" id="cancelar-eliminar" class="px-5 py-2 rounded-md bg-gray-200 text-gray-700 hover:bg-gray-300 transition font-medium">
+                Cancelar
+                </button>
+				<button type="submit" class="px-5 py-2 rounded-md bg-red-600 text-white hover:bg-red-700 transition font-medium shadow-sm">
+                Eliminar
+                </button>
+			</form>
+			<button id="close-modal-btn" type="button" onclick="cerrarModal()" class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 text-lg">
+                &times;
+            </button>
+		</div>
+	</div>
+	<style>
+		.animate-fade-in {
+						      animation: fadeIn 0.25s ease-out;
+						    }
+						  
+						    @keyframes fadeIn {
+						      from { opacity: 0; transform: scale(0.95); }
+						      to   { opacity: 1; transform: scale(1); }
+						    }			
+		
+	</style>
+
+
+</div>
+
+<!-- Flowbite JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
+
+<script>
+	// Modal de registro
+			    document.getElementById('open-modal-btn').addEventListener('click', function() {
+			        document.getElementById('crud-modal').classList.remove('hidden');
+			    });
+			
+			    document.getElementById('close-modal-btn').addEventListener('click', function() {
+			        document.getElementById('crud-modal').classList.add('hidden');
+			    });
+			    
+			    document.getElementById('cancel-btn').addEventListener('click', function() {
+			        document.getElementById('crud-modal').classList.add('hidden');
+			    });
+		
+		
+		        // Abrir y cargar modal de edición
+		        function abrirModalEditar(id) {
+		            window.location.href = `/modificar_usuario?id=${id}`;
+		          }
+		        
+		          function cerrarEditarModal() {
+		            document.getElementById('editar-modal').classList.add('hidden');
+		            document.getElementById('form-editar-usuario').reset();
+		            document.getElementById('form-editar-usuario').removeAttribute('action');
+		          }
+		        
+		          document.getElementById('cerrar-editar-btn').addEventListener('click', cerrarEditarModal);
+		          document.getElementById('cancelar-editar').addEventListener('click', cerrarEditarModal);
+			
+		
+		        // Abrir y cargar modal de edición
+		        document.querySelectorAll('[data-modal-target="modificar-modal"]').forEach(button => {
+		            button.addEventListener('click', () => {
+		            const id = button.dataset.id;
+		            const nombre = button.dataset.nombre;
+		            const username = button.dataset.username;
+		            const correo = button.dataset.correo;
+		            const telefono = button.dataset.telefono;
+		            const rol = button.dataset.rol;
+		
+		            document.getElementById('edit_nombre').value = nombre || '';
+		            document.getElementById('edit_username').value = username || '';
+		            document.getElementById('edit_correo').value = correo || '';
+		            document.getElementById('edit_telefono').value = telefono || '';
+		            document.getElementById('edit_rol').value = rol || '';
+		
+		            const form = document.getElementById('form-editar-usuario');
+		            form.setAttribute('action', `/editar_usuario/${id}`);
+		
+		            document.getElementById('editar-modal').classList.remove('hidden');
+		            });
+		        });
+		
+		        document.getElementById('form-editar-usuario').addEventListener('submit', () => {
+		            document.getElementById('nueva_contrasenia').value = document.getElementById('edit_contrasenia').value;
+		        });
+		
+		
+		        document.getElementById('cerrar-editar-btn').addEventListener('click', function () {
+		            document.getElementById('editar-modal').classList.add('hidden');
+		          });
+		        
+		          document.getElementById('cancelar-editar').addEventListener('click', function () {
+		            document.getElementById('editar-modal').classList.add('hidden');
+		          });
+	
+	              document.addEventListener('DOMContentLoaded', () => {
+	                const modal = document.getElementById('actualizar-modal');
+	                const openForm = document.getElementById('form-editar-usuario');
+	                const confirmBtn = document.getElementById('confirmar-actualizacion');
+	                const cancelBtn = document.getElementById('cancelar-actualizacion');
+	                const closeBtn = document.getElementById('cerrar-actualizar-modal');
+	            
+	                if (openForm) {
+	                  openForm.addEventListener('submit', function (e) {
+	                    e.preventDefault();
+	                    modal.classList.remove('hidden');
+	                  });
+	            
+	                  confirmBtn.addEventListener('click', function () {
+	                    modal.classList.add('hidden');
+	                    openForm.submit();
+	                  });
+	            
+	                  cancelBtn.addEventListener('click', function () {
+	                    modal.classList.add('hidden');
+	                  });
+	            
+	                  closeBtn.addEventListener('click', function () {
+	                    modal.classList.add('hidden');
+	                  });
+	            
+	                  window.addEventListener('click', function (e) {
+	                    if (e.target === modal) {
+	                      modal.classList.add('hidden');
+	                    }
+	                  });
+	                }
+	              });
+		
+		      
+		        // Modal de eliminación
+			    document.addEventListener('DOMContentLoaded', () => {
+			      const modal = document.getElementById('eliminar-modal');
+			      const form = document.getElementById('form-eliminar-usuario');
+			      const cancelBtn = document.getElementById('cancelar-eliminar');
+			  
+			      document.querySelectorAll('.btn-eliminar').forEach(button => {
+			        button.addEventListener('click', () => {
+			          const userId = button.getAttribute('data-id');
+			          form.setAttribute('action', `/eliminar_usuario/${userId}`);
+			          modal.classList.remove('hidden');
+			        });
+			      });
+			  
+			      cancelBtn.addEventListener('click', () => {
+			        modal.classList.add('hidden');
+			        form.removeAttribute('action');
+			      });
+			  
+			      window.addEventListener('click', (e) => {
+			        if (e.target === modal) {
+			          modal.classList.add('hidden');
+			          form.removeAttribute('action');
+			        }
+			      });
+			    });
+	           
+	            document.addEventListener("DOMContentLoaded", () => {
+	                // Si la URL contiene /cargar_usuario, la limpiamos
+	                if (window.location.pathname.includes("/cargar_usuario")) {
+	                  history.replaceState({}, document.title, "/usuarios");
+	                }
+	              });
+		
+	
+</script>
+
+{% if modificar_modal %}
+<script>
+	document.addEventListener('DOMContentLoaded', function () {
+		    document.getElementById('editar-modal').classList.remove('hidden');
+		  });
+		
+	
+</script>
+{% endif %} {% endblock %}

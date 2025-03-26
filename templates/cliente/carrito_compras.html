@@ -1,0 +1,135 @@
+{% extends "cliente/layout.html" %}
+{% block title %}Carrito de compras - Maicookies{% endblock %}
+{% block content %}
+
+<section class="min-h-screen py-16">
+  <div class="container mx-auto px-4 sm:px-6 max-w-screen-xl">
+    <div class="flex flex-col lg:flex-row gap-8">
+
+      <!-- Tabla del carrito -->
+      <div class="w-full bg-white rounded-xl shadow-md overflow-x-auto p-4">
+        <table class="w-full table-auto">
+          <thead>
+            <tr class="text-center border-b border-gray-400 text-[#7f7f7f] text-sm font-medium uppercase tracking-wide">
+              <th class="text-left px-2 py-2">Producto</th>
+              <th class="px-2 py-2">Precio</th>
+              <th class="px-2 py-2">Cantidad</th>
+              <th class="px-2 py-2">Subtotal</th>
+              <th class="px-2 py-2"></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for i in range(3) %}
+            <tr class="text-center">
+              <td class="px-2 py-4 text-left align-top">
+                <img src="https://iili.io/3FqLBsI.png" alt="Galleta" class="w-[80px] h-[80px] inline-block mr-3" />
+                <span class="font-semibold">Galletas de Chocolate</span>
+              </td>
+              <td class="px-2 py-2">$14.00</td>
+              <td class="p-2 bg-white rounded-full border border-[#a0a0a0] flex justify-center items-center space-x-3">
+                <button class="text-lg font-bold text-[#A0522D] hover:text-[#5A3E1B]">−</button>
+                <span class="text-base text-[#191919]">5</span>
+                <button class="text-lg font-bold text-[#A0522D] hover:text-[#5A3E1B]">+</button>
+              </td>
+              <td class="px-2 py-2">$70.00</td>
+              <td class="px-2 py-2">
+                <button class="text-red-600 hover:text-red-800">
+                  <i class="fas fa-trash-alt"></i>
+                </button>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="5" class="px-2 py-4 text-left">
+                <a href="{{ url_for('cliente_bp.productos') }}" class="button regresar-button">
+                  Seguir comprando
+                </a>
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+      <!-- Total del carrito -->
+      <div class="w-full lg:w-[200px] bg-white rounded-xl p-6 shadow-md">
+        <h2 class="text-[#191919] text-xl font-bold mb-4">Total del Carrito</h2>
+
+        <div class="mb-4">
+          <label for="pickup-date" class="block text-sm text-[#4c4c4c] mb-1">Fecha de recogida:</label>
+          <input type="date" id="pickup-date" class="w-full p-2 border border-gray-300 rounded-md">
+        </div>
+
+        <div class="mb-4">
+          <label for="pickup-time" class="block text-sm text-[#4c4c4c] mb-1">Hora de recogida:</label>
+          <select id="pickup-time" class="w-full p-2 border border-gray-300 rounded-md">
+            {% for hora in ["10:00 AM", "11:00 AM", "12:00 PM", "1:00 PM", "2:00 PM", "3:00 PM", "4:00 PM", "5:00 PM"] %}
+            <option>{{ hora }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="flex justify-between text-base text-[#4c4c4c] py-2">
+          <span>Total:</span>
+          <span class="font-semibold text-[#191919]">$84.00</span>
+        </div>
+
+        <div class="flex justify-between text-sm text-[#4c4c4c] border-t border-gray-200 pt-2">
+          <span>Subtotal:</span>
+          <span class="font-medium text-[#191919]">$84.00</span>
+        </div>
+
+        <button class="button proceder-button mt-6 w-full">
+          Finalizar pedido
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .button {
+    padding: 12px 32px;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+  .regresar-button {
+    background-color: #8B5A2B;
+    color: white;
+  }
+
+  .regresar-button:hover {
+    background-color: #6d4c41;
+  }
+
+  .proceder-button {
+    background-color: #8B5A2B;
+    color: white;
+  }
+
+  .proceder-button:hover {
+    background-color: #6d4c41;
+  }
+</style>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const today = new Date();
+    const maxDate = new Date();
+    maxDate.setDate(today.getDate() + 45);
+
+    const formattedToday = today.toISOString().split("T")[0];
+    const formattedMaxDate = maxDate.toISOString().split("T")[0];
+
+    const pickupDateInput = document.getElementById("pickup-date");
+    pickupDateInput.setAttribute("min", formattedToday);
+    pickupDateInput.setAttribute("max", formattedMaxDate);
+  });
+</script>
+
+{% endblock %}

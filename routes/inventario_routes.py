@@ -1,11 +1,12 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
 from forms.materia_prima_form import MateriaPrimaForm
 from models.models import MateriaPrima, InventarioMateria, db
+from routes.auth_routes import role_required  
 
 inventario_bp = Blueprint('inventario_bp', __name__, url_prefix='/')
 
-
 @inventario_bp.route('/inventario', methods=['GET', 'POST'])
+@role_required('admin')
 def index():
     create_form = MateriaPrimaForm(request.form)
     # Consulta que une materia_prima con inventario_materia
