@@ -28,7 +28,6 @@ class MateriaPrima(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nombre = db.Column(db.String(50), unique=True, nullable=False)
     unidad = db.Column(db.String(50), nullable=False)
-    estatus = db.Column(db.Integer, default=1)  # Estatus (0 o 1, por defecto 1)
     create_date = db.Column(db.DateTime, default=datetime.datetime.now, server_default=db.func.now())
     update_date = db.Column(db.DateTime, default=datetime.datetime.now, server_default=db.func.now())
     
