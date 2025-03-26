@@ -31,74 +31,101 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // Agregar insumo a la tabla
-    document.addEventListener("DOMContentLoaded", function () {
-        // Agregar insumo a la tabla
-        const agregarInsumoBtn = document.getElementById("agregar-insumo");
-        if (agregarInsumoBtn) {
-            agregarInsumoBtn.addEventListener("click", function () {
-                const insumoSelect = document.querySelector('[name="insumos[]"]');
-                const insumoCantidad = document.querySelector('[name="cantidades[]"]');
-                const tablaInsumos = document.getElementById("tabla-insumos").querySelector("tbody");
-    
-                if (!insumoSelect || !insumoCantidad || !tablaInsumos) {
-                    console.error("No se encontraron los elementos necesarios para agregar insumos");
-                    return;
-                }
-    
-                // Validar que se haya seleccionado un insumo y que la cantidad sea válida
-                if (insumoSelect.value && insumoCantidad.value && insumoCantidad.value > 0) {
-                    const nombreInsumo = insumoSelect.options[insumoSelect.selectedIndex].text;
-                    const cantidad = insumoCantidad.value;
-    
-                    // Crear nueva fila
-                    const newRow = tablaInsumos.insertRow();
-                    newRow.innerHTML = `
-                        <td>${nombreInsumo} <input type="hidden" name="insumos_seleccionados[]" value="${insumoSelect.value}"></td>
-                        <td>${cantidad} <input type="hidden" name="cantidades_seleccionadas[]" value="${cantidad}"></td>
-                        <td class="text-center">
-                            <button type="button" class="text-red-500 hover:text-red-700 eliminar-insumo">Eliminar</button>
-                        </td>
-                    `;
-    
-                    // Limpiar campos después de agregar
-                    insumoSelect.value = "";
-                    insumoCantidad.value = "";
-    
-                    // Agregar evento para eliminar la fila
-                    newRow.querySelector(".eliminar-insumo").addEventListener("click", function () {
-                        tablaInsumos.deleteRow(newRow.rowIndex - 1);
-                    });
-    
-                } else {
-                    alert("Selecciona un insumo y una cantidad válida.");
-                }
-            });
+    // Función para agregar insumos en el modal de modificar
+    function agregarInsumoModal(recetaId) {
+        const select = document.getElementById(`insumo-select-${recetaId}`);
+        const cantidadInput = document.getElementById(`cantidad-input-${recetaId}`);
+        const insumosContainer = document.getElementById(`insumos-actuales-${recetaId}`);
+        const hiddenContainer = document.getElementById(`insumos-seleccionados-container-${recetaId}`);
+        
+        if (!select.value || !cantidadInput.value) {
+            alert('Por favor selecciona un insumo y especifica la cantidad');
+            return;
+        }
+        
+        const insumoId = select.value;
+        const insumoNombre = select.options[select.selectedIndex].getAttribute('data-nombre');
+        const cantidad = cantidadInput.value;
+        
+        // Agregar a la lista visible
+        const nuevoInsumo = document.createElement('li');
+        nuevoInsumo.className = 'flex justify-between items-center mb-2 p-2 bg-gray-100 rounded';
+        nuevoInsumo.innerHTML = `
+            <span>${insumoNombre} - ${cantidad}</span>
+            <button type="button" class="text-red-500 hover:text-red-700" onclick="eliminarInsumoLista(this)">
+                <i class="fas fa-trash"></i>
+            </button>
+        `;
+        insumosContainer.appendChild(nuevoInsumo);
+        
+        // Agregar campos ocultos al formulario
+        const hiddenInsumo = document.createElement('input');
+        hiddenInsumo.type = 'hidden';
+        hiddenInsumo.name = 'insumos_seleccionados[]';
+        hiddenInsumo.value = insumoId;
+        
+        const hiddenCantidad = document.createElement('input');
+        hiddenCantidad.type = 'hidden';
+        hiddenCantidad.name = 'cantidades_seleccionadas[]';
+        hiddenCantidad.value = cantidad;
+        
+        hiddenContainer.appendChild(hiddenInsumo);
+        hiddenContainer.appendChild(hiddenCantidad);
+        
+        // Resetear los campos
+        select.value = '';
+        cantidadInput.value = '1';
+    }
+
+    // Función para eliminar insumos de la lista
+    function eliminarInsumoLista(button) {
+        const item = button.closest('li');
+        const container = item.parentElement;
+        const index = Array.from(container.children).indexOf(item);
+        
+        // Eliminar los campos ocultos correspondientes
+        const hiddenContainer = document.getElementById(`insumos-seleccionados-container-${container.id.split('-')[2]}`);
+        const hiddenInputs = hiddenContainer.querySelectorAll('input');
+        
+        hiddenInputs[index*2].remove(); // Eliminar el input del insumo
+        hiddenInputs[index*2].remove(); // Eliminar el input de la cantidad
+        
+        // Eliminar el elemento de la lista
+        item.remove();
+    }
+
+    // Función para agregar insumos en el formulario principal
+    document.getElementById('agregar-insumo')?.addEventListener('click', function() {
+        const insumoSelect = document.querySelector('select[name="insumo_id"]');
+        const cantidadInput = document.querySelector('input[name="cantidad"]');
+        
+        if (insumoSelect.value && cantidadInput.value) {
+            const insumoId = insumoSelect.value;
+            const insumoNombre = insumoSelect.options[insumoSelect.selectedIndex].text;
+            const cantidad = cantidadInput.value;
+            
+            const row = document.createElement('tr');
+            row.className = 'bg-white border-b dark:bg-gray-800 dark:border-gray-700';
+            row.innerHTML = `
+                <td class="px-6 py-4">${insumoNombre}</td>
+                <td class="px-6 py-4">${cantidad}</td>
+                <td class="px-6 py-4">
+                    <button type="button" class="text-red-600 hover:text-red-900" onclick="this.parentNode.parentNode.remove()">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+                <input type="hidden" name="insumos_seleccionados[]" value="${insumoId}">
+                <input type="hidden" name="cantidades_seleccionadas[]" value="${cantidad}">
+            `;
+            
+            document.getElementById('insumos-agregados').appendChild(row);
+            
+            insumoSelect.value = '';
+            cantidadInput.value = '1';
         }
     });
 
-    
-    // Buscar en la tabla de recetas
-    const searchInput = document.getElementById("search-input");
-    if (searchInput) {
-        searchInput.addEventListener("input", function () {
-            const searchText = this.value.toLowerCase();
-            const rows = document.getElementById("recetas-table").getElementsByTagName("tr");
-
-            for (let i = 1; i < rows.length; i++) {
-                const row = rows[i];
-                const cells = row.getElementsByTagName("td");
-                let found = false;
-
-                for (let j = 0; j < cells.length; j++) {
-                    if (cells[j].textContent.toLowerCase().includes(searchText)) {
-                        found = true;
-                        break;
-                    }
-                }
-
-                row.style.display = found ? "" : "none";
-            }
-        });
-    }
+    // Hacer las funciones accesibles globalmente
+    window.agregarInsumoModal = agregarInsumoModal;
+    window.eliminarInsumoLista = eliminarInsumoLista;
 });

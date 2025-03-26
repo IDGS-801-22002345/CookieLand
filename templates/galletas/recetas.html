@@ -46,44 +46,47 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for receta in recetas %}
+                        {% for receta_data in recetas %}
                         <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200 relative">
                             <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                {{ receta.nombre }}
+                                {{ receta_data.receta.nombre }}
                             </th>
                             <td class="px-6 py-4">
                                 <ul>
-                                    {% for insumo in receta.insumos %}
+                                    {% for insumo in receta_data.insumos %}
                                     <li>{{ insumo.nombre }} - {{ insumo.cantidad }}</li>
                                     {% endfor %}
                                 </ul>
                             </td>
                             <td class="px-6 py-4 w-32 overflow-hidden">
-                                <label for="switch-{{ receta.id }}" class="inline-flex items-center cursor-pointer">
-                                    <input 
-                                        type="checkbox" 
-                                        value="" 
-                                        id="switch-{{ receta.id }}" 
-                                        class="sr-only peer" 
-                                        {% if receta.estatus %}checked{% endif %}
-                                        data-id="{{ receta.id }}"
-                                        onchange="cambiarEstatus(this)"
-                                    >
-                                    <div class="relative w-11 h-6 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 dark:bg-gray-700 peer-checked:bg-green-500 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 
-                                        {% if receta.estatus %}bg-green-500{% else %}bg-red-500{% endif %}">
-                                    </div>
-                                    <span class="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">
-                                        {% if receta.estatus %}Activo{% else %}Inactivo{% endif %}
-                                    </span>
-                                </label>
+                                <form id="form-estatus-{{ receta_data.receta.id }}" 
+      action="{{ url_for('recetas_bp.cambiar_estatus', receta_id=receta_data.receta.id) }}" 
+      method="POST">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    
+          <label class="relative inline-flex items-center cursor-pointer">
+             <input 
+                type="checkbox" 
+                name="estatus"
+                class="sr-only peer" 
+                 {% if receta_data.receta.estatus %}checked{% endif %}
+                  onchange="this.form.submit()"
+                  >
+          <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+          <span class="ml-3 text-sm font-medium text-gray-900">
+            {% if receta_data.receta.estatus %}Activo{% else %}Inactivo{% endif %}
+        </span>
+    </label>
+</form>
                             </td>
                             <td class="px-6 py-4 flex justify-center items-center space-x-4">
+                                <!-- Botones de acciones -->
                                 <a href="javascript:void(0)" 
-                                    data-modal-target="modificar-modal-{{ receta.id }}" 
-                                    data-modal-toggle="modificar-modal-{{ receta.id }}"
+                                    data-modal-target="modificar-modal-{{ receta_data.receta.id }}" 
+                                    data-modal-toggle="modificar-modal-{{ receta_data.receta.id }}"
                                     class="btn-modificar"
-                                    data-id="{{ receta.id }}"
-                                    data-nombre="{{ receta.nombre }}">
+                                    data-id="{{ receta_data.receta.id }}"
+                                    data-nombre="{{ receta_data.receta.nombre }}">
                                     <svg class="w-5 h-5 text-gray-800 dark:text-black" aria-hidden="true"
                                         xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
@@ -93,81 +96,6 @@
                                 </a>
                             </td>
                         </tr>
-                        <div id="modal-backdrop" class="hidden fixed inset-0 bg-black bg-opacity-50 z-40"></div>
-
-                        <!-- Modal para Modificar Receta (dentro del bucle) -->
-                        <div id="modificar-modal-{{ receta.id }}" tabindex="-1" aria-hidden="true"
-                            class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 flex justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
-                            {{ form.csrf_token }}
-                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                            <div class="relative p-4 w-full max-w-md max-h-full">
-                                <!-- Modal content -->
-                                <div class="relative bg-white rounded-lg shadow-sm dark:bg-gray-700">
-                                    <!-- Modal header -->
-                                    <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600 border-gray-200">
-                                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-                                            Modificar Receta
-                                        </h3>
-                                        <button type="button"
-                                            class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
-                                            data-modal-hide="modificar-modal-{{ receta.id }}">
-                                            <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
-                                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
-                                            </svg>
-                                            <span class="sr-only">Cerrar modal</span>
-                                        </button>
-                                    </div>
-                                    <!-- Modal body -->
-                                    <form action="{{ url_for('recetas_bp.modificar', id=receta.id) }}" method="POST" novalidate class="p-4 md:p-5">
-                                        {{ form.csrf_token }}
-                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                        <input type="hidden" name="id" value="{{ receta.id }}">
-
-                                        <div class="grid gap-4 mb-4">
-                                            <!-- Campo Nombre -->
-                                            <label for="nombre" class="block text-sm font-medium text-gray-700 text-left">
-                                                Nombre de la Receta
-                                            </label>
-                                            <div class="relative z-0 w-full group">
-                                                {{ macros.campoNuevo(form.nombre, class="mt-1 p-2 w-full border border-gray-300 rounded-md", placeholder=" ") }}
-                                            </div>
-
-                                            <!-- Sección de insumos -->
-                                            <div id="insumos-section" class="mb-4">
-                                                <label class="block text-sm font-medium text-gray-700">Insumos</label>
-                                                <div class="insumo-entry mb-2 flex flex-row gap-5">
-                                                    <select name="insumos" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
-                                                        <option value="">Selecciona un insumo</option>
-                                                        {% for material in materiales %}
-                                                            <option value="{{ material.id }}">{{ material.nombre }}</option>
-                                                        {% endfor %}
-                                                    </select>
-                                                    <input type="number" name="cant" placeholder="Cantidad" value="0" required
-                                                        class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
-                                                </div>
-                                                <div class="flex justify-center">
-                                                    <button type="button" id="agregar-insumo"
-                                                        class="inline-flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                                                        Agregar Insumo
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <!-- Botones del formulario -->
-                                        <div class="flex justify-center mt-6">
-                                            <button type="submit" style="background-color: #24985a !important;"
-                                                class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
-                                                Guardar cambios
-                                            </button>
-                                            <button type="button" data-modal-hide="modificar-modal-{{ receta.id }}" style="background-color:#c90704   !important;"
-                                                class="btn-cancelar text-white bg-gray-500 hover:bg-gray-600 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center ml-2">
-                                                Cancelar
-                                            </button>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
                         {% endfor %}
                     </tbody>
                 </table>
@@ -175,113 +103,193 @@
         </div>
     </div>
 
+
+
+    <div id="modal-backdrop" class="hidden fixed inset-0 bg-black bg-opacity-50 z-40"></div>
+       {% for receta_data in recetas %}
+   <div id="modificar-modal-{{ receta_data.receta.id }}" tabindex="-1" aria-hidden="true" 
+    class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+    <div class="relative p-4 w-full max-w-2xl max-h-full">
+        <!-- Contenido del modal -->
+        <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+            <!-- Encabezado del modal -->
+            <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600" style="background-color: #7c5454;">
+                <h3 class="text-xl font-semibold text-white dark:text-white">
+                    Modificar Receta
+                </h3>
+                <button type="button" class="text-white bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-toggle="modificar-modal-{{ receta_data.receta.id }}">
+                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                    </svg>
+                    <span class="sr-only">Cerrar modal</span>
+                </button>
+            </div>
+            
+            <!-- Formulario de edición -->
+            <form class="p-4 md:p-5" action="{{ url_for('recetas_bp.actualizar_receta', receta_id=receta_data.receta.id) }}" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                
+                <div class="grid gap-4 mb-4 grid-cols-2">
+                    <!-- Campo Nombre -->
+                    <div class="col-span-2">
+                        <label for="nombre" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Nombre de la Receta</label>
+                        <input type="text" name="nombre" id="nombre" value="{{ receta_data.receta.nombre }}" 
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" required>
+                    </div>
+                    
+                    <!-- Campo Estatus -->
+                    <div class="col-span-2 sm:col-span-1">
+                        <label for="estatus" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Estatus</label>
+                        <select id="estatus" name="estatus" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
+                            <option value="1" {% if receta_data.receta.estatus %}selected{% endif %}>Activo</option>
+                            <option value="0" {% if not receta_data.receta.estatus %}selected{% endif %}>Inactivo</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Lista de Insumos Actuales -->
+                    <div class="col-span-2">
+                        <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Insumos Actuales</label>
+                        <div class="overflow-auto max-h-40 border border-gray-300 rounded-lg p-2">
+                            <ul id="insumos-actuales-{{ receta_data.receta.id }}">
+                                {% for insumo in receta_data.insumos %}
+                                <li class="flex justify-between items-center mb-2 p-2 bg-gray-100 rounded">
+                                    <span>{{ insumo.nombre }} - {{ insumo.cantidad }}</span>
+                                    <button type="button" class="text-red-500 hover:text-red-700" onclick="eliminarInsumoLista(this)">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <!-- Agregar nuevos insumos -->
+                    <div class="col-span-2 border-t pt-4">
+                        <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-2">Agregar Nuevos Insumos</h4>
+                        
+                        <div class="flex gap-2 mb-2">
+                            <select id="insumo-select-{{ receta_data.receta.id }}" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
+                                <option value="">Seleccionar insumo</option>
+                                {% for material in materiales %}
+                                <option value="{{ material.id }}" data-nombre="{{ material.nombre }}">{{ material.nombre }}</option>
+                                {% endfor %}
+                            </select>
+                            
+                            <input type="number" id="cantidad-input-{{ receta_data.receta.id }}" min="1" value="1" 
+                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-20 p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
+                            
+                            <button type="button" onclick="agregarInsumoModal('{{ receta_data.receta.id }}')" 
+                                class="text-white inline-flex items-center bg-green-500 hover:bg-green-600 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-3 py-2 text-center dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">
+                                <i class="fas fa-plus mr-1"></i> Agregar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Campos ocultos para los insumos seleccionados -->
+                <div id="insumos-seleccionados-container-{{ receta_data.receta.id }}">
+                    {% for insumo in receta_data.insumos %}
+                    <input type="hidden" name="insumos_seleccionados[]" value="{{ insumo.materia_prima_id }}">
+                    <input type="hidden" name="cantidades_seleccionadas[]" value="{{ insumo.cantidad }}">
+                    {% endfor %}
+                </div>
+                
+                <!-- Botones del modal -->
+                <div class="flex justify-end">
+                    <button type="button" data-modal-toggle="modificar-modal-{{ receta_data.receta.id }}" 
+                        class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600">
+                        Cancelar
+                    </button>
+                    <button type="submit" 
+                        class="ml-2 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                        Guardar Cambios
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
     <div id="modal-backdrop" class="hidden fixed inset-0 bg-black bg-opacity-50 z-40"></div>
     <!-- Modal para Agregar Receta -->
-<div id="crud-modal" tabindex="-1" aria-hidden="true" data-modal-backdrop="static"
-class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 flex justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
-<div class="relative p-4 w-full max-w-md max-h-full">
-    <!-- Modal content -->
-    <div class="relative bg-gray-100 rounded-lg shadow-sm dark:bg-gray-700">
-        <!-- Modal header -->
-        <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600 border-gray-300 mb-4">
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-white text-center">
-                Agregar Receta
-            </h3>
-            <button type="button"
-                class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
-                data-modal-hide="crud-modal">
-                <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
-                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
-                </svg>
-                <span class="sr-only">Cerrar modal</span>
-            </button>
-        </div>
-        <!-- Modal body -->
-        <form method="POST" action="{{ url_for('recetas_bp.agregar_receta') }}" novalidate class="p-4 md:p-5">
-    {{ form.csrf_token }}
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-    <div class="grid gap-4 mb-4">
-        <!-- Campo Nombre -->
-        <label for="nombre" class="block text-sm font-medium text-gray-700 text-left">
-            Nombre de la Receta
-        </label>
-        <div class="relative z-0 w-full group">
-            {{ form.nombre(class="mt-1 p-2 w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500", placeholder="Nombre de la receta") }}
-            {% for error in form.nombre.errors %}
-                <span class="text-sm text-red-600">{{ error }}</span>
-            {% endfor %}
-        </div>
-
-        <!-- Sección de insumos -->
-<div id="insumos-section" class="mb-4">
-    <label class="block text-sm font-medium text-gray-700">Insumos</label>
-    {% for insumo_form in form.insumos %}
-        <div class="insumo-entry mb-2 flex flex-row gap-5">
-            <select name="insumos_seleccionados[]" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
-                <option value="">Selecciona un insumo</option>
-                {% for material in materiales %}
-                    <option value="{{ material.id }}" {% if insumo_form.insumo.data == material.id %}selected{% endif %}>{{ material.nombre }}</option>
-                {% endfor %}
-            </select>
-            <input type="number" name="cantidades_seleccionadas[]" placeholder="Cantidad" value="{{ insumo_form.cantidad.data }}" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
-        </div>
-        {% for error in insumo_form.insumo.errors %}
-            <span class="text-sm text-red-600">{{ error }}</span>
-        {% endfor %}
-        {% for error in insumo_form.cantidad.errors %}
-            <span class="text-sm text-red-600">{{ error }}</span>
-        {% endfor %}
-    {% endfor %}
-</div>
-
-        <!-- Botón para agregar más insumos -->
-        <button type="button" id="agregar-insumo" class="inline-flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-            Agregar Insumo
-        </button>
-    </div>
-
-    <!-- Botón de guardar -->
-    <div class="flex justify-center mt-6">
-        <button type="submit" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
-            Guardar
-        </button>
-    </div>
-</form>
+    <div id="crud-modal" tabindex="-1" aria-hidden="true" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 flex justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+        <div class="relative p-4 w-full max-w-2xl max-h-full">
+            <!-- Modal content -->
+            <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+                <!-- Modal header -->
+                <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
+                    <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
+                        Agregar Nueva Receta
+                    </h3>
+                    <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-hide="crud-modal">
+                        <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                        </svg>
+                        <span class="sr-only">Cerrar modal</span>
+                    </button>
                 </div>
-                <!-- Tabla de insumos agregados -->
-                <table id="tabla-insumos" class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                    <thead class="text-xs text-white uppercase sticky top-0 dark:bg-gray-700 dark:text-gray-400" style="background-color: #7c5454 !important; z-index: 10;">
-                        <tr>
-                            <th scope="col" class="px-6 py-3">Insumo</th>
-                            <th scope="col" class="px-6 py-3">Cantidad</th>
-                            <th scope="col" class="px-6 py-3 text-center align-middle">Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- Aquí se agregarán dinámicamente los insumos -->
-                    </tbody>
-                </table>
+                <form method="POST" action="{{ url_for('recetas_bp.guardar_receta') }}" class="p-4 md:p-5">
+                    {{ form.csrf_token }}
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    
+                    <div class="grid gap-4 mb-4">
+                        <div>
+                            <label for="nombre" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Nombre de la Receta</label>
+                            <input type="text" name="nombre" id="nombre" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Escribe el nombre de la receta" required>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Insumos</label>
+                            <div class="grid grid-cols-2 gap-4 mb-2">
+                                <select name="insumo_id" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" required>
+                                    <option value="">Selecciona un insumo</option>
+                                    {% for material in materiales %}
+                                        <option value="{{ material.id }}">{{ material.nombre }}</option>
+                                    {% endfor %}
+                                </select>
+                                <input type="number" name="cantidad" value="1" min="1" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" required>
+                            </div>
+                            <button type="button" id="agregar-insumo" style="background-color: #24985a" class="text-white font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-green-600">
+                                <i class="fas fa-plus"></i> Agregar Insumo
+                            </button>
+                        </div>
+                        
+                        <!-- Tabla de insumos agregados -->
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                                <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                                    <tr>
+                                        <th scope="col" class="px-6 py-3 text-center align-middle">Insumo</th>
+                                        <th scope="col" class="px-6 py-3 text-center align-middle">Cantidad</th>
+                                        <th scope="col" class="px-6 py-3 text-center align-middle">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="insumos-agregados">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <!-- Botones del modal -->
+                    <div class="flex items-center justify-end space-x-4">
+                        <button type="button" data-modal-hide="crud-modal" style="background-color:#c90704" class="text-white font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-red-600">
+                            Cancelar
+                        </button>
+                        <button type="submit" style="background-color: #24985a" class="text-white font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-green-600">
+                            <i class="fas fa-save"></i> Guardar Receta
+                        </button>
+                    </div>
+                </form>
             </div>
-            <!-- Botones del formulario -->
-            <div class="flex justify-center mt-6">
-                <button type="submit" style="background-color: #24985a !important;"
-                    class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
-                    Guardar
-                </button>
-                <button type="button" data-modal-hide="crud-modal" style="background-color:#c90704   !important;"
-                    class="btn-cancelar text-white bg-gray-500 hover:bg-gray-600 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center ml-2">
-                    Cancelar
-                </button>
-            </div>
-        </form>
+        </div>
     </div>
-</div>
-</div>
 
     <!-- Incluye Flowbite JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
 
+  
+
     {% endblock %}
 </body>
-
 </html>
