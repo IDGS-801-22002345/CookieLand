@@ -10,6 +10,7 @@ from routes.registro_compras_routes import registro_compras_bp
 from routes.inventario_routes import inventario_bp
 from models.models import *
 from routes.proveedor_routes import provedor_bp
+from routes.inventario_routes import inventario_bp
 # from models.proveedor_model import db
 # from models.materia_prima_model import db
 app = Flask(__name__)
