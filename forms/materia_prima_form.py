@@ -16,9 +16,7 @@ class MateriaPrimaForm(Form):
     ])
     
     unidad = SelectField('Unidad de medida', choices=[
-        ('kg', 'Kilogramos'),
         ('g', 'Gramos'),
-        ('l', 'Litros'),
         ('ml', 'Mililitros'),
         ('pz', 'Piezas')
     ], validators=[validators.DataRequired(message='La unidad de medida es requerida')])
