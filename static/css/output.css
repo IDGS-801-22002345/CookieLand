@@ -90,11 +90,8 @@
     --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
     --default-transition-duration: 150ms;
     --default-transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-<<<<<<< HEAD
-=======
     --default-font-family: var(--font-sans);
     --default-mono-font-family: var(--font-mono);
->>>>>>> main
   }
 }
 @layer base {
@@ -108,16 +105,9 @@
     line-height: 1.5;
     -webkit-text-size-adjust: 100%;
     tab-size: 4;
-<<<<<<< HEAD
-    font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji",
-      "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-    font-feature-settings: initial;
-    font-variation-settings: initial;
-=======
     font-family: var(--default-font-family, ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji");
     font-feature-settings: var(--default-font-feature-settings, normal);
     font-variation-settings: var(--default-font-variation-settings, normal);
->>>>>>> main
     -webkit-tap-highlight-color: transparent;
   }
   hr {
@@ -142,16 +132,9 @@
     font-weight: bolder;
   }
   code, kbd, samp, pre {
-<<<<<<< HEAD
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
-      "Courier New", monospace;
-    font-feature-settings: initial;
-    font-variation-settings: initial;
-=======
     font-family: var(--default-mono-font-family, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace);
     font-feature-settings: var(--default-mono-font-feature-settings, normal);
     font-variation-settings: var(--default-mono-font-variation-settings, normal);
->>>>>>> main
     font-size: 1em;
   }
   small {
@@ -535,15 +518,6 @@
   .h-10 {
     height: calc(var(--spacing) * 10);
   }
-<<<<<<< HEAD
-  .h-12 {
-    height: calc(var(--spacing) * 12);
-  }
-  .h-16 {
-    height: calc(var(--spacing) * 16);
-  }
-=======
->>>>>>> main
   .h-27 {
     height: calc(var(--spacing) * 27);
   }
@@ -712,12 +686,9 @@
   .flex-3 {
     flex: 3;
   }
-<<<<<<< HEAD
   .flex-shrink {
     flex-shrink: 1;
   }
-=======
->>>>>>> main
   .shrink {
     flex-shrink: 1;
   }
@@ -727,7 +698,6 @@
   .grow {
     flex-grow: 1;
   }
-<<<<<<< HEAD
   .table-auto {
     table-layout: auto;
   }
@@ -764,11 +734,9 @@
     --tw-scale-z: 110%;
     scale: var(--tw-scale-x) var(--tw-scale-y);
   }
-=======
   .border-collapse {
     border-collapse: collapse;
   }
->>>>>>> main
   .transform {
     transform: var(--tw-rotate-x) var(--tw-rotate-y) var(--tw-rotate-z) var(--tw-skew-x) var(--tw-skew-y);
   }
@@ -781,12 +749,9 @@
   .resize {
     resize: both;
   }
-<<<<<<< HEAD
   .resize-none {
     resize: none;
   }
-=======
->>>>>>> main
   .list-disc {
     list-style-type: disc;
   }
@@ -1369,7 +1334,6 @@
   .text-white {
     color: var(--color-white);
   }
-<<<<<<< HEAD
   .text-yellow-400 {
     color: var(--color-yellow-400);
   }
@@ -1379,8 +1343,6 @@
   .text-yellow-600 {
     color: var(--color-yellow-600);
   }
-=======
->>>>>>> main
   .capitalize {
     text-transform: capitalize;
   }
@@ -1409,12 +1371,9 @@
   .opacity-0 {
     opacity: 0%;
   }
-<<<<<<< HEAD
-=======
   .opacity-50 {
     opacity: 50%;
   }
->>>>>>> main
   .opacity-100 {
     opacity: 100%;
   }
@@ -1446,13 +1405,10 @@
     --tw-ring-shadow: var(--tw-ring-inset,) 0 0 0 calc(1px + var(--tw-ring-offset-width)) var(--tw-ring-color, currentColor);
     box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
   }
-<<<<<<< HEAD
   .outline {
     outline-style: var(--tw-outline-style);
     outline-width: 1px;
   }
-=======
->>>>>>> main
   .grayscale {
     --tw-grayscale: grayscale(100%);
     filter: var(--tw-blur,) var(--tw-brightness,) var(--tw-contrast,) var(--tw-grayscale,) var(--tw-hue-rotate,) var(--tw-invert,) var(--tw-saturate,) var(--tw-sepia,) var(--tw-drop-shadow,);
@@ -1483,8 +1439,6 @@
     transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));
     transition-duration: var(--tw-duration, var(--default-transition-duration));
   }
-<<<<<<< HEAD
-=======
   .transition-opacity {
     transition-property: opacity;
     transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));
@@ -1494,7 +1448,6 @@
     --tw-duration: 150ms;
     transition-duration: 150ms;
   }
->>>>>>> main
   .duration-200 {
     --tw-duration: 200ms;
     transition-duration: 200ms;
@@ -1503,13 +1456,10 @@
     --tw-duration: 300ms;
     transition-duration: 300ms;
   }
-<<<<<<< HEAD
   .duration-500 {
     --tw-duration: 500ms;
     transition-duration: 500ms;
   }
-=======
->>>>>>> main
   .ease-in-out {
     --tw-ease: var(--ease-in-out);
     transition-timing-function: var(--ease-in-out);
@@ -1521,63 +1471,6 @@
   .outline-none {
     --tw-outline-style: none;
     outline-style: none;
-  }
-  .\[ticket\:489\] {
-    ticket: 489;
-  }
-  .\[ticket\:1523\] {
-    ticket: 1523;
-  }
-  .\[ticket\:1570\] {
-    ticket: 1570;
-  }
-  .\[ticket\:1892\] {
-    ticket: 1892;
-  }
-  .\[ticket\:2229\] {
-    ticket: 2229;
-  }
-  .\[ticket\:2362\] {
-    ticket: 2362;
-  }
-<<<<<<< HEAD
-  .\[ticket\:2406\] {
-    ticket: 2406;
-  }
-=======
->>>>>>> main
-  .\[ticket\:2619\] {
-    ticket: 2619;
-  }
-  .\[ticket\:3208\] {
-    ticket: 3208;
-  }
-  .\[ticket\:3633\] {
-    ticket: 3633;
-  }
-<<<<<<< HEAD
-  .\[ticket\:3725\] {
-    ticket: 3725;
-  }
-  .\[ticket\:3801\] {
-    ticket: 3801;
-  }
-  .\[ticket\:3989\] {
-    ticket: 3989;
-  }
-  .\[ticket\:4457\] {
-    ticket: 4457;
-  }
-  .\[ticket\:4730\] {
-    ticket: 4730;
-  }
-=======
-  .\[ticket\:4457\] {
-    ticket: 4457;
-  }
->>>>>>> main
-  .\[ticket\:10782\] {
-    ticket: 10782;
   }
   .peer-checked\:bg-green-500 {
     &:is(:where(.peer):checked ~ *) {
@@ -2238,8 +2131,6 @@
       background-color: var(--color-gray-800);
     }
   }
-<<<<<<< HEAD
-=======
   .dark\:bg-gray-900 {
     @media (prefers-color-scheme: dark) {
       background-color: var(--color-gray-900);
@@ -2250,7 +2141,6 @@
       background-color: var(--color-white);
     }
   }
->>>>>>> main
   .dark\:text-black {
     @media (prefers-color-scheme: dark) {
       color: var(--color-black);
