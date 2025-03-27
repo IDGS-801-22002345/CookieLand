@@ -1,39 +1,40 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
-from forms.auth_forms import LoginForm, RegisterFormLandingPage
+from forms.auth_forms import *
 from models.models import *
 from sqlalchemy.exc import IntegrityError
 from utils.decoradores import *
 
-
 auth_bp = Blueprint('auth_bp', __name__, url_prefix='/auth')
-
 
 @auth_bp.route('/login', methods=['GET', 'POST'])
 @anonymous_required
 def login():
     form = LoginForm()
-    
+
     if form.validate_on_submit():
         user = Usuario.query.filter_by(correo=form.email.data).first()
 
         if user and check_password_hash(user.contrasenia, form.password.data):
+            if user.estatus == 0:
+                flash('Tu cuenta está desactivada. Contacta al administrador.', 'warning')
+                return redirect(url_for('auth_bp.login'))
+
             login_user(user)
             flash('¡Inicio de sesión exitoso!', 'success')
 
             if user.has_role('admin'):
-                return redirect(url_for('inventario_bp.index'))  
+                return redirect(url_for('inventario_bp.index'))
             elif user.has_role('cliente'):
-                return redirect(url_for('cliente_bp.index')) 
+                return redirect(url_for('cliente_bp.index'))
 
-            flash('Tu rol no tiene asignado un acceso específico.', 'warning')
-            return redirect(url_for('auth_bp.login'))
-
-    elif request.method == 'POST':
-        flash('Las credenciales son incorrectas', 'danger')
+        else:
+            flash('Las credenciales son incorrectas', 'danger')
 
     return render_template('auth/login.html', form=form)
+
+
 
 @auth_bp.route('/logout')
 @login_required
@@ -80,12 +81,10 @@ def register_landing():
         
     return render_template('auth/register.html', form=form)
 
-
 @auth_bp.route('/profile')
 @role_required('cliente')
 def profile():
     return render_template('auth/profile.html')
-
 
 @auth_bp.route('/orders')
 @role_required('cliente')

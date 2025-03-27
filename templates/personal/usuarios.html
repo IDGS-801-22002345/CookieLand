@@ -6,15 +6,27 @@
 
 		{{ macros.mostrar_flash() }}
 
+		
 		<div class="flex justify-end">
 			<button id="open-modal-btn" class="flex items-center gap-2 text-white bg-green-500 hover:bg-green-500 focus:outline-none focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-1 transition-colors duration-200 ease-in-out">
                 <i class="fas fa-user-plus"></i> Agregar
             </button>
 		</div>
 
-		<div class="flex items-center border border-gray-300 rounded-md w-96 p-2">
-			<i class="fas fa-search text-gray-500 px-2"></i>
-			<input type="search" id="search-input" class="w-full outline-none" placeholder="Buscar usuario">
+		<div class="flex items-center gap-4">
+			<div class="flex items-center border border-gray-300 rounded-md w-60 p-2">
+				<i class="fas fa-search text-gray-500 px-2"></i>
+				<input type="search" id="search-input" class="w-full outline-none" placeholder="Buscar usuario">
+			</div>
+			<!-- <div class="flex items-center border border-gray-300 rounded-md w-50 p-2">
+				<i class="fas fa-filter text-gray-500 px-2"></i>
+				<select id="role-filter" class="w-full outline-none">
+					<option value="">Filtrar por rol</option>
+					{% for rol in roles %}
+					<option value="{{ rol.id }}">{{ rol.role_name }}</option>
+					{% endfor %}
+				</select>
+			</div> -->
 		</div>
 
 		<div class="overflow-x-auto overflow-y-auto max-h-[500px] mt-4">
@@ -39,16 +51,17 @@
 						<td class="px-6 py-4">{{ usuario.telefono }}</td>
 						<td class="px-6 py-4">{{ usuario.correo }}</td>
 						<td class="px-6 py-4">{{ usuario.username }}</td>
-						<td class="px-6 py-4">{{ usuario.estatus }}</td>
+						<td class="px-6 py-4 text-start">
+							<span class="inline-block w-4 h-4 rounded-full 
+								{% if usuario.estatus == 1 %} bg-green-500 {% else %} bg-red-500 {% endif %}">
+							</span>
+						</td>
 						<td class="px-6 py-4">{{ usuario.rol.role_name }}</td>
 						<td class="px-6 py-4 text-center flex justify-center items-center space-x-4">
-							<form method="POST" action="{{ url_for('personal_bp.cargar_usuario') }}">
-								{{ form.csrf_token }}
-								<input type="hidden" name="id" value="{{ usuario.id }}">
-								<button type="submit" class="text-yellow-500 hover:text-yellow-600 text-lg">
-                                  <i class="fas fa-edit"></i>
-                                </button>
-							</form>
+							<a href="javascript:void(0)" class="btn-modificar text-yellow-500  hover:text-yellow-600 text-lg px-3 py-1 rounded" data-modal-target="modificar-modal" data-modal-toggle="modificar-modal" data-id="{{ usuario.id }}" data-nombre="{{ usuario.nombre }}" data-username="{{ usuario.username }}" data-correo="{{ usuario.correo }}" data-telefono="{{ usuario.telefono }}" data-rol="{{ usuario.rol.role_name }}" data-estatus="{{ usuario.estatus }}">
+								<i class="fas fa-edit"></i>
+							</a>
+
 							<button class="btn-eliminar text-red-500 hover:text-red-700 text-lg" data-id="{{ usuario.id }}">
                                 <i class="fas fa-trash-alt"></i>
                             </button>
@@ -59,6 +72,7 @@
 			</table>
 		</div>
 	</div>
+
 
 	<!-- Modal para agregar usuarios -->
 	<div id="crud-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center w-full h-full" aria-hidden="true" role="dialog">
@@ -133,68 +147,48 @@
 
 
 	<!-- Modal para editar usuarios -->
-	<div id="editar-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center w-full h-full" aria-hidden="true" role="dialog">
-		<div class="relative p-4 w-full max-w-2xl max-h-screen">
-			<div class="relative bg-white rounded-lg shadow-lg">
-				<div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t border-gray-300 mb-4">
-					<h3 class="text-xl font-semibold text-gray-800 text-center w-full">
-            Editar usuario
-          </h3>
-					<button type="button" class="text-gray-600 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center" id="cerrar-editar-btn">
-            <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
-              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
-            </svg>
-            <span class="sr-only">Cerrar</span>
-          </button>
-				</div>
-				<form method="POST" action="{{ url_for('personal_bp.modificar_usuario') }}" id="form-editar-usuario" novalidate class="p-4 md:p-6">
-					{{ form.csrf_token }} {{ form.id }}
-					<div class="grid grid-cols-2 gap-6 mb-4">
-
-						<input type="hidden" name="nueva_contrasenia" id="nueva_contrasenia">
-
-						<div>
-							<label for="edit_nombre" class="block text-sm font-medium text-gray-700 text-left">Nombre</label> {{ form.nombre(class="mt-1 p-2 w-full border border-gray-300 rounded-md", id="edit_nombre") }}
-						</div>
-
-						<div>
-							<label for="edit_username" class="text-sm font-medium text-gray-700 text-left">Nombre de Usuario</label> {{ form.username(class="mt-1 p-2 w-full border border-gray-300 rounded-md", id="edit_username") }}
-						</div>
-
-						<div>
-							<label for="edit_correo" class="text-sm font-medium text-gray-700 text-left">Correo Electrónico</label> {{ form.correo(class="mt-1 p-2 w-full border border-gray-300 rounded-md", id="edit_correo") }}
-						</div>
-
-						<div>
-							<label for="edit_telefono" class="text-sm font-medium text-gray-700 text-left">Teléfono</label> {{ form.telefono(class="mt-1 p-2 w-full border border-gray-300 rounded-md", id="edit_telefono") }}
-						</div>
-
-						<div>
-							<label for="edit_rol" class="text-sm font-medium text-gray-700 text-left">Rol</label> {{ form.rol(class="mt-1 p-2 w-full border border-gray-300 rounded-md", id="edit_rol") }}
-						</div>
-
-						<div>
-							<label for="edit_estatus" class="text-sm font-medium text-gray-700 text-left">Estatus</label> {{ form.estatus(class="mt-1 p-2 w-full border border-gray-300 rounded-md", id="edit_estatus") }}
-						</div>
-
-						<div class="col-span-2">
-							<label for="edit_contrasenia" class="text-sm font-medium text-gray-700 text-left">Nueva Contraseña</label>
-							<input type="password" name="nueva_contrasenia" id="edit_contrasenia" placeholder="Ingrese nueva contraseña (opcional)" class="mt-1 p-2 w-full border border-gray-300 rounded-md">
-						</div>
-					</div>
-
-					<div class="flex justify-center mt-6 gap-4">
-						<button type="submit" style="background-color: #24985a !important;" class="text-white bg-green-500 hover:bg-green-600 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center">
-                        Guardar cambios
-                    </button>
-						<button type="button" id="cancelar-editar" style="background-color:#c90704 !important;" class="text-white bg-red-500 hover:bg-red-600 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm w-1/2 sm:w-auto px-5 py-2.5 text-center ml-2">
-                        Cancelar
-                    </button>
-					</div>
-				</form>
+	<div id="modificar-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center w-full h-full">
+		<div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-2xl">
+			<div class="flex justify-between items-center border-b pb-3 mb-4">
+				<h3 class="text-xl font-semibold text-gray-800">Editar Usuario</h3>
+				<button type="button" onclick="cerrarModalEditar()" class="text-gray-600 hover:text-red-600 text-2xl">&times;</button>
 			</div>
+			<form action="{{ url_for('personal_bp.modificar_usuario') }}" method="POST" id="form-editar">
+				{{ form.csrf_token }}
+				<input type="hidden" name="id" id="edit-id" value="{{ form.id.data }}">
+
+				<div class="grid grid-cols-2 gap-4">
+					<div>
+						<label>Nombre</label> {{ form.nombre(class="mt-1 p-2 w-full border rounded", id="edit-nombre") }}
+					</div>
+					<div>
+						<label>Usuario</label> {{ form.username(class="mt-1 p-2 w-full border rounded", id="edit-username") }}
+					</div>
+					<div>
+						<label>Correo</label> {{ form.correo(class="mt-1 p-2 w-full border rounded", id="edit-correo") }}
+					</div>
+					<div>
+						<label>Teléfono</label> {{ form.telefono(class="mt-1 p-2 w-full border rounded", id="edit-telefono") }}
+					</div>
+					<div>
+						<label>Rol</label> {{ form.rol(class="mt-1 p-2 w-full border rounded", id="edit-rol") }}
+					</div>
+					<div>
+						<label>Contraseña (opcional)</label> {{ form.contrasenia(class="mt-1 p-2 w-full border rounded", id="edit-contrasenia") }}
+					</div>
+					<div>
+						<label>Estatus</label> {{ form.estatus(class="mt-1 p-2 w-full border rounded", id="edit-estatus") }}
+					</div>
+				</div>
+
+				<div class="flex justify-center mt-6">
+					<button type="submit" class="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded">Guardar Cambios</button>
+					<button type="button" onclick="cerrarModalEditar()" class="ml-4 bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded">Cancelar</button>
+				</div>
+			</form>
 		</div>
 	</div>
+
 
 	<!-- Modal de confirmación de actualización -->
 	<div id="actualizar-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60">
@@ -228,21 +222,20 @@
 	</div>
 	<style>
 		.animate-fade-in {
-		      animation: fadeIn 0.25s ease-out;
-		    }
-		  
-		    @keyframes fadeIn {
-		      from {
-		        opacity: 0;
-		        transform: scale(0.95);
-		      }
-		  
-		      to {
-		        opacity: 1;
-		        transform: scale(1);
-		      }
-		    }
+			animation: fadeIn 0.25s ease-out;
+		}
 		
+		@keyframes fadeIn {
+			from {
+			opacity: 0;
+			transform: scale(0.95);
+			}
+		
+			to {
+			opacity: 1;
+			transform: scale(1);
+			}
+		}	
 	</style>
 
 
@@ -271,173 +264,156 @@
                 Eliminar
                 </button>
 			</form>
-			<button id="close-modal-btn" type="button" onclick="cerrarModal()" class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 text-lg">
-                &times;
-            </button>
+			<button id="cerrar-eliminar" type="button" onclick="cerrarModalEliminar()" class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 text-lg">
+				&times;
+			</button>
 		</div>
 	</div>
 	<style>
 		.animate-fade-in {
-						      animation: fadeIn 0.25s ease-out;
-						    }
-						  
-						    @keyframes fadeIn {
-						      from { opacity: 0; transform: scale(0.95); }
-						      to   { opacity: 1; transform: scale(1); }
-						    }			
+			animation: fadeIn 0.25s ease-out;
+		}
 		
+		@keyframes fadeIn {
+			from { opacity: 0; transform: scale(0.95); }
+			to   { opacity: 1; transform: scale(1); }
+		}				
 	</style>
-
-
 </div>
 
 <!-- Flowbite JS -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
 
 <script>
-	// Modal de registro
-			    document.getElementById('open-modal-btn').addEventListener('click', function() {
-			        document.getElementById('crud-modal').classList.remove('hidden');
-			    });
-			
-			    document.getElementById('close-modal-btn').addEventListener('click', function() {
-			        document.getElementById('crud-modal').classList.add('hidden');
-			    });
-			    
-			    document.getElementById('cancel-btn').addEventListener('click', function() {
-			        document.getElementById('crud-modal').classList.add('hidden');
-			    });
+		// Modal de agregar
+		document.getElementById('open-modal-btn').addEventListener('click', () => {
+		  document.getElementById('crud-modal').classList.remove('hidden');
+		});
 		
+		document.getElementById('close-modal-btn').addEventListener('click', () => {
+		  document.getElementById('crud-modal').classList.add('hidden');
+		});
 		
-		        // Abrir y cargar modal de edición
-		        function abrirModalEditar(id) {
-		            window.location.href = `/modificar_usuario?id=${id}`;
-		          }
-		        
-		          function cerrarEditarModal() {
-		            document.getElementById('editar-modal').classList.add('hidden');
-		            document.getElementById('form-editar-usuario').reset();
-		            document.getElementById('form-editar-usuario').removeAttribute('action');
-		          }
-		        
-		          document.getElementById('cerrar-editar-btn').addEventListener('click', cerrarEditarModal);
-		          document.getElementById('cancelar-editar').addEventListener('click', cerrarEditarModal);
-			
+		document.getElementById('cancel-btn').addEventListener('click', () => {
+		  document.getElementById('crud-modal').classList.add('hidden');
+		});
 		
-		        // Abrir y cargar modal de edición
-		        document.querySelectorAll('[data-modal-target="modificar-modal"]').forEach(button => {
-		            button.addEventListener('click', () => {
-		            const id = button.dataset.id;
-		            const nombre = button.dataset.nombre;
-		            const username = button.dataset.username;
-		            const correo = button.dataset.correo;
-		            const telefono = button.dataset.telefono;
-		            const rol = button.dataset.rol;
+		// Modal de edicion
+		document.addEventListener('DOMContentLoaded', () => {
+		  const botonesEditar = document.querySelectorAll('.btn-modificar');
 		
-		            document.getElementById('edit_nombre').value = nombre || '';
-		            document.getElementById('edit_username').value = username || '';
-		            document.getElementById('edit_correo').value = correo || '';
-		            document.getElementById('edit_telefono').value = telefono || '';
-		            document.getElementById('edit_rol').value = rol || '';
+		  botonesEditar.forEach(btn => {
+			btn.addEventListener('click', () => {
+			  document.getElementById('edit-id').value = btn.dataset.id;
+			  document.getElementById('edit-nombre').value = btn.dataset.nombre;
+			  document.getElementById('edit-username').value = btn.dataset.username;
+			  document.getElementById('edit-correo').value = btn.dataset.correo;
+			  document.getElementById('edit-telefono').value = btn.dataset.telefono;
+			  document.getElementById('edit-rol').value = btn.dataset.rol;
+			  document.getElementById('edit-estatus').value = btn.dataset.estatus;
+			  document.getElementById('edit-contrasenia').value = "";
 		
-		            const form = document.getElementById('form-editar-usuario');
-		            form.setAttribute('action', `/editar_usuario/${id}`);
-		
-		            document.getElementById('editar-modal').classList.remove('hidden');
-		            });
-		        });
-		
-		        document.getElementById('form-editar-usuario').addEventListener('submit', () => {
-		            document.getElementById('nueva_contrasenia').value = document.getElementById('edit_contrasenia').value;
-		        });
-		
-		
-		        document.getElementById('cerrar-editar-btn').addEventListener('click', function () {
-		            document.getElementById('editar-modal').classList.add('hidden');
-		          });
-		        
-		          document.getElementById('cancelar-editar').addEventListener('click', function () {
-		            document.getElementById('editar-modal').classList.add('hidden');
-		          });
-	
-	              document.addEventListener('DOMContentLoaded', () => {
-	                const modal = document.getElementById('actualizar-modal');
-	                const openForm = document.getElementById('form-editar-usuario');
-	                const confirmBtn = document.getElementById('confirmar-actualizacion');
-	                const cancelBtn = document.getElementById('cancelar-actualizacion');
-	                const closeBtn = document.getElementById('cerrar-actualizar-modal');
-	            
-	                if (openForm) {
-	                  openForm.addEventListener('submit', function (e) {
-	                    e.preventDefault();
-	                    modal.classList.remove('hidden');
-	                  });
-	            
-	                  confirmBtn.addEventListener('click', function () {
-	                    modal.classList.add('hidden');
-	                    openForm.submit();
-	                  });
-	            
-	                  cancelBtn.addEventListener('click', function () {
-	                    modal.classList.add('hidden');
-	                  });
-	            
-	                  closeBtn.addEventListener('click', function () {
-	                    modal.classList.add('hidden');
-	                  });
-	            
-	                  window.addEventListener('click', function (e) {
-	                    if (e.target === modal) {
-	                      modal.classList.add('hidden');
-	                    }
-	                  });
-	                }
-	              });
-		
-		      
-		        // Modal de eliminación
-			    document.addEventListener('DOMContentLoaded', () => {
-			      const modal = document.getElementById('eliminar-modal');
-			      const form = document.getElementById('form-eliminar-usuario');
-			      const cancelBtn = document.getElementById('cancelar-eliminar');
-			  
-			      document.querySelectorAll('.btn-eliminar').forEach(button => {
-			        button.addEventListener('click', () => {
-			          const userId = button.getAttribute('data-id');
-			          form.setAttribute('action', `/eliminar_usuario/${userId}`);
-			          modal.classList.remove('hidden');
-			        });
-			      });
-			  
-			      cancelBtn.addEventListener('click', () => {
-			        modal.classList.add('hidden');
-			        form.removeAttribute('action');
-			      });
-			  
-			      window.addEventListener('click', (e) => {
-			        if (e.target === modal) {
-			          modal.classList.add('hidden');
-			          form.removeAttribute('action');
-			        }
-			      });
-			    });
-	           
-	            document.addEventListener("DOMContentLoaded", () => {
-	                // Si la URL contiene /cargar_usuario, la limpiamos
-	                if (window.location.pathname.includes("/cargar_usuario")) {
-	                  history.replaceState({}, document.title, "/usuarios");
-	                }
-	              });
-		
-	
-</script>
-
-{% if modificar_modal %}
-<script>
-	document.addEventListener('DOMContentLoaded', function () {
-		    document.getElementById('editar-modal').classList.remove('hidden');
+			  const modal = document.getElementById('modificar-modal');
+			  modal.classList.remove('hidden');
+			  modal.classList.add('flex');
+			  modal.style.display = 'flex';
+			});
 		  });
 		
-	
+		  const modalEditar = document.getElementById('modificar-modal');
+		  window.addEventListener('click', (e) => {
+			if (e.target === modalEditar) {
+			  cerrarModalEditar();
+			}
+		  });
+		});
+		
+		function cerrarModalEditar() {
+		  const modal = document.getElementById('modificar-modal');
+		  modal.classList.add('hidden');
+		  modal.classList.remove('flex');
+		  modal.style.display = 'none';
+		  document.getElementById('form-editar').reset();
+		}
+		
+		// Modal de confirmación de actualización
+		document.addEventListener('DOMContentLoaded', () => {
+		  const formEditar = document.getElementById('form-editar');
+		  const modalConfirmar = document.getElementById('actualizar-modal');
+		  const confirmarBtn = document.getElementById('confirmar-actualizacion');
+		  const cancelarBtn = document.getElementById('cancelar-actualizacion');
+		  const cerrarX = document.getElementById('cerrar-actualizar-modal');
+		  let formSubmitEvent = null;
+		
+		  formEditar.addEventListener('submit', (e) => {
+			e.preventDefault();
+			formSubmitEvent = e;
+			modalConfirmar.classList.remove('hidden');
+			modalConfirmar.style.display = 'flex';
+		  });
+		
+		  confirmarBtn.addEventListener('click', () => {
+			modalConfirmar.classList.add('hidden');
+			modalConfirmar.style.display = 'none';
+			if (formSubmitEvent) {
+			  formEditar.submit();
+			}
+		  });
+		
+		  cancelarBtn.addEventListener('click', () => {
+			modalConfirmar.classList.add('hidden');
+			modalConfirmar.style.display = 'none';
+		  });
+		
+		  cerrarX.addEventListener('click', () => {
+			modalConfirmar.classList.add('hidden');
+			modalConfirmar.style.display = 'none';
+		  });
+		
+		  window.addEventListener('click', (e) => {
+			if (e.target === modalConfirmar) {
+			  modalConfirmar.classList.add('hidden');
+			  modalConfirmar.style.display = 'none';
+			}
+		  });
+		});
+		
+		// Modal de eliminación
+		document.addEventListener('DOMContentLoaded', () => {
+		  const modalEliminar = document.getElementById('eliminar-modal');
+		  const formEliminar = document.getElementById('form-eliminar-usuario');
+		  const cancelEliminar = document.getElementById('cancelar-eliminar');
+		
+		  document.querySelectorAll('.btn-eliminar').forEach(button => {
+			button.addEventListener('click', () => {
+			  const userId = button.getAttribute('data-id');
+			  formEliminar.setAttribute('action', `/eliminar_usuario/${userId}`);
+			  modalEliminar.classList.remove('hidden');
+			  modalEliminar.style.display = 'flex';
+			});
+		  });
+		
+		  cancelEliminar.addEventListener('click', () => {
+			modalEliminar.classList.add('hidden');
+			modalEliminar.style.display = 'none';
+			formEliminar.removeAttribute('action');
+		  });
+		
+		  window.addEventListener('click', (e) => {
+			if (e.target === modalEliminar) {
+			  modalEliminar.classList.add('hidden');
+			  modalEliminar.style.display = 'none';
+			  formEliminar.removeAttribute('action');
+			}
+		  });
+		});
+		
+		function cerrarModalEliminar() {
+		  const modal = document.getElementById('eliminar-modal');
+		  const form = document.getElementById('form-eliminar-usuario');
+		  modal.classList.add('hidden');
+		  modal.style.display = 'none';
+		  form.removeAttribute('action');
+		}	
 </script>
-{% endif %} {% endblock %}
+{% endblock %}

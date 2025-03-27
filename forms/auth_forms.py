@@ -1,19 +1,18 @@
-from flask_wtf import FlaskForm
+from flask_wtf import FlaskForm, RecaptchaField
 from wtforms import StringField, PasswordField, ValidationError
 from wtforms.validators import DataRequired, Length,Email, Regexp
 from werkzeug.security import check_password_hash
 from models.models import Usuario
 
-# Validadores para login 
 class LoginForm(FlaskForm):
-    # Definimos los campos con sus validadores
     email = StringField('Correo Electrónico', validators=[
         DataRequired(), Email()
     ])
     password = PasswordField('Contraseña', validators=[
         DataRequired(), Length(min=6)
     ])
-    
+    recaptcha = RecaptchaField()  
+
     def validate_email(self, field):
         user = Usuario.query.filter_by(correo=field.data).first()
         if not user:
@@ -41,7 +40,7 @@ class RegisterFormLandingPage(FlaskForm):
         DataRequired(), Length(min=4, max=10)
     ])
     password = PasswordField("Contraseña", validators=[
-        DataRequired(),Length(min=8, max=15),
+        DataRequired(),Length(min=6, max=12),
         Regexp(r'^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*?&]{8,}$', 
         message="La contraseña debe tener al menos 8 caracteres, una letra y un número.")
     ])

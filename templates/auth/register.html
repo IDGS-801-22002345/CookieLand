@@ -4,7 +4,7 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Registro | Maicookies</title>
+	<title>Registro - Maicookies</title>
 	<link rel="stylesheet" href="{{ url_for('static', filename='css/output.css') }}">
 	<script src="{{ url_for('static', filename='js/main.js') }}"></script>
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
@@ -70,11 +70,11 @@
             </div>
         
             <!-- Checkbox de términos y condiciones -->
-            <div class="flex items-center">
-                <input type="checkbox" id="terms" class="w-4 h-4 border border-gray-300 rounded-sm focus:ring-[#A0522D]" required>
+            <div class="flex items-center space-x-2">
+                <input type="checkbox" id="terms" class="w-5 h-5 border border-gray-300 rounded-sm focus:ring-[#A0522D]" required>
                 <label for="terms" class="ml-2 text-sm text-gray-700">
                     Acepto los 
-                    <a href="{{ url_for('cliente_bp.terminosycondiciones') }}" class="text-[#A0522D] hover:text-[#8B5A2B]">términos y condiciones</a>.
+                    <a href="{{ url_for('cliente_bp.terminosycondiciones') }}" class="text-[#A0522D] hover:text-[#8B5A2B] link-custom">términos y condiciones</a>.
                 </label>
             </div>
 

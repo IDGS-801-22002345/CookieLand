@@ -43,8 +43,12 @@
                 </a>                
             </div>
 
-            <!-- Agrega este código en el formulario antes del botón de envío
-            <div class="g-recaptcha" data-sitekey="6LepM_sqAAAAAPdE89CYgtsoPAT0DMLXNOyRnvd6"></div> -->
+            <div class="mt-4">
+                {{ form.recaptcha }}
+                {% for error in form.recaptcha.errors %}
+                    <p class="text-red-500 text-xs">{{ error }}</p>
+                {% endfor %}
+            </div>
         
             <div class="text-center mt-6">
                 <button type="submit" class="btn-custom">
@@ -55,23 +59,9 @@
                 </p>
             </div>   
         </form>
-        <script>
-            // Elimina automáticamente el contenedor a los 4 segundos
-            setTimeout(() => {
-              const flash = document.getElementById("flash-container");
-              if (flash) {
-                flash.style.opacity = "0";
-                flash.style.transition = "opacity 0.5s ease-out";
-                setTimeout(() => flash.remove(), 500);
-              }
-            }, 4000);
-          </script> 
-        
-    <!-- <script src="https://www.google.com/recaptcha/api.js" async defer></script> -->
     </div>
 
     <style>
-        /* Estilos personalizados para el botón */
         .btn-custom {
             background-color: #8B5A2B; /* Café cálido */
             color: white; /* Texto en blanco */
@@ -115,6 +105,7 @@
     </style>
 
     <!-- Scripts -->
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
     <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
 </body>
 </html>

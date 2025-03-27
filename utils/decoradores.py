@@ -11,12 +11,12 @@ def anonymous_required(f):
         return f(*args, **kwargs)
     return decorated
 
-def role_required(role_name):
+def role_required(*role_names):
     def decorator(f):
         @wraps(f)
         @login_required
         def wrapper(*args, **kwargs):
-            if not current_user.has_role(role_name):
+            if not current_user.rol or current_user.rol.role_name.lower() not in [role.lower() for role in role_names]:
                 flash("No tienes permisos para acceder a esta sección.", "danger")
                 return redirect(url_for('auth_bp.login'))
             return f(*args, **kwargs)

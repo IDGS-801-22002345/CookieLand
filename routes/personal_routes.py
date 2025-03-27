@@ -54,79 +54,43 @@ def usuarios():
         
     return render_template('personal/usuarios.html', form=form, usuarios=usuarios)
 
-
-# Ruta para editar un usuario
+# Ruta para modificar un usuario
 @personal_bp.route('/modificar_usuario', methods=["GET", "POST"])
 @role_required('admin')
 def modificar_usuario():
     form = RegistroUsuarioForm(request.form)
-    id = form.id.data  
 
-    usuario = Usuario.query.get(id)
-    if not usuario:
-        flash("Usuario no encontrado", "danger")
-        return redirect(url_for('personal_bp.usuarios'))
-    
     if request.method == "GET":
         id = request.args.get('id')
-        usuario = Usuario.query.get(id)
-
+        usuario = db.session.query(Usuario).filter(Usuario.id == id).first()
         if usuario:
             form.id.data = usuario.id
             form.nombre.data = usuario.nombre
             form.username.data = usuario.username
             form.correo.data = usuario.correo
             form.telefono.data = usuario.telefono
-            form.rol.data = usuario.rol.role_name if usuario.rol else ''
+            form.rol.data = usuario.rol.role_name
             form.estatus.data = usuario.estatus
         else:
-            flash("Usuario no encontrado", "danger")
+            flash("Usuario no encontrado", "error")
             return redirect(url_for('personal_bp.usuarios'))
 
     elif request.method == "POST":
         id = form.id.data
-        usuario = Usuario.query.get(id)
-
+        usuario = db.session.query(Usuario).filter(Usuario.id == id).first()
         if usuario:
-            # Verifica duplicados excluyendo el mismo usuario
-            if Usuario.query.filter(Usuario.correo == form.correo.data, Usuario.id != usuario.id).first():
-                flash("Otro usuario ya tiene ese correo.", "danger")
-                return redirect(url_for('personal_bp.usuarios'))
-
-            if Usuario.query.filter(Usuario.username == form.username.data, Usuario.id != usuario.id).first():
-                flash("Otro usuario ya tiene ese nombre de usuario.", "danger")
-                return redirect(url_for('personal_bp.usuarios'))
-
-            rol = Role.query.filter_by(role_name=form.rol.data).first()
-            if not rol:
-                flash("Rol no válido", "danger")
-                return redirect(url_for('personal_bp.usuarios'))
-
-            # Asignación
             usuario.nombre = form.nombre.data
             usuario.username = form.username.data
             usuario.correo = form.correo.data
             usuario.telefono = form.telefono.data
-            usuario.rol_id = rol.id
-            usuario.estatus = int(form.estatus.data)
-
-            # Nueva contraseña si se envía
-            nueva_contrasenia = request.form.get("nueva_contrasenia")
-            if nueva_contrasenia and nueva_contrasenia.strip():
-                if len(nueva_contrasenia.strip()) < 6:
-                    flash("La nueva contraseña debe tener al menos 6 caracteres.", "danger")
-                    return redirect(url_for('personal_bp.usuarios'))
-                usuario.contrasenia = generate_password_hash(nueva_contrasenia.strip())
-
-            try:
-                db.session.commit()
-                flash("Usuario actualizado correctamente.", "success")
-            except Exception as e:
-                db.session.rollback()
-                flash(f"Error al actualizar usuario: {e}", "danger")
+            usuario.rol_id = Role.query.filter_by(role_name=form.rol.data).first().id
+            usuario.estatus = form.estatus.data
+            if form.contrasenia.data:
+                usuario.contrasenia = generate_password_hash(form.contrasenia.data)
+            db.session.commit()
+            flash("Usuario actualizado correctamente", "success")
         else:
-            flash("Usuario no encontrado", "danger")
-
+            flash("Usuario no encontrado", "error")
         return redirect(url_for('personal_bp.usuarios'))
 
     usuarios = Usuario.query.all()
@@ -140,14 +104,15 @@ def eliminar_usuario(usuario_id):
     usuario = Usuario.query.get_or_404(usuario_id)
 
     try:
-        db.session.delete(usuario)
+        usuario.estatus = 0  # ← Estatus desactivado
         db.session.commit()
-        flash(f"Usuario '{usuario.username}' eliminado correctamente.", "success")
+        flash(f"Usuario '{usuario.username}' desactivado correctamente.", "success")
     except Exception as e:
         db.session.rollback()
-        flash(f"No se pudo eliminar el usuario: {e}", "danger")
+        flash(f"No se pudo desactivar el usuario: {e}", "danger")
 
     return redirect(url_for('personal_bp.usuarios'))
+
 
 @personal_bp.route('/cargar_usuario', methods=['POST'])
 @role_required('admin')
