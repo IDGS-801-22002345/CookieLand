@@ -1,28 +1,23 @@
-from wtforms import Form #type:ignore
-from flask_wtf import FlaskForm#type:ignore
- 
-from wtforms import StringField,IntegerField#type:ignore
-from wtforms import EmailField#type:ignore
-from wtforms import validators#type:ignore
-from wtforms import Form, IntegerField, StringField, EmailField, validators
- 
-class ProveedorForm(Form):  
-    id = IntegerField('id', [
-        validators.number_range(min=1, max=20, message='Valor no válido')
+from flask_wtf import FlaskForm
+from wtforms import StringField, IntegerField, EmailField
+from wtforms.validators import DataRequired, Length, Email, Regexp, NumberRange
+
+class ProveedorForm(FlaskForm):
+    id = IntegerField('id')  # No necesita validación si es autoincremental
+    nombre = StringField('Nombre', validators=[
+        DataRequired('El nombre es requerido'),
+        Length(min=4, max=50, message='El nombre debe tener entre 4 y 50 caracteres')
     ])
-    nombre = StringField('nombre', [
-        validators.DataRequired(message='El nombre es requerido'),
-        validators.length(min=4, max=50, message='Requiere min=4, max=50')
+    telefono = StringField('Teléfono', validators=[
+        DataRequired('El teléfono es requerido'),
+        Length(min=10, max=15, message='El teléfono debe tener entre 10 y 15 dígitos'),
+        Regexp(r'^\d+$', message='Solo se permiten números')
     ])
-    telefono = StringField('teléfono', [
-        validators.DataRequired(message='El teléfono es requerido'),
-        validators.length(min=10, max=15, message='Requiere min=10, max=15')
+    email = EmailField('Email', validators=[
+        DataRequired('El email es requerido'),
+        Email('Ingrese un email válido'),
+        Length(max=50, message='El email no debe exceder 50 caracteres')
     ])
-    email = EmailField('correo', [
-        validators.DataRequired(message='El correo es requerido'),
-        validators.Email(message='Ingrese un correo válido')
-    ])
-    estatus = IntegerField('estatus', [
-        validators.DataRequired(message='El estatus es requerido'),
-        validators.number_range(min=0, max=1, message='El estatus debe ser 0 o 1')
+    estatus = IntegerField('Estatus', validators=[
+        NumberRange(min=0, max=1, message='El estatus debe ser 0 o 1')
     ])

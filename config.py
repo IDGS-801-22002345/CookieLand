@@ -9,6 +9,6 @@ class Config(object):
 
 class DevelopmentConfig(Config):
     DEBUG = True
-    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:Maico@localhost/Maicookies'
+    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:root1234@localhost/flaskDB'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
