@@ -1,34 +1,38 @@
 from flask_sqlalchemy import SQLAlchemy
+from flask_login import UserMixin # type: ignore
 import datetime
 
-db=SQLAlchemy()
-
+db = SQLAlchemy()
 
 class Role(db.Model):
     __tablename__ = 'roles'
     id = db.Column(db.Integer, primary_key=True)
     role_name = db.Column(db.String(50), unique=True, nullable=False)
 
-class Usuario(db.Model):
-    __tablename__ = 'usuarios' 
+class Usuario(db.Model, UserMixin):
+    __tablename__ = 'usuarios'
     id = db.Column(db.Integer, primary_key=True)
     nombre = db.Column(db.String(255), nullable=False)
     telefono = db.Column(db.String(10), nullable=False)
     correo = db.Column(db.String(100), unique=True, nullable=False)
     contrasenia = db.Column(db.String(255), nullable=False)
+    estatus = db.Column(db.Integer, default=1) 
     username = db.Column(db.String(50), unique=True, nullable=False)
     rol_id = db.Column(db.Integer, db.ForeignKey('roles.id'), nullable=False)
-    rol = db.relationship('Role', backref=db.backref('usuarios', lazy=True))
 
-    def _repr_(self):
-        return f'<Usuario{self.nombre}>'
+    rol = db.relationship(Role, backref=db.backref('usuarios', lazy=True), lazy='joined')
+
+    def __repr__(self):
+        return f'<Usuario {self.nombre}>'
+
+    def has_role(self, role_name):
+        return self.rol and self.rol.role_name.lower() == role_name.lower()
     
 class MateriaPrima(db.Model):  
     __tablename__ = 'materia_prima' 
     id = db.Column(db.Integer, primary_key=True)
     nombre = db.Column(db.String(50), unique=True, nullable=False)
     unidad = db.Column(db.String(50), nullable=False)
-    estatus = db.Column(db.Integer, default=1)  # Estatus (0 o 1, por defecto 1)
     create_date = db.Column(db.DateTime, default=datetime.datetime.now, server_default=db.func.now())
     update_date = db.Column(db.DateTime, default=datetime.datetime.now, server_default=db.func.now())
     

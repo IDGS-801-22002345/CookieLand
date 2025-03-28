@@ -5,9 +5,12 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flowbite Flask</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/output.css') }}">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <script src="{{ url_for('static', filename='js/inventario.js') }}"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
 </head>
 
 <body>
@@ -37,16 +40,20 @@
             </button>
 
             <!-- Usuarios -->
-            <button class="relative px-3 py-3 flex items-center space-x-4 justify-start text-gray-500 rounded-lg group">
+            <a href="{{ url_for('personal_bp.usuarios') }}" class="relative px-3 py-3 flex items-center space-x-4 justify-start text-gray-500 rounded-lg group">
                 <i class="fas fa-users"></i>
                 <span class="font-medium">Usuarios</span>
-            </button>
+            </a>
 
             <!-- Proveedores -->
             <button class="relative px-3 py-3 flex items-center space-x-4 justify-start text-gray-500 rounded-lg group">
                 <i class="fas fa-truck"></i>
                 <span class="font-medium">Proveedores</span>
             </button>
+            <a href="" class="relative px-3 py-3 flex items-center space-x-4 justify-start text-gray-500 rounded-lg group">
+                <i class="fas fa-truck"></i>
+                <span class="font-medium">Proveedores</span>
+            </a>
 
             <!-- Ventas -->
             <button class="relative px-3 py-3 flex items-center space-x-4 justify-start text-gray-500 rounded-lg group">
@@ -79,60 +86,16 @@
             </button>
 
             <!-- Cerrar sesión -->
-            <button class="relative px-3 py-3 flex items-center space-x-4 justify-start text-gray-500 rounded-lg group">
+            <a href="{{ url_for('auth_bp.logout') }}" class="relative px-3 py-3 flex items-center space-x-4 justify-start text-gray-500 rounded-lg group">
                 <i class="fas fa-sign-out-alt"></i>
                 <span class="font-medium">Cerrar sesión</span>
-            </button>
+            </a>
         </div>
     </div>
 
     <!-- Contenido principal -->
     <div class="flex items-center justify-center min-h-screen">
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                <div class="absolute top-5 right-5 z-50 space-y-4">
-                    {% for category, message in messages %}
-                        <!-- Usando clases de Flowbite para notificaciones -->
-                        <div class="flex items-center p-4 mb-4 text-sm font-medium text-white rounded-lg 
-                            {% if category == 'success' %} 
-                                bg-green-500 
-                            {% elif category == 'error' %}
-                                bg-red-500
-                            {% elif category == 'info' %}
-                                bg-blue-500
-                            {% elif category == 'warning' %}
-                                bg-yellow-500
-                            {% endif %}
-                            animate__animated animate__slideInRight animate__fadeOut animate__duration-1000ms notification">
-                            <!-- Icono dependiendo del tipo de mensaje -->
-                            {% if category == 'success' %}
-                                <svg class="w-5 h-5 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" 
-                                     viewBox="0 0 24 24" stroke-width="2">
-                                    <path d="M9 12l2 2l4-4"></path>
-                                </svg>
-                            {% elif category == 'error' %}
-                                <svg class="w-5 h-5 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" 
-                                     viewBox="0 0 24 24" stroke-width="2">
-                                    <path d="M6 18L18 6M6 6l12 12"></path>
-                                </svg>
-                            {% elif category == 'info' %}
-                                <svg class="w-5 h-5 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" 
-                                     viewBox="0 0 24 24" stroke-width="2">
-                                    <path d="M12 4v16m8-8H4"></path>
-                                </svg>
-                            {% elif category == 'warning' %}
-                                <svg class="w-5 h-5 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" 
-                                     viewBox="0 0 24 24" stroke-width="2">
-                                    <path d="M12 2L2 22h20L12 2z"></path>
-                                </svg>
-                            {% endif %}
-                            <!-- Mensaje -->
-                            <p>{{ message }}</p>
-                        </div>
-                    {% endfor %}
-                </div>
-            {% endif %}
-        {% endwith %}
+       
 
         {% block content %}
         {% endblock %}
