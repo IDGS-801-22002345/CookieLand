@@ -1,5 +1,3 @@
-# Comando para poder usar tw
-
 # Ya no es necesario usar el codigo que esta debajo
 
 <!-- npx tailwindcss -i ./static/css/input.css -o ./static/css/output.css --watch -->
