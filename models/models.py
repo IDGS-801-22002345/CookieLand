@@ -56,3 +56,23 @@ class Proveedores(db.Model):  # Cambiamos de Alumnos a Proveedores
     email = db.Column(db.String(100))
     estatus = db.Column(db.Integer, default=1)  # Estatus (0 o 1, por defecto 1)
     create_date = db.Column(db.DateTime, default=datetime.datetime.now, server_default=db.func.now())
+
+class Compra(db.Model): 
+    __tablename__ = 'compras'
+    id = db.Column(db.Integer, primary_key=True)
+    total = db.Column(db.Float, nullable=False)
+    create_date = db.Column(db.DateTime, default=datetime.datetime.now, server_default=db.func.now())
+    materia_prima_id = db.Column(db.Integer, db.ForeignKey('materia_prima.id'), nullable=False)
+    proveedor_id = db.Column(db.Integer, db.ForeignKey('proveedores.id'), nullable=True)
+
+class DetalleCompra(db.Model):
+    __tablename__ = 'detalle_compras'
+    id = db.Column(db.Integer, primary_key=True)
+    cantidad = db.Column(db.Float, nullable=False)
+    costo_unitario = db.Column(db.Float, nullable=False)
+    total = db.Column(db.Float, nullable=False)
+    compra_id = db.Column(db.Integer, db.ForeignKey('compras.id'), nullable=False)  
+    materia_prima_id = db.Column(db.Integer, db.ForeignKey('materia_prima.id'), nullable=False)
+    proveedor_id = db.Column(db.Integer, db.ForeignKey('proveedores.id'), nullable=True)
+    proveedor_nombre = db.Column(db.String(255), nullable=True)
+
