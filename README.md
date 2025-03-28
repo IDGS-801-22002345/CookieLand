@@ -1,6 +1,16 @@
 # Comando para poder usar tw
 
-npx tailwindcss -i ./static/css/input.css -o ./static/css/output.css --watch
+# Ya no es necesario usar el codigo que esta debajo
+
+<!-- npx tailwindcss -i ./static/css/input.css -o ./static/css/output.css --watch -->
+
+# Ya solo con que peguen el siguien codigo les deberia de correr el tw
+
+npm run watch:css
+
+# Cuando se salgan les aparecera un este mensaje: ¿Desea terminar el trabajo por lotes (S/N)?
+
+# Le dan la S y enter
 
 # Hacer push de los cambios
 
