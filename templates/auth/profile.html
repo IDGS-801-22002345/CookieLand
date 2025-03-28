@@ -1,0 +1,46 @@
+{% extends "cliente/layout.html" %}
+{% block title %}Mi Perfil - Maicookies{% endblock %}
+{% block content %}
+
+<section class="min-h-screen py-16 bg-[#fdfaf6]">
+	<div class="max-w-3xl mx-auto bg-white rounded-3xl shadow-lg p-8 border border-[#E5E7EB]">
+		<div class="flex items-center justify-between mb-8">
+			<a href="{{ url_for('cliente_bp.index') }}" class="text-[#5A3E1B] hover:text-[#4E3417]" title="Inicio">
+				<i class="fas fa-home text-2xl"></i>
+			</a>
+			<h1 class="text-4xl font-bold text-[#5A3E1B] text-center w-full">Mi perfil</h1>
+		</div>
+		
+		<!-- Datos del cliente -->
+		<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 mt-4">
+			<div>
+				<label class="block text-sm font-semibold text-[#5A3E1B] mb-1">Nombre</label>
+				<p class="bg-gray-100 p-3 rounded-lg text-[#333]">{{ current_user.nombre }}</p>
+			</div>
+			<div>
+				<label class="block text-sm font-semibold text-[#5A3E1B] mb-1">Teléfono</label>
+				<p class="bg-gray-100 p-3 rounded-lg text-[#333]">{{ current_user.telefono }}</p>
+			</div>
+			<div>
+				<label class="block text-sm font-semibold text-[#5A3E1B] mb-1">Correo Electrónico</label>
+				<p class="bg-gray-100 p-3 rounded-lg text-[#333]">{{ current_user.correo }}</p>
+			</div>
+			<div>
+				<label class="block text-sm font-semibold text-[#5A3E1B] mb-1">Nombre de Usuario</label>
+				<p class="bg-gray-100 p-3 rounded-lg text-[#333]">{{ current_user.username }}</p>
+			</div>
+		</div>
+
+		<hr class="my-6 border-t border-[#E5E7EB]">
+
+		<!-- Acciones -->
+		<div class="flex justify-end">
+			<a href=""
+			   class="bg-[#5A3E1B] text-white px-6 py-2 rounded-xl font-semibold hover:bg-[#4E3417] transition duration-200">
+				Editar Perfil
+			</a>
+		</div>
+	</div>
+</section>
+
+{% endblock %}

@@ -1,117 +1,24 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>{% block title %}Maicookies{% endblock %}</title>
-	<link rel="stylesheet" href="{{ url_for('static', filename='css/output.css') }}">
-    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+{% extends "cliente/layout.html" %}
+{% block title %}Inicio - Maicookies{% endblock %}
+{% block content %}
 
-
-</head>
-<body class="bg-[#FAF3E0] text-gray-900 flex flex-col min-h-screen">
-
-    <nav class="bg-gradient-to-b from-black/50 bg-[#D2B48C]  fixed top-0 left-0 w-full z-50 py-6">
-        <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto px-6">
-            <a href="https://flowbite.com/" class="flex items-center space-x-3 rtl:space-x-reverse">
-                <span class="self-center text-2xl tracking-tight font-extrabold whitespace-nowrap text-gray-900 dark:text-white">🍪Maicookies</span>
-            </a>
-            <div class="flex items-center md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
-                <div class="flex items-center space-x-4">
-                    <!-- Icono de Usuario -->
-                    <button type="button" class="relative text-black text-2xl focus:outline-none
-                    id="user-menu-button" aria-expanded="false" data-dropdown-toggle="user-dropdown" data-dropdown-placement="bottom">
-                    <i class="fas fa-user text-lg"></i>
-                    </button>
-                    <!-- Icono de Carrito de Compras -->
-                    <button type="button" class="relative text-black text-2xl focus:outline-none">
-                        <i class="fas fa-shopping-cart"></i>
-                        <!-- Contador de artículos en el carrito -->
-                        <span class="absolute top-(-2) right-(-2) left-5 bg-red-500 text-white text-xs font-bold rounded-full px-2">3</span>
-                    </button>
-                </div>                
-                <!-- Dropdown menu -->
-                <div class="z-50 hidden my-4 text-base list-none rounded-lg shadow-sm bg-gray-200 dark:bg-gray-700 dark:divide-gray-600" id="user-dropdown">
-                    <div class="px-4 py-3">
-                        <span class="block text-sm text-gray-900 dark:text-white">Bonnie Green</span>
-                        <span class="block text-sm text-gray-500 truncate dark:text-gray-400">name@flowbite.com</span>
-                    </div>
-                    <ul class="py-2" aria-labelledby="user-menu-button">
-                        <li>
-                            <a href="#" class="block px-4 py-2 text-sm text-gray-900 hover:bg-gray-200 dark:hover:bg-gray-600 dark:text-gray-100 dark:hover:text-white">Dashboard</a>
-                        </li>
-                        <li>
-                            <a href="#" class="block px-4 py-2 text-sm text-gray-900 hover:bg-gray-200 dark:hover:bg-gray-600 dark:text-gray-100 dark:hover:text-white">Settings</a>
-                        </li>
-                        <li>
-                            <a href="#" class="block px-4 py-2 text-sm text-gray-900 hover:bg-gray-200 dark:hover:bg-gray-600 dark:text-gray-100 dark:hover:text-white">Earnings</a>
-                        </li>
-                        <li>
-                            <a href="#" class="block px-4 py-2 text-sm text-gray-900 hover:bg-gray-200 dark:hover:bg-gray-600 dark:text-gray-100 dark:hover:text-white">Sign out</a>
-                        </li>
-                    </ul>
-                </div>
-                <button data-collapse-toggle="navbar-user" type="button" class="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600" aria-controls="navbar-user" aria-expanded="false">
-                    <span class="sr-only">Open main menu</span>
-                    <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 17 14">
-                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 1h15M1 7h15M1 13h15"/>
-                    </svg>
-                </button>
-            </div>
-            <div class="items-center justify-between hidden w-full md:flex md:w-auto md:order-1" id="navbar-user">
-                <ul class="flex flex-col tracking-tight text-lg p-4 md:p-0 mt-4 rounded-lg bg-transparent md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0">
-                    <li>
-                        <a href="{{ url_for('cliente_bp.index')}}" class="block py-3 px-4 text-dark hover:underline md:p-0">Inicio</a>
-                    </li>
-                    <li>
-                        <a href="{{ url_for('cliente_bp.nosotros')}}" class="block py-3 px-4 text-dark hover:underline md:p-0">Nosotros</a>
-                    </li>
-                    <li>
-                        <a href="" class="block py-3 px-4 text-dark hover:underline md:p-0">Pide en Línea</a>
-                    </li>
-                    <li>
-                        <a href="{{ url_for('cliente_bp.geleria')}}" class="block py-3 px-4 text-dark hover:underline md:p-0">Galería</a>
-                    </li>
-                    <li>
-                        <a href="{{ url_for('cliente_bp.contacto') }}" class="block py-3 px-4 text-dark hover:underline md:p-0">Contacto</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
-    
-
-
-    <!-- JavaScript para el menú móvil -->
-    <script>
-        document.getElementById('menu-toggle').addEventListener('click', function () {
-            document.getElementById('mobile-menu').classList.toggle('hidden');
-        });
-    </script>
-
-
-    <div class="relative mt-20">
-        <!-- Imagen -->
+    <!-- Hero -->
+    <div class="relative">
         <img class="h-auto max-w-full w-full" src="{{ url_for('static', filename='img/img1.jpg') }}" alt="image description">
-    
-        <!-- Texto y botón sobre la imagen -->
         <div class="absolute inset-0 flex flex-col items-center justify-center bg-black/40 text-white text-center">
             <h1 class="text-4xl md:text-6xl font-extrabold tracking-wide mb-6">
             El primer bocado te enamora, el segundo te hace adicto
             </h1>
-            <a href="" class="px-6 py-3 bg-[#A0522D] text-white text-lg font-semibold rounded-lg shadow-lg hover:bg-[#8B5A2B] transition-all">
+            <a href="" class="px-6 py-3 bg-[#A0522D] text-white text-lg font-semibold rounded-lg shadow-lg hover:bg-[#EC9704] transition-all">
             Pide en Línea
             </a>
         </div>
     </div>
-    
 
-    <section class="bg-white dark:bg-gray-900">
+    <!-- Acerca de Maicookies -->
+    <section class="py-12 bg-white">
         <div class="gap-16 items-center py-8 px-4 mx-auto max-w-screen-xl lg:grid lg:grid-cols-2 lg:py-16 lg:px-6">
-            <div class="font-light text-gray-500 sm:text-lg dark:text-gray-400">
+            <div class="font-light text-dark text-lg dark:text-dark">
                 <h2 class="mb-4 text-5xl tracking-tight font-extrabold text-[#5A3E1B]">Somos un lugar al que llamar hogar</h2>
                 <p class="mb-4">Nos apasiona crear <strong>las galletas más deliciosas</strong> y únicas que jamás hayas probado. Utilizamos ingredientes de la más alta calidad y recetas tradicionales combinadas con un toque moderno para ofrecerte una experiencia inigualable. Nuestro compromiso con la excelencia y la satisfacción del cliente nos distingue como los mejores.</p>
             </div>
@@ -122,144 +29,130 @@
     </section>
 
     
+    <!-- Ventajas de Maicookies -->
+    <section class="py-20 bg-white" id="ventajas">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="mb-4 text-5xl tracking-tight font-extrabold text-[#5A3E1B]">¿Por qué elegir Maicookies?</h2>
+                <p class="mb-4 font-light text-dark text-lg dark:text-dark">Porque cada galleta está hecha con amor, ingredientes de calidad y un toque especial que te hará volver.</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+                <div class="text-center p-6 rounded-xl hover:shadow-xl transition-all duration-300 bg-[#ececec]" x-data="{ hover: false }" @mouseenter="hover = true" @mouseleave="hover = false">
+                    <div class="w-16 h-16 mx-auto mb-6 flex items-center justify-center bg-yellow-100 text-yellow-500 rounded-full text-3xl" :class="{ 'transform scale-110': hover }">
+                        <i class="fas fa-cookie-bite"></i>
+                    </div>
+                    <h3 class="text-xl tracking-tight font-extrabold mb-3">Sabor Inigualable</h3>
+                    <p class="mb-4 font-light text-dark text-lg dark:text-dark">Recetas únicas que combinan tradición y creatividad para ofrecerte una experiencia deliciosa en cada bocado.</p>
+                </div>
+                <div class="text-center p-6 rounded-xl hover:shadow-xl transition-all duration-300 bg-[#ececec]" x-data="{ hover: false }" @mouseenter="hover = true" @mouseleave="hover = false">
+                    <div class="w-16 h-16 mx-auto mb-6 flex items-center justify-center bg-pink-100 text-pink-500 rounded-full text-3xl" :class="{ 'transform scale-110': hover }">
+                        <i class="fas fa-seedling"></i>
+                    </div>
+                    <h3 class="text-xl tracking-tight font-extrabold mb-3">Ingredientes Naturales</h3>
+                    <p class="mb-4 font-light text-dark text-lg dark:text-dark">Solo usamos productos frescos y seleccionados para garantizarte galletas sanas y deliciosas.</p>
+                </div>
+                <div class="text-center p-6 rounded-xl hover:shadow-xl transition-all duration-300 bg-[#ececec]" x-data="{ hover: false }" @mouseenter="hover = true" @mouseleave="hover = false">
+                    <div class="w-16 h-16 mx-auto mb-6 flex items-center justify-center bg-green-100 text-green-500 rounded-full text-3xl" :class="{ 'transform scale-110': hover }">
+                        <i class="fas fa-smile-beam"></i>
+                    </div>
+                    <h3 class="text-xl tracking-tight font-extrabold mb-3">Atención Personalizada</h3>
+                    <p class="mb-4 font-light text-dark text-lg dark:text-dark">Nos encanta consentirte. Te atendemos con cariño y rapidez para que siempre quieras regresar.</p>
+                </div>
+            </div>
+        </div>
+    </section>  
+
+
+    <section class="py-20 tracking-tight font-light text-dark text-lg bg-white" id="testimonials">
+        <div class="container mx-auto px-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
     
-    <!-- Categorías de Galletas -->
-    <section class="bg-[#F3E5D8] py-12">
-        <div class="max-w-screen-xl mx-auto px-6">
-            <h2 class="mb-8 text-4xl tracking-tight font-extrabold text-center text-[#5A3E1B]">Categorías de Galletas</h2>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <!-- Galletas Clásicas -->
-                <div class="max-w-xs mx-auto cursor-pointer rounded-lg bg-white p-4 shadow-lg duration-150 hover:scale-105 hover:shadow-md">
-                    <img class="w-full rounded-lg object-cover object-center" src="{{ url_for('static', filename='img/img2.jpg') }}" alt="Galletas Clásicas" />
-                    <p class="my-4 text-lg font-bold text-[#8B5A2B] text-center">Galletas Clásicas</p>
+                <!-- Columna izquierda: título -->
+                <div>
+                    <h2 class="mb-2 text-5xl tracking-tight font-extrabold text-[#5A3E1B]">Los clientes nos respaldan con cada bocado</h2>                   
                 </div>
-
-                <!-- Galletas de Chocolate -->
-                <div class="max-w-xs mx-auto cursor-pointer rounded-lg bg-white p-4 shadow-lg duration-150 hover:scale-105 hover:shadow-md">
-                    <img class="w-full rounded-lg object-cover object-center" src="{{ url_for('static', filename='img/img2.jpg') }}" alt="Galletas Clásicas" />
-                    <p class="my-4 text-lg font-bold text-[#8B5A2B] text-center">Galletas de Chocolate</p>
-                </div>
-
-                <!-- Galletas Rellenas -->
-                <div class="max-w-xs mx-auto cursor-pointer rounded-lg bg-white p-4 shadow-lg duration-150 hover:scale-105 hover:shadow-md">
-                    <img class="w-full rounded-lg object-cover object-center" src="{{ url_for('static', filename='img/img4.jpg') }}" alt="Galletas Clásicas" />
-                    <p class="my-4 text-lg font-bold text-[#8B5A2B] text-center">Galletas Rellenas</p>
-                </div>
-
-                <!-- Galletas de Avena -->
-                <div class="max-w-xs mx-auto cursor-pointer rounded-lg bg-white p-4 shadow-lg duration-150 hover:scale-105 hover:shadow-md">
-                    <img class="w-full rounded-lg object-cover object-center" src="{{ url_for('static', filename='img/img5.jpg') }}" alt="Galletas Clásicas" />
-                    <p class="my-4 text-lg font-bold text-[#8B5A2B] text-center">Galletas de Avena</p>
-                </div>
-
-                <!-- Galletas sin Azúcar -->
-                <div class="max-w-xs mx-auto cursor-pointer rounded-lg bg-white p-4 shadow-lg duration-150 hover:scale-105 hover:shadow-md">
-                    <img class="w-full rounded-lg object-cover object-center" src="{{ url_for('static', filename='img/img4.jpg') }}" alt="Galletas Clásicas" />
-                    <p class="my-4 text-lg font-bold text-[#8B5A2B] text-center">Galletas sin Azúcar</p>
-                </div>
-
-                <!-- Galletas Gourmet -->
-                <div class="max-w-xs mx-auto cursor-pointer rounded-lg bg-white p-4 shadow-lg duration-150 hover:scale-105 hover:shadow-md">
-                    <img class="w-full rounded-lg object-cover object-center" src="{{ url_for('static', filename='img/img8.jpg') }}" alt="Galletas Clásicas" />
-                    <p class="my-4 text-lg font-bold text-[#8B5A2B] text-center">Galletas Gourmet</p>
+    
+                <!-- Columna derecha: carrusel de testimonios -->
+                <div class="relative" x-data="{ current: 0, testimonials: [0, 1, 2] }">
+                    <div class="overflow-hidden relative h-80">
+    
+                        <!-- Testimonio 1 -->
+                        <div class="absolute inset-0 transition-all duration-500 ease-in-out p-8 bg-[#ececec] rounded-xl flex flex-col justify-center shadow-md" :class="{ 'opacity-100 translate-x-0': current === 0, 'opacity-0 translate-x-full': current !== 0 }">
+                            <div class="text-yellow-400 mb-4">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <p class="mb-6 text-lg">"¡Las mejores galletas que he probado en mi vida! Crujientes por fuera y suaves por dentro. Además, el trato fue súper amable."</p>
+                            <div class="flex items-center">
+                                <img src="https://randomuser.me/api/portraits/women/44.jpg" class="w-12 h-12 rounded-full" alt="María G.">
+                                <div class="ml-4">
+                                    <h4 class="font-bold">María G.</h4>
+                                </div>
+                            </div>
+                        </div>
+    
+                        <!-- Testimonio 2 -->
+                        <div class="absolute inset-0 transition-all duration-500 ease-in-out p-8 bg-[#ececec] rounded-xl flex flex-col justify-center shadow-md" :class="{ 'opacity-100 translate-x-0': current === 1, 'opacity-0 translate-x-full': current !== 1 }">
+                            <div class="text-yellow-400 mb-4">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <p class="mb-6 text-lg">"Hice un pedido para un evento y llegaron justo a tiempo. Todos los invitados quedaron encantados. ¡Súper recomendados!"</p>
+                            <div class="flex items-center">
+                                <img src="https://randomuser.me/api/portraits/men/36.jpg" class="w-12 h-12 rounded-full" alt="Luis R.">
+                                <div class="ml-4">
+                                    <h4 class="font-bold">Luis R.</h4>
+                                </div>
+                            </div>
+                        </div>
+    
+                        <!-- Testimonio 3 -->
+                        <div class="absolute inset-0 transition-all duration-500 ease-in-out p-8 bg-[#ececec] rounded-xl flex flex-col justify-center shadow-md" :class="{ 'opacity-100 translate-x-0': current === 2, 'opacity-0 translate-x-full': current !== 2 }">
+                            <div class="text-yellow-400 mb-4">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <p class="mb-6 text-lg">"La calidad es insuperable. El empaque, el sabor, el olor… todo es perfecto. ¡Maicookies se ganó mi corazón!"</p>
+                            <div class="flex items-center">
+                                <img src="https://randomuser.me/api/portraits/women/65.jpg" class="w-12 h-12 rounded-full" alt="Ana P.">
+                                <div class="ml-4">
+                                    <h4 class="font-bold">Ana P.</h4>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+    
+                    <!-- Botones de navegación -->
+                    <button @click="current = (current - 1 + testimonials.length) % testimonials.length" class="absolute top-1/2 left-0 -translate-y-1/2 -translate-x-6 w-10 h-10 rounded-full bg-white shadow-lg flex items-center justify-center text-dark hover:text-yellow-500 transition">
+              <i class="fas fa-chevron-left"></i>
+            </button>
+                    <button @click="current = (current + 1) % testimonials.length" class="absolute top-1/2 right-0 -translate-y-1/2 translate-x-6 w-10 h-10 rounded-full bg-white shadow-lg flex items-center justify-center text-dark hover:text-yellow-500 transition">
+              <i class="fas fa-chevron-right"></i>
+            </button>
+    
+                    <!-- Indicadores -->
+                    <div class="flex justify-center mt-6 space-x-2">
+                        <template x-for="(_, index) in testimonials" :key="index">
+                <button @click="current = index"
+                        class="w-3 h-3 rounded-full"
+                        :class="{ 'bg-yellow-500 scale-110': current === index, 'bg-gray-300': current !== index }"></button>
+              </template>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
+  
 
+  <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 
-    <section class="bg-white dark:bg-gray-900">
-        <div class="py-8 lg:py-16 px-4 mx-auto max-w-screen-md">
-            <h2 class="mb-4 text-4xl tracking-tight font-extrabold text-center text-gray-900 dark:text-white">Contact Us</h2>
-            <p class="mb-8 lg:mb-16 font-light text-center text-gray-500 dark:text-gray-400 sm:text-xl">Got a technical issue? Want to send feedback about a beta feature? Need details about our Business plan? Let us know.</p>
-            <form action="#" class="space-y-8">
-                <div>
-                    <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300">Your email</label>
-                    <input type="email" id="email" class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500 dark:shadow-sm-light" placeholder="name@flowbite.com" required>
-                </div>
-                <div>
-                    <label for="subject" class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300">Subject</label>
-                    <input type="text" id="subject" class="block p-3 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 shadow-sm focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500 dark:shadow-sm-light" placeholder="Let us know how we can help you" required>
-                </div>
-                <div class="sm:col-span-2">
-                    <label for="message" class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-400">Your message</label>
-                    <textarea id="message" rows="6" class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg shadow-sm border border-gray-300 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Leave a comment..."></textarea>
-                </div>
-                <button type="submit" class="py-3 px-5 text-sm font-medium text-center text-white rounded-lg bg-primary-700 sm:w-fit hover:bg-primary-800 focus:ring-4 focus:outline-none focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">Send message</button>
-            </form>
-        </div>
-      </section>
-
-    
-    
-
-    <!-- Footer -->
-    <footer class="bg-[#D2B48C] text-dark ">
-        <div class="mx-auto w-full max-w-screen-xl">
-            <div class="grid grid-cols-2 gap-8 px-4 py-6 lg:py-8 md:grid-cols-4">
-                <div>
-                    <h2 class="mb-6 text-sm font-semibold uppercase"><strong>Maicookies</strong></h2>
-                    <ul class="text-dark-200 font-medium">
-                        <li class="mb-4">
-                            <a href="#" class="hover:underline">Nosotros</a>
-                        </li>
-                        <li class="mb-4">
-                            <a href="#" class="hover:underline">Galería</a>
-                        </li>
-                        <li class="mb-4">
-                            <a href="#" class="hover:underline">Contacto</a>
-                        </li>
-                    </ul>
-                </div>
-                <div>
-                    <h2 class="mb-6 text-sm font-semibold uppercase"><strong>Síguenos</strong></h2>
-                    <ul class="text-dark-200 font-medium space-y-4">
-                        <li class="flex items-center space-x-2">
-                            <i class="fab fa-tiktok text-lg"></i>
-                            <a href="#" class="hover:underline">TikTok</a>
-                        </li>
-                        <li class="flex items-center space-x-2">
-                            <i class="fab fa-instagram text-lg"></i>
-                            <a href="#" class="hover:underline">Instagram</a>
-                        </li>
-                        <li class="flex items-center space-x-2">
-                            <i class="fab fa-facebook text-lg"></i>
-                            <a href="#" class="hover:underline">Facebook</a>
-                        </li>
-                    </ul>                    
-                </div>
-                <div>
-                    <h2 class="mb-6 text-sm font-semibold uppercase"><strong>Legal</strong></h2>
-                    <ul class="text-dark-200 font-medium">
-                        <li class="mb-4">
-                            <a href="{{ url_for('cliente_bp.avisodeprivacidad') }}" class="hover:underline">Política de Privacidad</a>
-                        </li>
-                        <li class="mb-4">
-                            <a href="{{ url_for('cliente_bp.terminosycondiciones') }}" class="hover:underline">Términos &amp; Condiciones</a>
-                        </li>
-                    </ul>
-                </div>
-                <div>
-                    <h2 class="mb-6 text-sm font-semibold uppercase"><strong>Ubicación</strong></h2>
-                    <ul class="text-dark-200 font-medium">
-                        <li class="mb-4">
-                            <a href="https://maps.app.goo.gl/trkCNgv9YEPkRMcq6" target="_blank" class="hover:underline">
-                                Av. Panorama, Valle del Campestre, 37150 León de los Aldama, Gto.
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-            <div class="px-4 py-6 bg-[#D2B48C] text-center">
-                <span class="text-sm text-dark-200">© 2025 <a href="#" class="hover:underline">Maicookies™</a>. Todos los derechos reservados.</span>
-            </div>
-        </div>
-    </footer>
-
-    <!-- FontAwesome (Verifica que este enlace esté presente) -->
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
-
-</body>
-</html>
+{% endblock %}
