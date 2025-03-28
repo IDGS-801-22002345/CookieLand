@@ -12,6 +12,7 @@ from routes.proveedor_routes import provedor_bp
 from routes.galletas_routes import recetas_bp
 from routes.inventario_routes import inventario_bp
 from routes.materia_prima_routes import materia_prima_bp
+from routes.merma_routes import merma_bp
 # from models.proveedor_model import db
 # from models.materia_prima_model import db
 
@@ -51,6 +52,7 @@ app.register_blueprint(materia_prima_bp)
 app.register_blueprint(provedor_bp)
 app.register_blueprint(inventario_bp)
 app.register_blueprint(recetas_bp)
+app.register_blueprint(merma_bp)
 
 
 

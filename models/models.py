@@ -12,8 +12,6 @@ detalle_recetas = db.Table(
     db.Column('cantidad', db.Integer, nullable=False)
 )
 
-
-
 class Role(db.Model):
     __tablename__ = 'roles'
     id = db.Column(db.Integer, primary_key=True)
@@ -67,14 +65,16 @@ class InventarioMateria(db.Model):
     create_date = db.Column(db.DateTime, default=datetime.datetime.now, server_default=db.func.now())
     update_date = db.Column(db.DateTime, default=datetime.datetime.now, server_default=db.func.now())
 
+    mermas = db.relationship('Merma', back_populates='inventario_materia')
 
-class Proveedores(db.Model):  # Cambiamos de Alumnos a Proveedores
-    __tablename__ = 'proveedores'  # Cambiamos el nombre de la tabla
+
+class Proveedores(db.Model):  
+    __tablename__ = 'proveedores'  
     id = db.Column(db.Integer, primary_key=True)
     nombre = db.Column(db.String(50))
-    telefono = db.Column(db.String(15))  # Nuevo campo para el teléfono
+    telefono = db.Column(db.String(15))  
     email = db.Column(db.String(100))
-    estatus = db.Column(db.Integer, default=1)  # Estatus (0 o 1, por defecto 1)
+    estatus = db.Column(db.Integer, default=1) 
     create_date = db.Column(db.DateTime, default=datetime.datetime.now, server_default=db.func.now())
 
 class Receta(db.Model):
@@ -92,6 +92,7 @@ class Receta(db.Model):
     
     galletas = db.relationship('Galleta', back_populates='receta')
 
+
 class Galleta(db.Model):
     __tablename__ = 'galletas'
     
@@ -100,3 +101,41 @@ class Galleta(db.Model):
     receta_id    = db.Column(db.Integer, db.ForeignKey('recetas.id'))
     foto = db.Column(db.LargeBinary, nullable=False) 
     receta = db.relationship('Receta', back_populates='galletas')
+
+    inventario = db.relationship('InventarioGalletas', back_populates='galleta', uselist=False)
+
+
+class Merma(db.Model):
+    __tablename__ = 'Merma'  # Nombre exacto de la tabla en la BD
+    
+    id = db.Column(db.Integer, primary_key=True)
+    descripcion = db.Column(db.String(255), nullable=False)
+    cantidad = db.Column(db.Integer, nullable=False)
+    create_date = db.Column('fecha', db.DateTime, default=datetime.datetime.now, server_default=db.func.now())  # Mapea a columna 'fecha'
+    tipo_merma = db.Column(db.String(50), nullable=True)
+    
+    inventario_materia_id = db.Column('inventarioMateriaId', db.Integer, 
+                                    db.ForeignKey('inventario_materia.id'), nullable=True)
+    inventario_galletas_id = db.Column('inventarioGalletasId', db.Integer, 
+                                     db.ForeignKey('InventarioGalletas.id'), nullable=True)  # <-- Mayúscula aquí
+
+    # Relaciones
+    inventario_materia = db.relationship('InventarioMateria', back_populates='mermas')
+    inventario_galletas = db.relationship('InventarioGalletas', back_populates='mermas')
+
+
+class InventarioGalletas(db.Model):
+    __tablename__ = 'InventarioGalletas'  # <-- Nombre exacto con mayúsculas
+    
+    id = db.Column(db.Integer, primary_key=True)
+    cantidad = db.Column(db.Integer, nullable=False, default=0)
+    cantidad_minima = db.Column(db.Integer, nullable=False)
+    estado_stock = db.Column(db.String(50), nullable=False)
+
+    galleta_id = db.Column(db.Integer, db.ForeignKey('galletas.id'), unique=True, nullable=False)
+    galleta = db.relationship('Galleta', back_populates='inventario')
+
+    create_date = db.Column(db.DateTime, default=datetime.datetime.now, server_default=db.func.now())
+    update_date = db.Column(db.DateTime, default=datetime.datetime.now, server_default=db.func.now())
+    
+    mermas = db.relationship('Merma', back_populates='inventario_galletas')

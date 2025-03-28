@@ -1,0 +1,202 @@
+{% extends "layout.html" %}
+
+{% block content %}
+{% import "_macros.html" as macros %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/output.css') }}">
+
+<!-- Contenedor principal con margen superior -->
+<div class="flex flex-col self-start mt-10 w-[1200px]">
+    <!-- Botón para abrir el modal de agregar -->
+    <div class="ml-28 w-full p-4 text-center bg-white border border-gray-300 rounded-lg shadow-sm sm:p-8 dark:bg-gray-800 dark:border-gray-700">
+        <div class="flex justify-end">
+            <button data-modal-target="crud-modal" data-modal-toggle="crud-modal"
+                class="flex items-center gap-2 text-white focus:outline-none bg-green-500 hover:bg-green-500 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-1 dark:bg-green-600 dark:hover:bg-[#3b82f6]">
+                <i class="fas fa-box-open"></i>
+                Agregar Merma
+            </button>
+        </div>
+        <div class="flex items-center border border-gray-300 rounded-md w-96 p-2">
+            <i class="fas fa-search text-gray-500 px-2"></i>
+            <input type="search" id="search-input" class="w-full outline-none" placeholder="Buscar merma">
+        </div>
+
+        <!-- Contenedor de la tabla con scroll -->
+        <div class="overflow-x-auto overflow-y-auto max-h-[500px] mt-4">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <table id="mermas-table" class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                <thead class="text-xs text-white uppercase sticky top-0" style="background-color: #7c5454; z-index: 10;">
+                    <tr>
+                        <th scope="col" class="px-6 py-3">Descripción</th>
+                        <th scope="col" class="px-6 py-3">Cantidad</th>
+                        <th scope="col" class="px-6 py-3">Fecha</th>
+                        <th scope="col" class="px-6 py-3">Tipo Merma</th>
+                        <th scope="col" class="px-6 py-3 text-center">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for merma in mermas %}
+                    <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                        <th scope="row" class="px-6 py-4 font-medium text-gray-900 dark:text-white">
+                            {{ merma.descripcion }}
+                        </th>
+                        <td class="px-6 py-4">{{ merma.cantidad }}</td>
+                        <td class="px-6 py-4">{{ merma.fecha }}</td>
+                        <td class="px-6 py-4">{{ merma.tipo_merma }}</td>
+                        <td class="px-6 py-4 flex justify-center space-x-2">
+                            <a href="#" data-modal-target="modificar-modal-{{ merma.id }}" 
+                               data-modal-toggle="modificar-modal-{{ merma.id }}"
+                               class="p-1 text-gray-700 hover:text-blue-600 dark:text-gray-400 dark:hover:text-white">
+                                <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m14.304 4.844 2.852 2.852M7 7H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-4.5m2.409-9.91a2.017 2.017 0 0 1 0 2.853l-6.844 6.844L8 14l.713-3.565 6.844-6.844a2.015 2.015 0 0 1 2.852 0Z"/>
+                                </svg>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Agregar Merma -->
+<div id="modal-backdrop" class="hidden fixed inset-0 bg-black bg-opacity-50 z-40"></div>
+
+<div id="crud-modal" tabindex="-1" aria-hidden="true" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 flex justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+    <div class="relative p-4 w-full max-w-2xl max-h-full">
+        <!-- Modal content -->
+        <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+            <!-- Modal header -->
+            <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600" style="background-color: #7c5454;">
+                <h3 class="text-xl font-semibold text-white dark:text-white">
+                    Agregar Merma
+                </h3>
+                <button type="button" class="text-white bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-hide="crud-modal">
+                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                    </svg>
+                    <span class="sr-only">Cerrar modal</span>
+                </button>
+            </div>
+            
+            <!-- Formulario -->
+            <form method="POST" action="{{ url_for('merma_bp.crear') }}" class="p-4 md:p-5">
+                {{ form.csrf_token }}
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                
+                <div class="grid gap-4 mb-4 grid-cols-2">
+                    <!-- Campo Descripción -->
+                    <div class="col-span-2">
+                        <label for="descripcion" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Descripción</label>
+                        {{ macros.campoNuevo(form.descripcion, class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500", placeholder="Descripción de la merma") }}
+                    </div>
+
+                    <!-- Campo Cantidad -->
+                    <div>
+                        <label for="cantidad" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Cantidad</label>
+                        {{ macros.campoNuevo(form.cantidad, class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500", placeholder="Cantidad") }}
+                    </div>
+
+                    <!-- Campo Tipo Merma -->
+                    <div>
+                        <label for="tipo_merma" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Tipo de Merma</label>
+                        {{ macros.campoNuevo(form.tipo_merma, class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500") }}
+                    </div>
+                </div>
+                
+                <!-- Botones del modal -->
+                <div class="flex items-center justify-end space-x-4">
+                    <button type="button" data-modal-hide="crud-modal" style="background-color: #c90704" class="text-white font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-green-600 hover:bg-green-700">
+                        Cancelar
+                    </button>
+                    <button type="submit" style="background-color: #24985a" class="text-white font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-green-600 hover:bg-green-700">
+                        <i class="fas fa-save"></i> Guardar Merma
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modales para Modificar Merma -->
+{% for merma in mermas %}
+<div id="modificar-modal-{{ merma.id }}" tabindex="-1" aria-hidden="true" 
+    class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+    <div class="relative p-4 w-full max-w-2xl max-h-full">
+        <!-- Contenido del modal -->
+        <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+            <!-- Encabezado del modal -->
+            <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600" style="background-color: #7c5454;">
+                <h3 class="text-xl font-semibold text-white dark:text-white">
+                    Modificar Merma
+                </h3>
+                <button type="button" class="text-white bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-toggle="modificar-modal-{{ merma.id }}">
+                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                    </svg>
+                    <span class="sr-only">Cerrar modal</span>
+                </button>
+            </div>
+            
+            <!-- Formulario de edición -->
+            <form class="p-4 md:p-5" action="{{ url_for('merma_bp.modificar', id=merma.id) }}" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                
+                <div class="grid gap-4 mb-4 grid-cols-2">
+                    <!-- Campo Descripción -->
+                    <div class="col-span-2">
+                        <label for="descripcion" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Descripción</label>
+                        <input type="text" name="descripcion" id="descripcion" value="{{ merma.descripcion }}" 
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" required>
+                    </div>
+
+                    <!-- Campo Cantidad -->
+                    <div>
+                        <label for="cantidad" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Cantidad</label>
+                        <input type="number" name="cantidad" id="cantidad" value="{{ merma.cantidad }}" 
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" required>
+                    </div>
+
+                    <!-- Campo Tipo Merma -->
+                    <div>
+                        <label for="tipo_merma" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Tipo de Merma</label>
+                        <select name="tipo_merma" id="tipo_merma" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" required>
+                            <option value="Producción" {% if merma.tipo_merma == 'Producción' %}selected{% endif %}>Producción</option>
+                            <option value="Insumo" {% if merma.tipo_merma == 'Insumo' %}selected{% endif %}>Insumo</option>
+                            <option value="Otro" {% if merma.tipo_merma == 'Otro' %}selected{% endif %}>Otro</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- Botones del modal -->
+                <div class="flex justify-end">
+                    <button type="button" data-modal-hide="modificar-modal-{{ merma.id }}" style="background-color: #c90704" class="text-white font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-green-600 hover:bg-green-700">
+                        Cancelar
+                    </button>
+                    <button type="submit" style="background-color: #24985a" class="text-white font-medium rounded-lg text-sm px-5 py-2.5 text-center ml-2 dark:bg-green-600 hover:bg-green-700">
+                        Guardar Cambios
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+<!-- Incluye Flowbite JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
+
+<script>
+// Función para buscar en la tabla
+document.getElementById('search-input').addEventListener('input', function() {
+    const searchTerm = this.value.toLowerCase();
+    const rows = document.querySelectorAll('#mermas-table tbody tr');
+    
+    rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(searchTerm) ? '' : 'none';
+    });
+});
+</script>
+{% endblock %}
