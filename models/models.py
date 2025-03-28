@@ -91,6 +91,6 @@ class Galleta(db.Model):
     
     id = db.Column(db.Integer, primary_key=True)
     nombre = db.Column(db.String(255), unique=True, nullable=False)
-    receta_id    = db.Column(db.Integer, db.ForeignKey('recetas.id')) 
-    
+    receta_id    = db.Column(db.Integer, db.ForeignKey('recetas.id'))
+    foto = db.Column(db.LargeBinary, nullable=False) 
     receta = db.relationship('Receta', back_populates='galletas')

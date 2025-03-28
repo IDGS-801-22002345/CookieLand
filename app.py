@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for
 from flask_wtf.csrf import CSRFProtect
+import base64
 
 # Importar rutas correctamente desde el módulo 'routes'
 from config import DevelopmentConfig
@@ -38,6 +39,11 @@ app.register_blueprint(registro_compras_bp)
 app.register_blueprint(materia_prima_bp)
 app.register_blueprint(provedor_bp)
 app.register_blueprint(inventario_bp)
+app.register_blueprint(recetas_bp)
+
+
+
+app.jinja_env.filters['b64encode'] = lambda x: base64.b64encode(x).decode('utf-8') if x else None
 
 
 if __name__ == '__main__':

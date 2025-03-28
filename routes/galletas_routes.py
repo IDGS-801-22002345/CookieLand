@@ -1,176 +1,146 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from models.models import Receta, Galleta, detalle_recetas, MateriaPrima, db
 from forms.recetas_forms import RecetaForm
+from werkzeug.utils import secure_filename
+import os
+import base64
 
 recetas_bp = Blueprint('recetas_bp', __name__, url_prefix='/galletas')
 
 detalles_receta = []
 
-@recetas_bp.route("/", methods=['GET', 'POST'])
+@recetas_bp.route("/")
 def index():
-    recetas_con_insumos = db.session.query(
-        Receta,
-        MateriaPrima.nombre.label('nombre_insumo'),
-        detalle_recetas.c.cantidad
-    ).join(
-        detalle_recetas,
-        detalle_recetas.c.recetaId == Receta.id  
-    ).join(
-        MateriaPrima,
-        detalle_recetas.c.insumoId == MateriaPrima.id 
-    ).order_by(Receta.id).all()
-
-
-    recetas_agrupadas = {}
-    for receta, nombre_insumo, cantidad in recetas_con_insumos:
-        if receta.id not in recetas_agrupadas:
-            recetas_agrupadas[receta.id] = {
-                'receta': receta,
-                'insumos': []
-            }
-        recetas_agrupadas[receta.id]['insumos'].append({
-            'nombre': nombre_insumo,
-            'cantidad': cantidad
-        })
-
-    form = RecetaForm(request.form)
-    global detalles_receta
+    create_form = RecetaForm(request.form)
     materiales = MateriaPrima.query.all()
-
-    if request.method == 'POST' and form.validate():
-        if 'agregar' in request.form:
-            materia = MateriaPrima.query.get(form.Insumo.data)
-            detalle = {
-                'materia_prima_id': form.Insumo.data,
+    
+    recetas = Receta.query.all()
+    recetas_data = []
+    
+    for receta in recetas:
+        insumos = db.session.execute(
+            detalle_recetas.select().where(detalle_recetas.c.recetaId == receta.id)
+        ).fetchall()
+        
+        insumos_con_nombre = []
+        for insumo in insumos:
+            materia = MateriaPrima.query.get(insumo.insumoId)
+            insumos_con_nombre.append({
+                'id': insumo.insumoId,
                 'nombre': materia.nombre,
-                'cantidad': form.Cantidad.data
-            }
-            detalles_receta.append(detalle)
-
-            form.Insumo.data = ''
-            form.NombreInsumo.data = ''
-            form.Cantidad.data = 1
-
-    return render_template(
-        'galletas/recetas.html',
-        form=form,
-        detalles=detalles_receta,
-        materiales=materiales,
-        recetas=list(recetas_agrupadas.values()) 
-    )
+                'cantidad': insumo.cantidad
+            })
+        
+        galleta = Galleta.query.filter_by(receta_id=receta.id).first()
+        
+        recetas_data.append({
+            'receta': receta,
+            'insumos': insumos_con_nombre,
+            'galleta': galleta
+        })
+    
+    return render_template("galletas/recetas.html", 
+                         form=create_form, 
+                         recetas=recetas_data,
+                         materiales=materiales)
 
 @recetas_bp.route('/guardar_receta', methods=['POST'])
 def guardar_receta():
     nombre_receta = request.form.get('nombre')
-    estatus_receta = request.form.get('estatus', 1, type=int)  # Valor por defecto 1
+    foto = request.files.get('foto')
     insumos_ids = request.form.getlist('insumos_seleccionados[]')
     cantidades = request.form.getlist('cantidades_seleccionadas[]')
 
-    # Validaciones
     if not nombre_receta:
-        flash("El nombre de la receta es obligatorio.", "error")
+        flash("El nombre es requerido", "error")
         return redirect(url_for('recetas_bp.index'))
 
-    if not insumos_ids or len(insumos_ids) == 0:
-        flash("Debes agregar al menos un insumo.", "error")
+    if not foto or foto.filename == '':
+        flash("Debes subir una imagen", "error")
         return redirect(url_for('recetas_bp.index'))
 
-    # Crear nueva receta con estatus
-    nueva_receta = Receta(nombre=nombre_receta, estatus=estatus_receta)
-    db.session.add(nueva_receta)
-    db.session.commit()
-
-    # Crear galleta asociada
-    nueva_galleta = Galleta(nombre=nombre_receta, receta_id=nueva_receta.id)
-    db.session.add(nueva_galleta)
-    db.session.commit()
-
-    # Agregar insumos a la receta
-    for materia_prima_id, cantidad in zip(insumos_ids, cantidades):
-        stmt = detalle_recetas.insert().values(
-            recetaId=nueva_receta.id,  
-            insumoId=int(materia_prima_id), 
-            cantidad=int(cantidad)
-        )
-        db.session.execute(stmt)
+    allowed_extensions = {'png', 'jpg', 'jpeg'}
+    if '.' not in foto.filename or foto.filename.rsplit('.', 1)[1].lower() not in allowed_extensions:
+        flash("Formato de imagen no válido. Use JPG, PNG o JPEG", "error")
+        return redirect(url_for('recetas_bp.index'))
 
     try:
+        foto_data = foto.read()
+
+        nueva_receta = Receta(nombre=nombre_receta, estatus=1)
+        db.session.add(nueva_receta)
+        db.session.flush() 
+
+        nueva_galleta = Galleta(
+            nombre=nombre_receta,
+            receta_id=nueva_receta.id,
+            foto=foto_data
+        )
+        db.session.add(nueva_galleta)
+
+        for insumo_id, cantidad in zip(insumos_ids, cantidades):
+            stmt = detalle_recetas.insert().values(
+                recetaId=nueva_receta.id,
+                insumoId=int(insumo_id),
+                cantidad=int(cantidad)
+            )
+            db.session.execute(stmt)
+
         db.session.commit()
-        flash("Receta y galleta creadas correctamente.", "success")
+        flash("Receta guardada correctamente", "success")
     except Exception as e:
         db.session.rollback()
-        flash(f"Error al guardar la receta: {str(e)}", "error")
+        flash(f"Error al guardar: {str(e)}", "error")
 
     return redirect(url_for('recetas_bp.index'))
 
-@recetas_bp.route('/editar/<int:receta_id>', methods=['GET'])
-def editar_receta(receta_id):
-    receta = Receta.query.get_or_404(receta_id)
-    
-    # Obtener insumos actuales
-    insumos_actuales = db.session.query(
-        MateriaPrima.id,
-        MateriaPrima.nombre,
-        detalle_recetas.c.cantidad
-    ).join(
-        detalle_recetas,
-        detalle_recetas.c.insumoId == MateriaPrima.id
-    ).filter(
-        detalle_recetas.c.recetaId == receta_id
-    ).all()
-    
-    # Preparar datos para el template
-    detalles_actuales = [{
-        'materia_prima_id': insumo.id,
-        'nombre': insumo.nombre,
-        'cantidad': cantidad
-    } for insumo, cantidad in insumos_actuales]
-    
-    # Crear formulario
-    form = RecetaForm(obj=receta)
-    form.estatus.data = receta.estatus
-    
-    materiales = MateriaPrima.query.all()
-    opciones_insumos = [(m.id, m.nombre) for m in materiales]
-    
-    for item in form.insumos:
-        item.insumo.choices = opciones_insumos
-    
-    return render_template(
-        'galletas/editar_receta.html',
-        form=form,
-        receta=receta,
-        detalles=detalles_actuales,
-        materiales=materiales
-    )
-
-@recetas_bp.route('/actualizar/<int:receta_id>', methods=['POST'])
+@recetas_bp.route('/actualizar/<int:receta_id>', methods=["GET", "POST"])
 def actualizar_receta(receta_id):
     receta = Receta.query.get_or_404(receta_id)
-    form = RecetaForm(request.form)
+    galleta = Galleta.query.filter_by(receta_id=receta_id).first()
     
-    # Configurar opciones ANTES de validar
-    materiales = MateriaPrima.query.all()
-    opciones_insumos = [(m.id, m.nombre) for m in materiales]
+    if request.method == "GET":
+        insumos = db.session.execute(
+            detalle_recetas.select().where(detalle_recetas.c.recetaId == receta_id)
+        ).fetchall()
+        
+        return render_template("modificar_receta.html", 
+                            receta=receta,
+                            galleta=galleta,
+                            insumos=insumos,
+                            materiales=MateriaPrima.query.all())  
     
-    for item in form.insumos:
-        item.insumo.choices = opciones_insumos
-    
-    if form.validate():
+    elif request.method == "POST":
         try:
-            # Tu lógica de actualización aquí
-            receta.nombre = form.nombre.data
-            receta.estatus = form.estatus.data
+            receta.nombre = request.form.get('nombre', receta.nombre)
+            if galleta:
+                galleta.nombre = receta.nombre
             
-            # Resto de tu código de actualización...
+            if 'nueva_foto' in request.files:
+                nueva_foto = request.files['nueva_foto']
+                if nueva_foto and nueva_foto.filename != '':
+                    if '.' in nueva_foto.filename and \
+                       nueva_foto.filename.rsplit('.', 1)[1].lower() in {'png', 'jpg', 'jpeg'}:
+                        galleta.foto = nueva_foto.read()
+            
+                
+                for insumo_id, cantidad in request.form.getlist('insumos'):
+                    if insumo_id and cantidad:
+                        db.session.execute(
+                            detalle_recetas.insert().values(
+                                recetaId=receta_id,
+                                insumoId=int(insumo_id),
+                                cantidad=float(cantidad)
+                            )
+                        )
             
             db.session.commit()
             flash("Receta actualizada correctamente", "success")
         except Exception as e:
             db.session.rollback()
-            flash(f"Error al actualizar receta: {str(e)}", "error")
-    
-    return redirect(url_for('recetas_bp.index'))
+            flash(f"Error al actualizar: {str(e)}", "error")
+        
+        return redirect(url_for('recetas_bp.index'))
 
 @recetas_bp.route('/cambiar-estatus/<int:receta_id>', methods=['POST'])
 def cambiar_estatus(receta_id):
@@ -178,7 +148,7 @@ def cambiar_estatus(receta_id):
         try:
             receta = Receta.query.get_or_404(receta_id)
             
-            # El checkbox envía 'on' cuando está marcado, None cuando no
+
             nuevo_estatus = request.form.get('estatus') == 'on'
             receta.estatus = nuevo_estatus
             
