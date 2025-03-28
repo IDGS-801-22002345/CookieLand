@@ -1,0 +1,40 @@
+{% macro mostrar_flash() %}
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div id="flash-container" class="fixed top-5 right-5 z-50 w-md max-w-md text-center mt-10">
+        {% for category, message in messages %}
+          <div class="p-4 mb-4 text-sm text-white rounded-lg shadow
+                      {% if category == 'success' %}bg-green-500
+                      {% elif category == 'danger' %}bg-red-500
+                      {% elif category == 'warning' %}bg-yellow-500
+                      {% else %}bg-blue-500{% endif %}">
+            <span class="mr-2 text-lg">
+              {% if category == 'success' %}
+              <i class="fas fa-check-circle"></i>
+              {% elif category == 'danger' %}
+              <i class="fas fa-times-circle"></i>
+              {% elif category == 'warning' %}
+              <i class="fas fa-exclamation-circle"></i>
+              {% else %}
+              <i class="fas fa-info-circle"></i>
+              {% endif %}
+            </span>
+            {{ message }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <script>
+    setTimeout(() => {
+      const flash = document.getElementById("flash-container");
+      if (flash) {
+        flash.style.opacity = "0";
+        flash.style.transition = "opacity 0.5s ease-out";
+        setTimeout(() => flash.remove(), 500);
+      }
+    }, 2500);
+  </script> 
+
+{% endmacro %}
