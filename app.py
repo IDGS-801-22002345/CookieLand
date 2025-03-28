@@ -60,4 +60,4 @@ app.jinja_env.filters['b64encode'] = lambda x: base64.b64encode(x).decode('utf-8
 
 if __name__ == '__main__':
     app = create_app()
-    app.run(host='127.0.0.1', debug=True)
+    app.run(debug=True)
