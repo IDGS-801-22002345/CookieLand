@@ -1,7 +1,7 @@
 import os
-from sqlalchemy import create_engine
+from flask.cli import load_dotenv
 
-import urllib
+load_dotenv()
 
 class Config(object):
     SECRET_KEY = 'Clave Nueva'
@@ -9,9 +9,9 @@ class Config(object):
     
 class DevelopmentConfig(Config):
     DEBUG = True
-    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:Deadmau6@localhost/bdidgs801'
+    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
-    RECAPTCHA_PUBLIC_KEY = '6LemBAIrAAAAAL69KGKIprR-Z577orMrDPVX94f1'
-    RECAPTCHA_PRIVATE_KEY = '6LemBAIrAAAAALTrVi0_ILffDwwozOYvb5pzZKO9'
+    RECAPTCHA_PUBLIC_KEY = os.getenv('RECAPTCHA_PUBLIC_KEY')
+    RECAPTCHA_PRIVATE_KEY = os.getenv('RECAPTCHA_PRIVATE_KEY')
     

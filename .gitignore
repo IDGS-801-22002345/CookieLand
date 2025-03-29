@@ -1,5 +1,7 @@
 node_modules
 __pycache__/
-config.py
-/config.py
+*.py[cod]
+*.pyc/
 credentials.json
+.env
+output.css
