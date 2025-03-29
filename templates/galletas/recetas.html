@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Galleta</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <script src="{{ url_for('static', filename='js/receta.js') }}"></script>
+</head>
+
+<body>
+    {% extends "layout.html" %}
+    {% block content %}
+    {% import "_macros.html" as macros %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/output.css') }}">
+
+    <!-- Contenedor principal con margen superior -->
+    <div class="flex flex-col self-start mt-10 w-[1200px]">
+        <!-- Botón para abrir el modal de agregar -->
+        <div class="ml-28 w-full p-4 text-center bg-white border border-gray-300 rounded-lg shadow-sm sm:p-8 dark:bg-gray-800 dark:border-gray-700">
+            <div class="flex justify-end">
+                <button data-modal-target="crud-modal" data-modal-toggle="crud-modal"
+                    class="flex items-center gap-2 text-white focus:outline-none bg-green-500 hover:bg-green-500 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-1 dark:bg-green-600 dark:hover:bg-[#3b82f6]">
+                    <i class="fas fa-plus"></i>
+                    Agregar Galleta
+                </button>
+            </div>
+            <div class="flex items-center border border-gray-300 rounded-md w-96 p-2">
+                <i class="fas fa-search text-gray-500 px-2"></i>
+                <input type="search" id="search-input" class="w-full outline-none" placeholder="Buscar receta">
+            </div>
+
+            <!-- Contenedor de la tabla con scroll -->
+
+                <div class="overflow-x-auto overflow-y-auto max-h-[500px] mt-4">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                    <table id="recetas-table" class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                        <thead class="text-xs text-white uppercase sticky top-0" style="background-color: #7c5454; z-index: 10;">
+                            <tr>
+                                <th scope="col" class="px-6 py-3">Imagen</th>
+                                <th scope="col" class="px-6 py-3">Nombre</th>
+                                <th scope="col" class="px-6 py-3">Insumos</th>
+                                <th scope="col" class="px-6 py-3 w-32">Estatus</th>
+                                <th scope="col" class="px-6 py-3 text-center">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for receta_data in recetas %}
+                            <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                                <!-- Columna Imagen -->
+                                <td class="px-6 py-4">
+                                    {% if receta_data.galleta and receta_data.galleta.foto %}
+                                    <img src="data:image/jpeg;base64,{{ receta_data.galleta.foto | b64encode }}" 
+                                         alt="Imagen de {{ receta_data.receta.nombre }}"
+                                         class="w-16 h-16 object-cover rounded-lg border border-gray-200 dark:border-gray-600">
+                                    {% else %}
+                                    <div class="w-16 h-16 bg-gray-100 dark:bg-gray-600 rounded-lg flex items-center justify-center">
+                                        <span class="text-gray-500 dark:text-gray-300 text-xs">Sin imagen</span>
+                                    </div>
+                                    {% endif %}
+                                </td>
+                                
+                                <!-- Columna Nombre -->
+                                <th scope="row" class="px-6 py-4 font-medium text-gray-900 dark:text-white">
+                                    {{ receta_data.receta.nombre }}
+                                </th>
+                                
+                                <!-- Columna Insumos -->
+                                <td class="px-6 py-4">
+                                    <ul class="space-y-1">
+                                        {% for insumo in receta_data.insumos %}
+                                        <li class="text-sm">{{ insumo.nombre }} - {{ insumo.cantidad }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </td>
+                                
+                                <!-- Columna Estatus -->
+                                <td class="px-6 py-4">
+                                    <form action="{{ url_for('recetas_bp.cambiar_estatus', receta_id=receta_data.receta.id) }}" method="POST">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <label class="relative inline-flex items-center cursor-pointer">
+                                            <input type="checkbox" name="estatus" class="sr-only peer" 
+                                                   {% if receta_data.receta.estatus %}checked{% endif %}
+                                                   onchange="this.form.submit()">
+                                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                                            <span class="ml-3 text-sm font-medium text-gray-900 dark:text-gray-300">
+                                                {% if receta_data.receta.estatus %}Activo{% else %}Inactivo{% endif %}
+                                            </span>
+                                        </label>
+                                    </form>
+                                </td>
+                                
+                                <!-- Columna Acciones -->
+                                <td class="px-6 py-4">
+                                    <div class="flex justify-center space-x-2">
+                                        <a href="#" data-modal-target="modificar-modal-{{ receta_data.receta.id }}" 
+                                           data-modal-toggle="modificar-modal-{{ receta_data.receta.id }}"
+                                           class="p-1 text-gray-700 hover:text-blue-600 dark:text-gray-400 dark:hover:text-white">
+                                            <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m14.304 4.844 2.852 2.852M7 7H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-4.5m2.409-9.91a2.017 2.017 0 0 1 0 2.853l-6.844 6.844L8 14l.713-3.565 6.844-6.844a2.015 2.015 0 0 1 2.852 0Z"/>
+                                            </svg>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+        </div>
+    </div>
+
+
+
+    <div id="modal-backdrop" class="hidden fixed inset-0 bg-black bg-opacity-50 z-40"></div>
+       {% for receta_data in recetas %}
+   <div id="modificar-modal-{{ receta_data.receta.id }}" tabindex="-1" aria-hidden="true" 
+    class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+    <div class="relative p-4 w-full max-w-2xl max-h-full">
+        <!-- Contenido del modal -->
+        <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+            <!-- Encabezado del modal -->
+            <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600" style="background-color: #7c5454;">
+                <h3 class="text-xl font-semibold text-white dark:text-white">
+                    Modificar Galleta
+                </h3>
+                <button type="button" class="text-white bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-toggle="modificar-modal-{{ receta_data.receta.id }}">
+                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                    </svg>
+                    <span class="sr-only">Cerrar modal</span>
+                </button>
+            </div>
+            
+            <!-- Formulario de edición -->
+            <form class="p-4 md:p-5" action="{{ url_for('recetas_bp.actualizar_receta', receta_id=receta_data.receta.id) }}" method="POST" enctype="multipart/form-data">                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                
+                <div class="grid gap-4 mb-4 grid-cols-2">
+                    <!-- Campo Nombre -->
+                    <div class="col-span-2">
+                        <label for="nombre" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Nombre de la Receta</label>
+                        <input type="text" name="nombre" id="nombre" value="{{ receta_data.receta.nombre }}" 
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Imagen</label>
+                        <div class="flex items-center gap-4">
+                            <div class="w-20 h-20 border rounded-lg overflow-hidden">
+                                <img src="data:image/jpeg;base64,{{ receta_data.galleta.foto | b64encode }}" 
+                                     class="w-full h-full object-cover" 
+                                     alt="Imagen actual">
+                            </div>
+                            <div>
+                                <input type="file" name="nueva_foto" accept="image/*" 
+                                       class="block w-full text-sm text-gray-500
+                                              file:mr-4 file:py-2 file:px-4
+                                              file:rounded-md file:border-0
+                                              file:text-sm file:font-semibold
+                                              file:bg-blue-50 file:text-blue-700
+                                              hover:file:bg-blue-100">
+                                <p class="mt-1 text-xs text-gray-500">Dejar vacío para mantener la imagen actual</p>
+                            </div>
+                        </div>
+                    </div> 
+
+                    
+                    <!-- Lista de Insumos Actuales -->
+                    <!-- Dentro del formulario de edición -->
+<!-- Dentro del formulario de edición -->
+<div class="col-span-2">
+    <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Insumos</label>
+    <div class="overflow-auto max-h-40 border border-gray-300 rounded-lg p-2">
+        <ul id="insumos-actuales-{{ receta_data.receta.id }}">
+            {% for insumo in receta_data.insumos %}
+            <li class="flex justify-between items-center mb-2 p-2 bg-gray-100 rounded" 
+                data-insumo-id="{{ insumo.materia_prima_id }}"
+                data-cantidad="{{ insumo.cantidad }}">
+                <span>{{ insumo.nombre }} - {{ insumo.cantidad }} {{ insumo.unidad }}</span>
+                <button type="button" class="text-red-500 hover:text-red-700" 
+                        onclick="eliminarInsumoLista(this, '{{ receta_data.receta.id }}', '{{ insumo.materia_prima_id }}')">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+
+<!-- SOLO UN CONTENEDOR PARA CAMPOS OCULTOS (elimina el otro que está duplicado) -->
+<div id="insumos-seleccionados-container-{{ receta_data.receta.id }}">
+    {% for insumo in receta_data.insumos %}
+    <input type="hidden" name="insumos_seleccionados[]" value="{{ insumo.materia_prima_id }}">
+    <input type="hidden" name="cantidades_seleccionadas[]" value="{{ insumo.cantidad }}">
+    {% endfor %}
+</div>
+
+                    
+                    <!-- Agregar nuevos insumos -->
+                    <div class="col-span-2 border-t pt-4">
+                        <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-2">Agregar Nuevos Insumos</h4>
+                        
+                        <div class="flex gap-2 mb-2">
+                            <select id="insumo-select-{{ receta_data.receta.id }}" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
+                                <option value="">Seleccionar insumo</option>
+                                {% for material in materiales %}
+                                <option value="{{ material.id }}" data-nombre="{{ material.nombre }}">{{ material.nombre }}</option>
+                                {% endfor %}
+                            </select>
+                            
+                            <input type="number" id="cantidad-input-{{ receta_data.receta.id }}" min="1" value="1" 
+                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-20 p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
+                            
+                            <button type="button" onclick="agregarInsumoModal('{{ receta_data.receta.id }}')" 
+                                class="text-white inline-flex items-center bg-green-500 hover:bg-green-600 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-3 py-2 text-center dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">
+                                <i class="fas fa-plus mr-1"></i> Agregar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Campos ocultos para los insumos seleccionados -->
+                <div id="insumos-seleccionados-container-{{ receta_data.receta.id }}">
+                    {% for insumo in receta_data.insumos %}
+                    <input type="hidden" name="insumos_seleccionados[]" value="{{ insumo.materia_prima_id }}">
+                    <input type="hidden" name="cantidades_seleccionadas[]" value="{{ insumo.cantidad }}">
+                    {% endfor %}
+                </div>
+                
+                <!-- Botones del modal -->
+                <div class="flex justify-end">
+                    <button type="submit" data-modal-hide="crud-modal" style="background-color: #c90704" class="text-white font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-green-600 hover:bg-green-700">
+                        Cancelar
+                    </button>
+                    <button type="submit" data-modal-toggle="modificar-modal-{{ receta_data.receta.id }}" 
+                        class="ml-2 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                        Guardar Cambios
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+<!-- Modal para Agregar Receta -->
+<div id="modal-backdrop" class="hidden fixed inset-0 bg-black bg-opacity-50 z-40"></div>
+
+<div id="crud-modal" tabindex="-1" aria-hidden="true" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 flex justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+    <div class="relative p-4 w-full max-w-2xl max-h-full">
+        <!-- Modal content -->
+        <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+            <!-- Modal header -->
+            <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
+                <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
+                    Agregar Nueva Galleta
+                </h3>
+                <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-hide="crud-modal">
+                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                    </svg>
+                    <span class="sr-only">Cerrar modal</span>
+                </button>
+            </div>
+            
+            <!-- Formulario -->
+            <form method="POST" action="{{ url_for('recetas_bp.guardar_receta') }}" enctype="multipart/form-data" class="p-4 md:p-5">
+                {{ form.csrf_token }}
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                
+                <div class="grid gap-4 mb-4">
+                    <!-- Campo Nombre -->
+                    <div>
+                        <label for="nombre" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Nombre de la Receta</label>
+                        <input type="text" name="nombre" id="nombre" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Escribe el nombre de la receta" required>
+                    </div>
+
+                    <!-- Campo Imagen -->
+                    <div>
+                        <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Imagen de la Galleta</label>
+                        <div class="flex items-center space-x-4">
+                            <div class="flex-1">
+                                <input type="file" name="foto" id="foto" accept="image/*" class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400" required>
+                                <p class="mt-1 text-sm text-gray-500 dark:text-gray-300">Formatos: JPG, PNG o JPEG (Max. 5MB)</p>
+                            </div>
+                            <div id="image-preview" class="hidden w-16 h-16 rounded border border-gray-200 dark:border-gray-600 overflow-hidden">
+                                <img id="preview-image" class="w-full h-full object-cover" src="" alt="Vista previa">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sección Insumos -->
+                    <div class="mb-4">
+                        <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Insumos</label>
+                        <div class="grid grid-cols-2 gap-4 mb-2">
+                            <select name="insumo_id" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" required>
+                                <option value="">Selecciona un insumo</option>
+                                {% for material in materiales %}
+                                    <option value="{{ material.id }}">{{ material.nombre }}</option>
+                                {% endfor %}
+                            </select>
+                            <input type="number" name="cantidad" value="1" min="1" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" required>
+                        </div>
+                        <button type="button" id="agregar-insumo" style="background-color: #24985a" class="text-white font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-green-600">
+                            <i class="fas fa-plus"></i> Agregar Insumo
+                        </button>
+                    </div>
+                    
+                    <!-- Tabla de insumos agregados -->
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                            <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3 text-center align-middle">Insumo</th>
+                                    <th scope="col" class="px-6 py-3 text-center align-middle">Cantidad</th>
+                                    <th scope="col" class="px-6 py-3 text-center align-middle">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="insumos-agregados">
+                                <!-- Los insumos agregados dinámicamente aparecerán aquí -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Botones del modal -->
+                <div class="flex items-center justify-end space-x-4">
+                    <button type="submit" data-modal-hide="crud-modal" style="background-color: #c90704" class="text-white font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-green-600 hover:bg-green-700">
+                        Cancelar
+                    </button>
+                    <button type="submit" style="background-color: #24985a" class="text-white font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-green-600 hover:bg-green-700">
+                        <i class="fas fa-save"></i> Guardar Receta
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+    <!-- Incluye Flowbite JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
+
+  
+
+    {% endblock %}
+</body>
+</html>
