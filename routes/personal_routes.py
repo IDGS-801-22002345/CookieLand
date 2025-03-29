@@ -54,6 +54,7 @@ def usuarios():
         
     return render_template('personal/usuarios.html', form=form, usuarios=usuarios)
 
+
 # Ruta para modificar un usuario
 @personal_bp.route('/modificar_usuario', methods=["GET", "POST"])
 @role_required('admin')
@@ -104,7 +105,7 @@ def eliminar_usuario(usuario_id):
     usuario = Usuario.query.get_or_404(usuario_id)
 
     try:
-        usuario.estatus = 0  # ← Estatus desactivado
+        usuario.estatus = 0  
         db.session.commit()
         flash(f"Usuario '{usuario.username}' desactivado correctamente.", "success")
     except Exception as e:
@@ -112,27 +113,6 @@ def eliminar_usuario(usuario_id):
         flash(f"No se pudo desactivar el usuario: {e}", "danger")
 
     return redirect(url_for('personal_bp.usuarios'))
-
-
-@personal_bp.route('/cargar_usuario', methods=['POST'])
-@role_required('admin')
-def cargar_usuario():
-    form = RegistroUsuarioForm()
-    id = request.form.get('id')
-
-    usuario = Usuario.query.get_or_404(id)
-    form.id.data = usuario.id
-    form.nombre.data = usuario.nombre
-    form.username.data = usuario.username
-    form.correo.data = usuario.correo
-    form.telefono.data = usuario.telefono
-    form.rol.data = usuario.rol.role_name if usuario.rol else ''
-    form.estatus.data = usuario.estatus
-
-    usuarios = Usuario.query.all()
-    return render_template("personal/usuarios.html", form=form, usuarios=usuarios, modificar_modal=True)
-
-
 
 
 # Ruta para la ventana de ventas

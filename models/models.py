@@ -1,5 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
+from werkzeug.security import generate_password_hash
 import datetime
 
 db = SQLAlchemy()
@@ -8,6 +9,15 @@ class Role(db.Model):
     __tablename__ = 'roles'
     id = db.Column(db.Integer, primary_key=True)
     role_name = db.Column(db.String(50), unique=True, nullable=False)
+
+    @staticmethod
+    def insertar_roles():
+        roles = ['admin', 'cliente', 'vendedor', 'produccion']
+        for nombre in roles:
+            if not Role.query.filter_by(role_name=nombre).first():
+                nuevo_rol = Role(role_name=nombre)
+                db.session.add(nuevo_rol)
+        db.session.commit()
 
 class Usuario(db.Model, UserMixin):
     __tablename__ = 'usuarios'
@@ -19,6 +29,25 @@ class Usuario(db.Model, UserMixin):
     estatus = db.Column(db.Integer, default=1) 
     username = db.Column(db.String(50), unique=True, nullable=False)
     rol_id = db.Column(db.Integer, db.ForeignKey('roles.id'), nullable=False)
+    
+    @staticmethod
+    def insertar_admin():
+        # Busca si ya existe el usuario admin
+        if not Usuario.query.filter_by(correo='admin@gmail.com').first():
+            # Obtiene el rol de admin
+            rol_admin = Role.query.filter_by(role_name='admin').first()
+            if rol_admin:
+                admin = Usuario(
+                    nombre='Admin Predeterminado',
+                    username='admin',
+                    correo='admin@gmail.com',
+                    telefono='1234567890',
+                    contrasenia=generate_password_hash('maicookies123'),
+                    estatus=1,
+                    rol_id=rol_admin.id
+                )
+                db.session.add(admin)
+                db.session.commit()
 
     rol = db.relationship(Role, backref=db.backref('usuarios', lazy=True), lazy='joined')
 

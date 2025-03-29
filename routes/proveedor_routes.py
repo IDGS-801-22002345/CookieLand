@@ -1,10 +1,12 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
 from forms.proveedores_form import ProveedorForm
 from models.models import Proveedores, db
+from utils.decoradores import login_required
  
 provedor_bp = Blueprint('provedor_bp', __name__, url_prefix='/proveedores')
  
 @provedor_bp.route("/proveedores")
+@login_required
 def index():
     create_form = ProveedorForm(request.form)
     proveedores = Proveedores.query.all()

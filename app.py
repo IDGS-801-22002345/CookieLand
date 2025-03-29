@@ -29,13 +29,15 @@ def create_app():
         with current_app.app_context():
             return db.session.get(Usuario, int(user_id))
  
-
     app.config.from_object(DevelopmentConfig)
     db.init_app(app)
     login_manager.init_app(app)
     csrf.init_app(app)
     with app.app_context():
-        db.create_all()
+      db.create_all()             
+      Role.insertar_roles()      
+      Usuario.insertar_admin()   
+
     
     app.register_blueprint(auth_bp)
     app.register_blueprint(cliente_bp)
