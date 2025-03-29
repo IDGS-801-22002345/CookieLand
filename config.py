@@ -9,7 +9,7 @@ class Config(object):
     
 class DevelopmentConfig(Config):
     DEBUG = True
-    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:admin@localhost/dongalleto'
+    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:Deadmau6@localhost/bdidgs801'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
     RECAPTCHA_PUBLIC_KEY = '6LemBAIrAAAAAL69KGKIprR-Z577orMrDPVX94f1'

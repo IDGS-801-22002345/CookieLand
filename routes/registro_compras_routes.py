@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
-from models.models import Proveedores, MateriaPrima
+from models.models import Proveedores, MateriaPrima, DetalleCompra, Compra
 from forms.compra_forms import FormCompra
 
 registro_compras_bp = Blueprint('registro_compras_bp', __name__, url_prefix='/')
@@ -54,7 +54,8 @@ def compras():
 
     # Obtener los productos en el carrito de la sesión
     compras = session.get('carrito', [])
-    return render_template('compras/registro_compras.html', form=form, compras=compras)
+    total_general = sum(item['total'] for item in compras)
+    return render_template('compras/registro_compras.html', form=form, compras=compras, total_general=total_general)
 
 @registro_compras_bp.route('/eliminar-producto', methods=['POST'])
 def eliminar_producto():
@@ -68,6 +69,39 @@ def eliminar_producto():
             session.modified = True  # Asegurarse de que los cambios se guardan en la sesión
             flash('Producto eliminado del carrito', 'success')
 
-    return redirect(url_for('registro_compras_bp.compras'))  # Redirigir de nuevo a la página de compras
+    return redirect(url_for('registro_compras_bp.compras'))  
+
+@registro_compras_bp.route('/finalizar-compra', methods=['POST'])
+def finalizar_compra():
+    from app import db 
+    if 'carrito' not in session or not session['carrito']:
+        flash('No hay productos en el carrito', 'warning')
+        return redirect(url_for('registro_compras_bp.compras'))
+
+    nueva_compra = Compra() 
+    db.session.add(nueva_compra)
+    db.session.commit()
+
+    for item in session['carrito']:
+        materia_prima = MateriaPrima.query.filter_by(nombre=item['producto']).first()
+        proveedor = Proveedores.query.filter_by(nombre=item['proveedor']).first() if item['proveedor'] != "Otro" else None
+
+        detalle = DetalleCompra(
+            cantidad=item['cantidad'],
+            costo_unitario=item['precio_unitario'],
+            total=item['total'],
+            compra_id=nueva_compra.id,
+            materia_prima_id=materia_prima.id if materia_prima else None,
+            proveedor_id=proveedor.id if proveedor else None,
+            proveedor_nombre=item['proveedor']
+        )
+        db.session.add(detalle)
+
+    db.session.commit()
+
+    session.pop('carrito', None)
+    flash('Compra finalizada con éxito', 'success')
+
+    return redirect(url_for('registro_compras_bp.compras'))
 
 
