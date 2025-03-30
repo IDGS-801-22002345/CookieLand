@@ -1,8 +1,18 @@
+# models/materia_prima_model.py
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin # type: ignore
 import datetime
 
-db = SQLAlchemy()
+db=SQLAlchemy()
+
+detalle_recetas = db.Table(
+    'DetalleRecetas',
+    db.Column('recetaId', db.Integer, db.ForeignKey('recetas.id'), primary_key=True),  
+    db.Column('insumoId', db.Integer, db.ForeignKey('materia_prima.id'), primary_key=True),  
+    db.Column('cantidad', db.Integer, nullable=False)
+)
+
+
 
 class Role(db.Model):
     __tablename__ = 'roles'
@@ -38,6 +48,11 @@ class MateriaPrima(db.Model):
     
     inventario = db.relationship('InventarioMateria', back_populates='materia_prima', uselist=False)
 
+    recetas = db.relationship(
+        'Receta',
+        secondary=detalle_recetas, 
+        back_populates='insumos' 
+    )
 
 class InventarioMateria(db.Model):  
     __tablename__ = 'inventario_materia' 
@@ -61,3 +76,27 @@ class Proveedores(db.Model):  # Cambiamos de Alumnos a Proveedores
     email = db.Column(db.String(100))
     estatus = db.Column(db.Integer, default=1)  # Estatus (0 o 1, por defecto 1)
     create_date = db.Column(db.DateTime, default=datetime.datetime.now, server_default=db.func.now())
+
+class Receta(db.Model):
+    __tablename__ = 'recetas'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    nombre = db.Column(db.String(255), unique=True, nullable=False)
+    estatus =  db.Column(db.Integer, default=1)
+
+    insumos = db.relationship(
+        'MateriaPrima',
+        secondary=detalle_recetas,  
+        back_populates='recetas'  
+    )
+    
+    galletas = db.relationship('Galleta', back_populates='receta')
+
+class Galleta(db.Model):
+    __tablename__ = 'galletas'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    nombre = db.Column(db.String(255), unique=True, nullable=False)
+    receta_id    = db.Column(db.Integer, db.ForeignKey('recetas.id'))
+    foto = db.Column(db.LargeBinary, nullable=False) 
+    receta = db.relationship('Receta', back_populates='galletas')
