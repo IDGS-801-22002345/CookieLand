@@ -1,5 +1,6 @@
 document.addEventListener("DOMContentLoaded", function () {
     let backdrop = document.getElementById("modal-backdrop");
+    let modal = document.getElementById("crud-modal");
 
     function mostrarFondo() {
         backdrop.classList.remove("hidden");
@@ -9,23 +10,41 @@ document.addEventListener("DOMContentLoaded", function () {
         backdrop.classList.add("hidden");
     }
 
-    // Evento para abrir el modal de agregar
-    document.querySelector('[data-modal-toggle="crud-modal"]').addEventListener("click", function () {
-        document.getElementById("crud-modal").classList.remove("hidden");
+    // Si hay errores en la validación, mostrar el modal automáticamente
+    if (modal.classList.contains("modal-error")) {
+        modal.classList.remove("hidden");
         mostrarFondo();
+    }
+
+    // Asegurar que el botón de "Agregar" abre el modal correctamente
+    document.querySelectorAll("[data-modal-toggle='crud-modal']").forEach(btn => {
+        btn.addEventListener("click", function () {
+            modal.classList.remove("hidden");
+            mostrarFondo();
+        });
     });
 
     // Evento para cerrar el modal de agregar
-    document.querySelector('[data-modal-hide="crud-modal"]').addEventListener("click", function () {
-        document.getElementById("crud-modal").classList.add("hidden");
-        ocultarFondo();
+    document.querySelectorAll("[data-modal-hide='crud-modal']").forEach(btn => {
+        btn.addEventListener("click", function () {
+            modal.classList.add("hidden");
+            ocultarFondo();
+        });
+    });
+
+    // Evento para cerrar el modal con cualquier botón de cancelar
+    document.querySelectorAll(".btn-cancelar").forEach(btn => {
+        btn.addEventListener("click", function () {
+            modal.classList.add("hidden");
+            ocultarFondo();
+        });
     });
 
     // Evento para abrir el modal de modificar (detecta múltiples botones)
     document.querySelectorAll(".btn-modificar").forEach(btn => {
         btn.addEventListener("click", function () {
-            let modal = document.getElementById("modificar-modal");
-            modal.classList.remove("hidden");
+            let modalModificar = document.getElementById("modificar-modal");
+            modalModificar.classList.remove("hidden");
             mostrarFondo();
 
             // Llenar los campos del modal con los datos del proveedor
@@ -37,24 +56,25 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     // Evento para cerrar el modal de modificar con el botón "Cancelar"
-    document.querySelector('[data-modal-hide="modificar-modal"]').addEventListener("click", function () {
-        document.getElementById("modificar-modal").classList.add("hidden");
-        ocultarFondo();
-    });
+    let btnCerrarModificar = document.querySelector('[data-modal-hide="modificar-modal"]');
+    if (btnCerrarModificar) {
+        btnCerrarModificar.addEventListener("click", function () {
+            document.getElementById("modificar-modal").classList.add("hidden");
+            ocultarFondo();
+        });
+    }
 
-    // Evento adicional: Si tienes otro botón de "Cancelar", también lo detectará
+    // Evento para cerrar el modal con cualquier botón de cancelar
     document.querySelectorAll(".btn-cancelar").forEach(btn => {
         btn.addEventListener("click", function () {
-            document.getElementById("modificar-modal").classList.add("hidden");
+            modal.classList.add("hidden");
             ocultarFondo();
         });
     });
 });
 
-
  
-     
-     
+
         document.addEventListener("DOMContentLoaded", function () {
             const searchInput = document.getElementById("search-input");
             const table = document.getElementById("proveedores-table");
@@ -86,3 +106,6 @@ document.addEventListener("DOMContentLoaded", function () {
             });
         });
        
+
+
+     
