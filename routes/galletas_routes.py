@@ -4,12 +4,14 @@ from forms.recetas_forms import RecetaForm
 from werkzeug.utils import secure_filename
 import os
 import base64
+from utils.decoradores import *
 
 recetas_bp = Blueprint('recetas_bp', __name__, url_prefix='/galletas')
 
 detalles_receta = []
 
 @recetas_bp.route("/")
+@login_required
 def index():
     create_form = RecetaForm(request.form)
     materiales = MateriaPrima.query.all()

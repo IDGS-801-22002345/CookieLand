@@ -13,13 +13,13 @@ detalle_recetas = db.Table(
     db.Column('cantidad', db.Integer, nullable=False)
 )
 
-
-
+# Tabla de Roles
 class Role(db.Model):
     __tablename__ = 'roles'
     id = db.Column(db.Integer, primary_key=True)
     role_name = db.Column(db.String(50), unique=True, nullable=False)
 
+    #Insercion de Roles
     @staticmethod
     def insertar_roles():
         roles = ['admin', 'cliente', 'vendedor', 'produccion']
@@ -29,6 +29,7 @@ class Role(db.Model):
                 db.session.add(nuevo_rol)
         db.session.commit()
 
+# Tabla de Usuarios
 class Usuario(db.Model, UserMixin):
     __tablename__ = 'usuarios'
     id = db.Column(db.Integer, primary_key=True)
@@ -36,15 +37,23 @@ class Usuario(db.Model, UserMixin):
     telefono = db.Column(db.String(10), nullable=False)
     correo = db.Column(db.String(100), unique=True, nullable=False)
     contrasenia = db.Column(db.String(255), nullable=False)
-    estatus = db.Column(db.Integer, default=1) 
+    estatus = db.Column(db.Integer, default=1)
+    verificado = db.Column(db.Boolean, default=False)
     username = db.Column(db.String(50), unique=True, nullable=False)
     rol_id = db.Column(db.Integer, db.ForeignKey('roles.id'), nullable=False)
-    
+
+    rol = db.relationship('Role', backref=db.backref('usuarios', lazy=True), lazy='joined')
+
+    def __repr__(self):
+        return f'<Usuario {self.nombre}>'
+
+    def has_role(self, role_name):
+        return self.rol and self.rol.role_name.lower() == role_name.lower()
+
+    # Insercion de Usuario admin predeterminado
     @staticmethod
     def insertar_admin():
-        # Busca si ya existe el usuario admin
         if not Usuario.query.filter_by(correo='admin@gmail.com').first():
-            # Obtiene el rol de admin
             rol_admin = Role.query.filter_by(role_name='admin').first()
             if rol_admin:
                 admin = Usuario(
@@ -54,18 +63,22 @@ class Usuario(db.Model, UserMixin):
                     telefono='1234567890',
                     contrasenia=generate_password_hash('maicookies123'),
                     estatus=1,
+                    verificado=True,
                     rol_id=rol_admin.id
                 )
                 db.session.add(admin)
                 db.session.commit()
 
-    rol = db.relationship(Role, backref=db.backref('usuarios', lazy=True), lazy='joined')
-
-    def __repr__(self):
-        return f'<Usuario {self.nombre}>'
-
-    def has_role(self, role_name):
-        return self.rol and self.rol.role_name.lower() == role_name.lower()
+# Tabla para verificar las cuentas de clientes
+class CodigoVerificacion(db.Model):
+    __tablename__ = 'codigos_verificacion'
+    id = db.Column(db.Integer, primary_key=True)
+    codigo = db.Column(db.String(6), nullable=False)
+    usuario_id = db.Column(db.Integer, db.ForeignKey('usuarios.id'), nullable=False)
+    expiracion = db.Column(db.DateTime, nullable=False)
+    verificado = db.Column(db.Boolean, default=False)
+    usuario = db.relationship('Usuario', backref='codigo_verificacion')
+    
     
 class MateriaPrima(db.Model):  
     __tablename__ = 'materia_prima' 

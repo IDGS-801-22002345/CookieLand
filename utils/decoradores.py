@@ -1,6 +1,8 @@
 from functools import wraps
 from flask import redirect, url_for, flash
 from flask_login import current_user, login_required
+from itsdangerous import URLSafeTimedSerializer
+from flask import current_app
 
 def anonymous_required(f):
     @wraps(f)

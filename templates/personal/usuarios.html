@@ -145,49 +145,70 @@
 		</div>
 	</div>
 
-
 	<!-- Modal para editar usuarios -->
-	<div id="modificar-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center w-full h-full">
-		<div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-2xl">
-			<div class="flex justify-between items-center border-b pb-3 mb-4">
-				<h3 class="text-xl font-semibold text-gray-800">Editar Usuario</h3>
-				<button type="button" onclick="cerrarModalEditar()" class="text-gray-600 hover:text-red-600 text-2xl">&times;</button>
+	<div id="modal-edicion" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center w-full h-full" aria-hidden="true" role="dialog">
+		<div class="relative p-4 w-full max-w-2xl max-h-screen">
+			<div class="relative bg-white rounded-lg shadow-lg">
+				<div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t border-gray-300 mb-4">
+					<h3 class="text-xl font-semibold text-gray-800 text-center w-full">
+						Editar usuario
+					</h3>
+					<button type="button" class="text-gray-600 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center" id="cerrar-modal-edicion">
+						<svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+							<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+						</svg>
+						<span class="sr-only">Cerrar</span>
+					</button>
+				</div>
+				<form action="{{ url_for('personal_bp.modificar_usuario') }}" method="POST" id="form-editar" novalidate class="p-4 md:p-6">
+					{{ form.csrf_token }}
+					<input type="hidden" name="id" id="edit-id" value="{{ form.id.data }}">
+					<div class="grid grid-cols-2 gap-6 mb-4">
+						<div>
+							<label for="edit-nombre" class="block text-sm font-medium text-gray-700 text-left">Nombre</label>
+							{{ form.nombre(class="mt-1 p-2 w-full border border-gray-300 rounded-md", id="edit-nombre", placeholder="Ingrese el nombre") }}
+						</div>
+						<div>
+							<label for="edit-username" class="text-sm font-medium text-gray-700 text-left">Nombre de Usuario</label>
+							{{ form.username(class="mt-1 p-2 w-full border border-gray-300 rounded-md", id="edit-username", placeholder="Usuario") }}
+						</div>
+						<div>
+							<label for="edit-correo" class="text-sm font-medium text-gray-700 text-left">Correo Electrónico</label>
+							{{ form.correo(class="mt-1 p-2 w-full border border-gray-300 rounded-md", id="edit-correo", placeholder="ejemplo@correo.com", type="email") }}
+						</div>
+						<div>
+							<label for="edit-telefono" class="text-sm font-medium text-gray-700 text-left">Teléfono</label>
+							{{ form.telefono(class="mt-1 p-2 w-full border border-gray-300 rounded-md", id="edit-telefono", placeholder="Ingrese número", type="number") }}
+						</div>
+						<div>
+							<label for="edit-rol" class="text-sm font-medium text-gray-700 text-left">Rol</label>
+							{{ form.rol(class="mt-1 p-2 w-full border border-gray-300 rounded-md", id="edit-rol") }}
+						</div>
+						<div>
+							<label for="edit-contrasenia" class="text-sm font-medium text-gray-700 text-left">Contraseña (opcional)</label>
+							{{ form.contrasenia(class="mt-1 p-2 w-full border border-gray-300 rounded-md", id="edit-contrasenia", placeholder="Ingrese la contraseña", type="password") }}
+						</div>
+						<div>
+							<label for="edit-estatus" class="text-sm font-medium text-gray-700 text-left">Estatus</label>
+							<select id="edit-estatus" name="estatus" class="mt-1 p-2 w-full border border-gray-300 rounded-md">
+								<option value="1" {% if form.estatus.data == 1 %}selected{% endif %}>Activo</option>
+								<option value="0" {% if form.estatus.data == 0 %}selected{% endif %}>Inactivo</option>
+							</select>
+						</div>
+					</div>
+					<div class="flex justify-center mt-6 gap-4">
+						<button type="submit" style="background-color: #24985a !important;" class="text-white bg-green-500 hover:bg-green-600 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center">
+							Guardar Cambios
+						</button>
+						<button type="button" id="cancelar-editar" style="background-color:#c90704 !important;" class="text-white bg-red-500 hover:bg-red-600 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm w-1/2 sm:w-auto px-5 py-2.5 text-center ml-2" onclick="cerrarModalEditar()">
+							Cancelar
+						</button>
+					</div>
+				</form>
 			</div>
-			<form action="{{ url_for('personal_bp.modificar_usuario') }}" method="POST" id="form-editar">
-				{{ form.csrf_token }}
-				<input type="hidden" name="id" id="edit-id" value="{{ form.id.data }}">
-
-				<div class="grid grid-cols-2 gap-4">
-					<div>
-						<label>Nombre</label> {{ form.nombre(class="mt-1 p-2 w-full border rounded", id="edit-nombre") }}
-					</div>
-					<div>
-						<label>Usuario</label> {{ form.username(class="mt-1 p-2 w-full border rounded", id="edit-username") }}
-					</div>
-					<div>
-						<label>Correo</label> {{ form.correo(class="mt-1 p-2 w-full border rounded", id="edit-correo") }}
-					</div>
-					<div>
-						<label>Teléfono</label> {{ form.telefono(class="mt-1 p-2 w-full border rounded", id="edit-telefono") }}
-					</div>
-					<div>
-						<label>Rol</label> {{ form.rol(class="mt-1 p-2 w-full border rounded", id="edit-rol") }}
-					</div>
-					<div>
-						<label>Contraseña (opcional)</label> {{ form.contrasenia(class="mt-1 p-2 w-full border rounded", id="edit-contrasenia") }}
-					</div>
-					<div>
-						<label>Estatus</label> {{ form.estatus(class="mt-1 p-2 w-full border rounded", id="edit-estatus") }}
-					</div>
-				</div>
-
-				<div class="flex justify-center mt-6">
-					<button type="submit" class="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded">Guardar Cambios</button>
-					<button type="button" onclick="cerrarModalEditar()" class="ml-4 bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded">Cancelar</button>
-				</div>
-			</form>
 		</div>
 	</div>
+	
 
 
 	<!-- Modal de confirmación de actualización -->
@@ -298,85 +319,83 @@
 		  document.getElementById('crud-modal').classList.add('hidden');
 		});
 		
-		// Modal de edicion
 		document.addEventListener('DOMContentLoaded', () => {
-		  const botonesEditar = document.querySelectorAll('.btn-modificar');
+			const botonesEditar = document.querySelectorAll('.btn-modificar');
+			const modalEditar = document.getElementById('modal-edicion');
+			const cerrarBtn = document.getElementById('cerrar-modal-edicion');
+			const formEditar = document.getElementById('form-editar');
 		
-		  botonesEditar.forEach(btn => {
-			btn.addEventListener('click', () => {
-			  document.getElementById('edit-id').value = btn.dataset.id;
-			  document.getElementById('edit-nombre').value = btn.dataset.nombre;
-			  document.getElementById('edit-username').value = btn.dataset.username;
-			  document.getElementById('edit-correo').value = btn.dataset.correo;
-			  document.getElementById('edit-telefono').value = btn.dataset.telefono;
-			  document.getElementById('edit-rol').value = btn.dataset.rol;
-			  document.getElementById('edit-estatus').value = btn.dataset.estatus;
-			  document.getElementById('edit-contrasenia').value = "";
+			// Abrir modal con datos
+			botonesEditar.forEach(btn => {
+			  btn.addEventListener('click', () => {
+				document.getElementById('edit-id').value = btn.dataset.id;
+				document.getElementById('edit-nombre').value = btn.dataset.nombre;
+				document.getElementById('edit-username').value = btn.dataset.username;
+				document.getElementById('edit-correo').value = btn.dataset.correo;
+				document.getElementById('edit-telefono').value = btn.dataset.telefono;
+				document.getElementById('edit-rol').value = btn.dataset.rol;
+				document.getElementById('edit-estatus').value = btn.dataset.estatus;
+				document.getElementById('edit-contrasenia').value = "";
 		
-			  const modal = document.getElementById('modificar-modal');
-			  modal.classList.remove('hidden');
-			  modal.classList.add('flex');
-			  modal.style.display = 'flex';
+				modalEditar.classList.remove('hidden');
+				modalEditar.classList.add('flex');
+				modalEditar.style.display = 'flex';
+			  });
 			});
-		  });
 		
-		  const modalEditar = document.getElementById('modificar-modal');
-		  window.addEventListener('click', (e) => {
-			if (e.target === modalEditar) {
-			  cerrarModalEditar();
+			// Botón de cerrar
+			cerrarBtn.addEventListener('click', cerrarModalEditar);
+		
+			// Cerrar al hacer clic fuera del modal
+			window.addEventListener('click', (e) => {
+			  if (e.target === modalEditar) cerrarModalEditar();
+			});
+		
+			// Función de cierre que limpia el formulario
+			function cerrarModalEditar() {
+			  modalEditar.classList.add('hidden');
+			  modalEditar.classList.remove('flex');
+			  modalEditar.style.display = 'none';
+			  formEditar.reset();
 			}
-		  });
-		});
 		
-		function cerrarModalEditar() {
-		  const modal = document.getElementById('modificar-modal');
-		  modal.classList.add('hidden');
-		  modal.classList.remove('flex');
-		  modal.style.display = 'none';
-		  document.getElementById('form-editar').reset();
-		}
+			// Modal de confirmación de actualización
+			const modalConfirmar = document.getElementById('actualizar-modal');
+			const confirmarBtn = document.getElementById('confirmar-actualizacion');
+			const cancelarBtn = document.getElementById('cancelar-actualizacion');
+			const cerrarX = document.getElementById('cerrar-actualizar-modal');
+			let formSubmitEvent = null;
 		
-		// Modal de confirmación de actualización
-		document.addEventListener('DOMContentLoaded', () => {
-		  const formEditar = document.getElementById('form-editar');
-		  const modalConfirmar = document.getElementById('actualizar-modal');
-		  const confirmarBtn = document.getElementById('confirmar-actualizacion');
-		  const cancelarBtn = document.getElementById('cancelar-actualizacion');
-		  const cerrarX = document.getElementById('cerrar-actualizar-modal');
-		  let formSubmitEvent = null;
+			formEditar.addEventListener('submit', (e) => {
+			  e.preventDefault();
+			  formSubmitEvent = e;
+			  modalConfirmar.classList.remove('hidden');
+			  modalConfirmar.style.display = 'flex';
+			});
 		
-		  formEditar.addEventListener('submit', (e) => {
-			e.preventDefault();
-			formSubmitEvent = e;
-			modalConfirmar.classList.remove('hidden');
-			modalConfirmar.style.display = 'flex';
-		  });
-		
-		  confirmarBtn.addEventListener('click', () => {
-			modalConfirmar.classList.add('hidden');
-			modalConfirmar.style.display = 'none';
-			if (formSubmitEvent) {
-			  formEditar.submit();
-			}
-		  });
-		
-		  cancelarBtn.addEventListener('click', () => {
-			modalConfirmar.classList.add('hidden');
-			modalConfirmar.style.display = 'none';
-		  });
-		
-		  cerrarX.addEventListener('click', () => {
-			modalConfirmar.classList.add('hidden');
-			modalConfirmar.style.display = 'none';
-		  });
-		
-		  window.addEventListener('click', (e) => {
-			if (e.target === modalConfirmar) {
+			confirmarBtn.addEventListener('click', () => {
 			  modalConfirmar.classList.add('hidden');
 			  modalConfirmar.style.display = 'none';
-			}
+			  if (formSubmitEvent) formEditar.submit();
+			});
+		
+			cancelarBtn.addEventListener('click', () => {
+			  modalConfirmar.classList.add('hidden');
+			  modalConfirmar.style.display = 'none';
+			});
+		
+			cerrarX.addEventListener('click', () => {
+			  modalConfirmar.classList.add('hidden');
+			  modalConfirmar.style.display = 'none';
+			});
+		
+			window.addEventListener('click', (e) => {
+			  if (e.target === modalConfirmar) {
+				modalConfirmar.classList.add('hidden');
+				modalConfirmar.style.display = 'none';
+			  }
+			});
 		  });
-		});
 		
 		// Modal de eliminación
 		document.addEventListener('DOMContentLoaded', () => {

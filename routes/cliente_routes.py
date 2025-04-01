@@ -1,9 +1,11 @@
 from flask import Blueprint, render_template, session
+from utils.decoradores import *
 
 cliente_bp = Blueprint('cliente_bp', __name__, url_prefix='/')
 
 # Ruta de layout
 @cliente_bp.route('/layout')
+@login_required
 def layout():
     return render_template('cliente/layout.html')
 
@@ -51,7 +53,6 @@ def productos():
 @cliente_bp.route('/carrito_compras')
 def carrito_compras():
     return render_template('cliente/carrito_compras.html')
-
 
 
 

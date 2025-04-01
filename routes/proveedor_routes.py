@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
 from forms.proveedores_form import ProveedorForm
 from models.models import Proveedores, db
-from utils.decoradores import login_required
+from utils.decoradores import *
  
 provedor_bp = Blueprint('provedor_bp', __name__, url_prefix='/proveedores')
  
@@ -13,7 +13,9 @@ def index():
     proveedores_ordenados = sorted(proveedores, key=lambda x: x.estatus, reverse=True)
     return render_template("proveedores/index.html", form=create_form, proveedores=proveedores_ordenados)
 
+
 @provedor_bp.route("/cambiar-estatus/<int:id>", methods=["POST"])
+@login_required
 def cambiar_estatus(id):
     data = request.get_json()
     nuevo_estatus = data.get("estatus")
@@ -24,7 +26,9 @@ def cambiar_estatus(id):
     db.session.commit()
     return jsonify({"success": True})
 
+
 @provedor_bp.route("/agregar", methods=['POST'])
+@login_required
 def agregar_proveedor():
     create_form = ProveedorForm(request.form)
     if request.method == "POST":
@@ -40,7 +44,9 @@ def agregar_proveedor():
         flash("Error al agregar el proveedor", "error")
     return redirect(url_for('provedor_bp.index'))
 
+
 @provedor_bp.route('/modificar', methods=["GET", "POST"])
+@login_required
 def modificar():
     create_form = ProveedorForm(request.form)
     if request.method == "GET":
@@ -70,7 +76,9 @@ def modificar():
     proveedores = Proveedores.query.all()
     return render_template("proveedores/index.html", form=create_form, proveedores=proveedores, modificar_modal=True)
 
+
 @provedor_bp.route("/eliminar", methods=["GET", "POST"])
+@login_required
 def eliminar():
     if request.method == "GET":
         id = request.args.get('id')
