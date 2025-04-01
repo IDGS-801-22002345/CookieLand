@@ -1,6 +1,6 @@
 from wtforms import Form, StringField, IntegerField, TextAreaField, SelectField
 from wtforms.validators import DataRequired
-from datetime import datetime  # Importa la clase datetime del módulo datetime
+from datetime import datetime  
 
 class MermaForm(Form):
     id = IntegerField('ID')
