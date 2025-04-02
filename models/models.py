@@ -1,16 +1,20 @@
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
+from werkzeug.security import generate_password_hash
 import datetime
 from sqlalchemy.dialects.mysql import JSON
 
 
 db = SQLAlchemy()
 
+# Tabla de Roles
 class Role(db.Model):
     __tablename__ = 'roles'
     id = db.Column(db.Integer, primary_key=True)
     role_name = db.Column(db.String(50), unique=True, nullable=False)
 
+
+# Tabla de Usuarios
 class Usuario(db.Model, UserMixin):
     __tablename__ = 'usuarios'
     id = db.Column(db.Integer, primary_key=True)
@@ -18,12 +22,32 @@ class Usuario(db.Model, UserMixin):
     telefono = db.Column(db.String(10), nullable=False)
     correo = db.Column(db.String(100), unique=True, nullable=False)
     contrasenia = db.Column(db.String(255), nullable=False)
-    estatus = db.Column(db.Integer, default=1) 
+    estatus = db.Column(db.Integer, default=1)
+    verificado = db.Column(db.Boolean, default=False)
     username = db.Column(db.String(50), unique=True, nullable=False)
     rol_id = db.Column(db.Integer, db.ForeignKey('roles.id'), nullable=False)
+    last_login = db.Column(db.DateTime) 
 
-    rol = db.relationship(Role, backref=db.backref('usuarios', lazy=True), lazy='joined')
 
+    rol = db.relationship('Role', backref=db.backref('usuarios', lazy=True), lazy='joined')
+
+    def __repr__(self):
+        return f'<Usuario {self.nombre}>'
+
+    def has_role(self, role_name):
+        return self.rol and self.rol.role_name.lower() == role_name.lower()
+
+# Tabla para verificar las cuentas de clientes
+class CodigoVerificacion(db.Model):
+    __tablename__ = 'codigos_verificacion'
+    id = db.Column(db.Integer, primary_key=True)
+    codigo = db.Column(db.String(6), nullable=False)
+    usuario_id = db.Column(db.Integer, db.ForeignKey('usuarios.id'), nullable=False)
+    expiracion = db.Column(db.DateTime, nullable=False)
+    verificado = db.Column(db.Boolean, default=False)
+    usuario = db.relationship('Usuario', backref='codigo_verificacion')
+    
+    
 class MateriaPrima(db.Model):  
     __tablename__ = 'materia_prima' 
     id = db.Column(db.Integer, primary_key=True)
@@ -47,14 +71,16 @@ class InventarioMateria(db.Model):
     create_date = db.Column(db.DateTime, default=datetime.datetime.now, server_default=db.func.now())
     update_date = db.Column(db.DateTime, default=datetime.datetime.now, server_default=db.func.now())
 
+    mermas = db.relationship('Merma', back_populates='inventario_materia')
 
-class Proveedores(db.Model):  # Cambiamos de Alumnos a Proveedores
-    __tablename__ = 'proveedores'  # Cambiamos el nombre de la tabla
+
+class Proveedores(db.Model):  
+    __tablename__ = 'proveedores'  
     id = db.Column(db.Integer, primary_key=True)
     nombre = db.Column(db.String(50))
-    telefono = db.Column(db.String(15))  # Nuevo campo para el teléfono
+    telefono = db.Column(db.String(15))  
     email = db.Column(db.String(100))
-    estatus = db.Column(db.Integer, default=1)  # Estatus (0 o 1, por defecto 1)
+    estatus = db.Column(db.Integer, default=1) 
     create_date = db.Column(db.DateTime, default=datetime.datetime.now, server_default=db.func.now())
 
 import datetime
@@ -98,7 +124,8 @@ class Galleta(db.Model):
     foto = db.Column(db.LargeBinary(length=16777215), nullable=False)  
     
     receta = db.relationship('Receta', back_populates='galletas')
-    producciones = db.relationship('Produccion', back_populates='galleta', cascade="all, delete-orphan")  
+    producciones = db.relationship('Produccion', back_populates='galleta')
+
 
 class Produccion(db.Model):
     __tablename__ = 'produccion'
@@ -109,3 +136,19 @@ class Produccion(db.Model):
     estadoProduccion = db.Column(db.String(50), nullable=False)
     
     galleta = db.relationship('Galleta', back_populates='producciones')
+    mermas = db.relationship('Merma', back_populates='produccion')
+
+class Merma(db.Model):
+    __tablename__ = 'Merma'  
+    id = db.Column(db.Integer, primary_key=True)
+    descripcion = db.Column(db.String(255), nullable=False)
+    cantidad = db.Column(db.Integer, nullable=False)
+    fecha = db.Column('fecha', db.DateTime, default=datetime.datetime.now, server_default=db.func.now())  
+    tipo_merma = db.Column(db.String(50), nullable=True)
+    
+    inventario_materia_id = db.Column('inventarioMateriaId', db.Integer, 
+                                    db.ForeignKey('inventario_materia.id'), nullable=True)
+    produccion_id = db.Column(db.Integer, db.ForeignKey('produccion.id'), nullable=True)  
+
+    inventario_materia = db.relationship('InventarioMateria', back_populates='mermas')
+    produccion = db.relationship('Produccion', back_populates='mermas')

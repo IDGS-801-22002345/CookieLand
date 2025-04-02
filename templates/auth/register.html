@@ -6,7 +6,6 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Registro - Maicookies</title>
 	<link rel="stylesheet" href="{{ url_for('static', filename='css/output.css') }}">
-	<script src="{{ url_for('static', filename='js/main.js') }}"></script>
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
 	<link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
     <script src="https://www.google.com/recaptcha/api.js"></script>
@@ -84,13 +83,12 @@
                 <button type="submit" class="btn-custom">
                     Registrarme
                 </button>
-                <p class="mt-4 text-sm text-gray-600">¿No tienes cuenta? 
+                <p class="mt-4 text-sm text-gray-600">Ya tienes cuenta
                     <a href="{{ url_for('auth_bp.login') }}" class="link-custom">Inicia Sesión</a>
                 </p>
             </div>
         </form>
-
-        
+           
         <style>
             /* Estilos personalizados para el botón */
             .btn-custom {

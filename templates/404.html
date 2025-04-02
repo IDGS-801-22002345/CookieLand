@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Error 404 - Página no encontrada</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/output.css') }}">
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/js/all.min.js"></script>
+</head>
+<body class="bg-[#D2B48C] flex items-center justify-center min-h-screen">
+
+  <div class="bg-white px-10 py-12 rounded-2xl shadow-xl text-center max-w-md">
+    <div class="text-[#8B5A2B] mb-4">
+      <i class="fas fa-exclamation-triangle text-6xl"></i>
+    </div>
+    <h1 class="text-5xl font-bold text-[#5A3E1B] mb-4">404</h1>
+    <p class="text-lg text-gray-700 mb-2">¡Oops! Página no encontrada.</p>
+    <p class="text-sm text-gray-500 mb-6">La página que buscas no existe o ha sido movida.</p>
+    
+    <a href="{{ url_for('cliente_bp.index') }}" class="btn-custom">Volver al inicio</a>
+  </div>
+
+  <style>
+    .btn-custom {
+        background-color: #8B5A2B;
+        color: white;
+        font-size: 1.1rem;
+        font-weight: bold;
+        padding: 10px 20px;
+        border-radius: 8px;
+        text-align: center;
+        display: inline-block;
+        transition: background-color 0.3s ease-in-out, transform 0.2s ease-in-out;
+    }
+
+    .btn-custom:hover {
+        background-color: #A0522D;
+        transform: scale(1.05);
+    }
+  </style>
+</body>
+</html>

@@ -8,14 +8,13 @@ class InsumoForm(Form):
         'Insumo', 
         coerce=int, 
         validators=[validators.DataRequired(message='El insumo es requerido')],
-        choices=[]  # Inicializamos vacío pero manejaremos dinámicamente
+        choices=[]
     )
     cantidad = IntegerField('Cantidad', [
         validators.DataRequired(message='La cantidad es requerida'),
         validators.number_range(min=1, message='La cantidad debe ser mayor a 0')
     ])
 
-# Validador personalizado para archivos requeridos
 def file_required(form, field):
     if not field.data:
         raise ValidationError('El archivo es obligatorio.')
