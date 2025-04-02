@@ -4,21 +4,15 @@ from werkzeug.security import generate_password_hash
 import datetime
 from sqlalchemy.dialects.mysql import JSON
 
+
+db = SQLAlchemy()
+
 # Tabla de Roles
 class Role(db.Model):
     __tablename__ = 'roles'
     id = db.Column(db.Integer, primary_key=True)
     role_name = db.Column(db.String(50), unique=True, nullable=False)
 
-    #Insercion de Roles
-    @staticmethod
-    def insertar_roles():
-        roles = ['admin', 'cliente', 'vendedor', 'produccion']
-        for nombre in roles:
-            if not Role.query.filter_by(role_name=nombre).first():
-                nuevo_rol = Role(role_name=nombre)
-                db.session.add(nuevo_rol)
-        db.session.commit()
 
 # Tabla de Usuarios
 class Usuario(db.Model, UserMixin):
@@ -42,25 +36,6 @@ class Usuario(db.Model, UserMixin):
 
     def has_role(self, role_name):
         return self.rol and self.rol.role_name.lower() == role_name.lower()
-
-    # Insercion de Usuario admin predeterminado
-    @staticmethod
-    def insertar_admin():
-        if not Usuario.query.filter_by(correo='admin@gmail.com').first():
-            rol_admin = Role.query.filter_by(role_name='admin').first()
-            if rol_admin:
-                admin = Usuario(
-                    nombre='Admin Predeterminado',
-                    username='admin',
-                    correo='admin@gmail.com',
-                    telefono='1234567890',
-                    contrasenia=generate_password_hash('maicookies123'),
-                    estatus=1,
-                    verificado=True,
-                    rol_id=rol_admin.id
-                )
-                db.session.add(admin)
-                db.session.commit()
 
 # Tabla para verificar las cuentas de clientes
 class CodigoVerificacion(db.Model):
