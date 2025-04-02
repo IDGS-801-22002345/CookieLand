@@ -11,12 +11,14 @@ from routes.personal_routes import personal_bp
 from routes.registro_compras_routes import registro_compras_bp
 from models.models import *
 from routes.proveedor_routes import provedor_bp
-from routes.galletas_routes import recetas_bp
+from routes.galletas_routes import galletas_bp
 from routes.inventario_routes import inventario_bp
 from routes.materia_prima_routes import materia_prima_bp
 from flask_mail import Mail
 import logging
 from logging.handlers import TimedRotatingFileHandler
+from routes.produccion_routes import produccion_bp
+from routes.detalle_compras import detalle_compras_bp
 
 
 
@@ -72,7 +74,10 @@ def create_app():
     app.register_blueprint(materia_prima_bp)
     app.register_blueprint(provedor_bp)
     app.register_blueprint(inventario_bp)
-    app.register_blueprint(recetas_bp)
+    app.register_blueprint(galletas_bp)
+    app.register_blueprint(produccion_bp)
+    app.register_blueprint(detalle_compras_bp)
+
 
     app.jinja_env.filters['b64encode'] = lambda x: base64.b64encode(x).decode('utf-8') if x else None
 
@@ -110,6 +115,9 @@ def create_app():
         return response
 
     return app
+
+
+app.jinja_env.filters['b64encode'] = lambda x: base64.b64encode(x).decode('utf-8') if x else None
 
 if __name__ == '__main__':
     app = create_app()

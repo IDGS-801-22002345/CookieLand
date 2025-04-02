@@ -6,7 +6,7 @@ from wtforms import EmailField
 from wtforms import validators
 from wtforms import Form, IntegerField, StringField, EmailField, validators
  
-class MateriaPrimaForm(Form):
+class MateriaPrimaForm(FlaskForm):
     id = IntegerField('id', [
         validators.number_range(min=1, max=20, message='Valor no válido')
     ])

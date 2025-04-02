@@ -3,10 +3,14 @@
 {% import "_macros.html" as macros %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/output.css') }}">
 
+<div class="flex flex-col w-full px-4 md:px-10">
+    <div
+      class="w-full p-4 text-center bg-white border border-gray-200 rounded-lg shadow-sm"
+    >
 <!-- Contenedor principal con margen superior -->
 <div class="flex flex-col self-start mt-10 w-[1200px]">
     <!-- Título INVENTARIO centrado -->
-    <h1 class="text-3xl font-bold text-center mb-4">INVENTARIO</h1>
+    <h1 class="text-3xl font-bold text-center mb-4">INVENTARIO INSUMOS</h1>
     <!-- Botón para abrir el modal de agregar -->
     <div class="ml-28 w-full p-4 text-center bg-white border border-gray-300 rounded-lg shadow-sm sm:p-8">
         <div class="flex items-center border border-gray-300 rounded-md w-96 p-2">
@@ -21,8 +25,8 @@
                 <thead class="text-xs text-white uppercase sticky top-0" style="background-color: #7c5454 !important; z-index: 10;">
                     <tr>
                         <th scope="col" class="px-6 py-3">Producto</th>
-                        <th scope="col" class="px-6 py-3">Unidad de Medida</th>
-                        <th scope="col" class="px-6 py-3">Cantidad</th>
+                        <th scope="col" class="px-6 py-3 text-center align-middle">Cantidad</th>
+                        <th scope="col" class="px-6 py-3 text-center align-middle">Unidad de Medida</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -31,8 +35,7 @@
                         <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
                             {{ materia.nombre }}
                         </th>
-                        <td class="px-6 py-4">{{ materia.unidad }}</td>
-                        <td class="px-6 py-4">
+                        <td class="px-6 py-4 text-center align-middle">
                             <span class="inline-block py-1 px-2 text-xs font-medium rounded-full 
                                         {% if not materia.inventario or materia.inventario.cantidad == 0 %}
                                         bg-red-500 text-white
@@ -44,6 +47,7 @@
                                 {{ materia.inventario.cantidad if materia.inventario else 0 }}
                             </span>
                         </td>
+                        <td class="px-6 py-4 text-center align-middle">{{ materia.unidad }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>

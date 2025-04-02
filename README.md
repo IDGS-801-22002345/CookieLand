@@ -6,6 +6,10 @@
 
 npm run watch:css
 
+# Ya pueden cargar datos para la base de datos para que todos tengamos los mismos datos, lo pueden modificar pero solo agarren su parte, no modifiquen todo el seed, para poder correrlo NO DEBE DE ESTAR CORRIENDO EL PROYECTO, Recomiendo que en mysql borren su base de datos y la crean de nuevo para que tengan estos datos
+
+py utils/seed.py
+
 # Cuando se salgan les aparecera un este mensaje: ¿Desea terminar el trabajo por lotes (S/N)?
 
 # Le dan la S y enter

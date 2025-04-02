@@ -1,30 +1,47 @@
 {% macro mostrar_flash() %}
-  {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-    <div id="flash-container" class="fixed top-5 right-5 z-50 w-md max-w-md text-center mt-10">
-        {% for category, message in messages %}
-          <div class="p-4 mb-4 text-sm text-white rounded-lg shadow
-                      {% if category == 'success' %}bg-green-500
-                      {% elif category == 'danger' %}bg-red-500
-                      {% elif category == 'warning' %}bg-yellow-500
-                      {% else %}bg-blue-500{% endif %}">
-            <span class="mr-2 text-lg">
-              {% if category == 'success' %}
-              <i class="fas fa-check-circle"></i>
-              {% elif category == 'danger' %}
-              <i class="fas fa-times-circle"></i>
-              {% elif category == 'warning' %}
-              <i class="fas fa-exclamation-circle"></i>
-              {% else %}
-              <i class="fas fa-info-circle"></i>
-              {% endif %}
-            </span>
-            {{ message }}
-          </div>
-        {% endfor %}
-      </div>
-    {% endif %}
-  {% endwith %}
+{% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="fixed top-5 right-5 z-50 space-y-4">  <!-- Cambiado a fixed para que no dependa del scroll -->
+                {% for category, message in messages %}
+                    <div class="flex items-center p-4 mb-4 text-sm font-medium text-white rounded-lg 
+                        {% if category == 'success' %} 
+                            bg-green-500 
+                        {% elif category == 'error' %}
+                            bg-red-500
+                        {% elif category == 'info' %}
+                            bg-blue-500
+                        {% elif category == 'warning' %}
+                            bg-yellow-500
+                        {% endif %}
+                        animate__animated animate__slideInRight animate__fadeOut animate__duration-1000ms notification">
+                        <!-- Iconos... -->
+                        {% if category == 'success' %}
+                            <svg class="w-5 h-5 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" 
+                                 viewBox="0 0 24 24" stroke-width="2">
+                                <path d="M9 12l2 2l4-4"></path>
+                            </svg>
+                        {% elif category == 'error' %}
+                            <svg class="w-5 h-5 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" 
+                                 viewBox="0 0 24 24" stroke-width="2">
+                                <path d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        {% elif category == 'info' %}
+                            <svg class="w-5 h-5 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" 
+                                 viewBox="0 0 24 24" stroke-width="2">
+                                <path d="M12 4v16m8-8H4"></path>
+                            </svg>
+                        {% elif category == 'warning' %}
+                            <svg class="w-5 h-5 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" 
+                                 viewBox="0 0 24 24" stroke-width="2">
+                                <path d="M12 2L2 22h20L12 2z"></path>
+                            </svg>
+                        {% endif %}
+                        <p>{{ message }}</p>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
 
   <script>
     setTimeout(() => {

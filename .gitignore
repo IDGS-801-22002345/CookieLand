@@ -1,7 +1,14 @@
 node_modules
+**/__pycache__
+***/__pycache__
+**__pycache__
 __pycache__/
 *.py[cod]
 *.pyc/
+**/__pycache__/
+**/*.py[cod]
+**/*.pyc
 credentials.json
 .env
 output.css
+**output.css

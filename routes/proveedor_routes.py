@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
+from flask import Blueprint, render_template, request, redirect, url_for, flash
 from forms.proveedores_form import ProveedorForm
 from models.models import Proveedores, db
 from utils.decoradores import *
@@ -25,10 +25,12 @@ def cambiar_estatus(id):
     nuevo_estatus = data.get("estatus")
     proveedor = Proveedores.query.get(id)
     if not proveedor:
-        return jsonify({"success": False, "message": "Proveedor no encontrado"}), 404
+        flash("Proveedor no encontrado", "error")
+        return redirect(url_for("provedor_bp.index"))
+
+    nuevo_estatus = int(request.form.get("estatus", proveedor.estatus))
     proveedor.estatus = nuevo_estatus
     db.session.commit()
-    return jsonify({"success": True})
 
 
 @provedor_bp.route("/agregar", methods=['POST'])
@@ -47,8 +49,8 @@ def agregar_proveedor():
         db.session.add(proveedor)
         db.session.commit()
     else:
-        flash("Error al agregar el proveedor", "error")
-    return redirect(url_for('provedor_bp.index'))
+        flash("¡Proveedor desactivado correctamente!", "warning")
+    return redirect(url_for("provedor_bp.index"))
 
 
 @provedor_bp.route('/modificar', methods=["GET", "POST"])
@@ -57,6 +59,7 @@ def agregar_proveedor():
 @login_required
 def modificar():
     create_form = ProveedorForm(request.form)
+    
     if request.method == "GET":
         id = request.args.get('id')
         proveedor = db.session.query(Proveedores).filter(Proveedores.id == id).first()
@@ -68,21 +71,69 @@ def modificar():
         else:
             flash("Proveedor no encontrado", "error")
             return redirect(url_for('provedor_bp.index'))
+    
     elif request.method == "POST":
         id = create_form.id.data
         proveedor = db.session.query(Proveedores).filter(Proveedores.id == id).first()
+        
         if proveedor:
-            proveedor.nombre = create_form.nombre.data
-            proveedor.telefono = create_form.telefono.data
-            proveedor.email = create_form.email.data
-            proveedor.estatus = 1  # Reactivar el proveedor al actualizar
-            db.session.commit()
+            # Validar duplicados excluyendo el proveedor actual
+            existente = Proveedores.query.filter(
+                (Proveedores.id != id) & (
+                    (Proveedores.nombre == create_form.nombre.data) |
+                    (Proveedores.email == create_form.email.data) |
+                    (Proveedores.telefono == create_form.telefono.data)
+                )
+            ).first()
+
+            if existente:
+                if existente.nombre == create_form.nombre.data:
+                    flash("Ya existe otro proveedor con este nombre.", "error")
+                elif existente.email == create_form.email.data:
+                    flash("Ya existe otro proveedor con este email.", "error")
+                elif existente.telefono == create_form.telefono.data:
+                    flash("Ya existe otro proveedor con este teléfono.", "error")
+                
+                return render_template("proveedores/index.html",
+                                    form=create_form,
+                                    proveedores=Proveedores.query.all(),
+                                    modificar_modal=True, 
+                                    modal_error=True)
+
+            try:
+                proveedor.nombre = create_form.nombre.data
+                proveedor.telefono = create_form.telefono.data
+                proveedor.email = create_form.email.data
+                proveedor.estatus = 1  # Reactivar el proveedor al actualizar
+                
+                db.session.commit()
+                flash("Proveedor actualizado correctamente", "success")
+                return redirect(url_for('provedor_bp.index'))
+                
+            except Exception as e:
+                db.session.rollback()
+                flash(f"Error al actualizar proveedor: {str(e)}", "error")
+                return render_template("proveedores/index.html",
+                                     form=create_form,
+                                     proveedores=Proveedores.query.all(),
+                                     modificar_modal=True,
+                                     agregar_modal=False,
+                                     modal_error=True)
         else:
             flash("Proveedor no encontrado", "error")
-        return redirect(url_for('provedor_bp.index'))
+            return redirect(url_for('provedor_bp.modificar'))
 
-    proveedores = Proveedores.query.all()
-    return render_template("proveedores/index.html", form=create_form, proveedores=proveedores, modificar_modal=True)
+    # Si hay errores de validación del formulario
+    for field, errors in create_form.errors.items():
+        for error in errors:
+            flash(f"{getattr(create_form, field).label.text}: {error}", "error")
+    
+    return render_template("proveedores/index.html",
+                         form=create_form,
+                         proveedores=Proveedores.query.all(),
+                         modificar_modal=True,
+                         modal_error=True)
+ 
 
 
 @provedor_bp.route("/eliminar", methods=["GET", "POST"])
@@ -94,8 +145,14 @@ def eliminar():
         id = request.args.get('id')
         proveedor = Proveedores.query.get(id)
         if proveedor:
-            proveedor.estatus = 0
-            db.session.commit()
+            try:
+                proveedor.estatus = 0
+                db.session.commit()
+                # Alerta agregada para desactivación exitosa
+                flash("¡Proveedor desactivado correctamente!", "warning")
+            except Exception as e:
+                # Alerta agregada para error en desactivación
+                flash(f"Error al desactivar el proveedor: {str(e)}", "error")
         else:
             flash("Proveedor no encontrado", "error")
     return redirect(url_for('provedor_bp.index'))
