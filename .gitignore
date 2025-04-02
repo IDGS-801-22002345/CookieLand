@@ -5,3 +5,17 @@ __pycache__/
 credentials.json
 .env
 output.css
+node_modules
+**/_pycache_
+***/_pycache_
+**_pycache_
+_pycache_/
+*.py[cod]
+*.pyc/
+**/_pycache_/
+*/.py[cod]
+*/.pyc
+credentials.json
+.env
+output.css
+**output.css
