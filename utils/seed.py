@@ -83,28 +83,28 @@ def run_seed():
         materias_primas = [
             {
                 "nombre": "Harina de trigo",
-                "unidad": "kg",
+                "unidad": "g",
                 "cantidad": 100,
                 "cantidad_minima": 20,
                 "estado_stock": "DISPONIBLE"
             },
             {
                 "nombre": "Azúcar",
-                "unidad": "kg",
+                "unidad": "g",
                 "cantidad": 50,
                 "cantidad_minima": 10,
                 "estado_stock": "DISPONIBLE"
             },
             {
                 "nombre": "Huevo",
-                "unidad": "piezas",
+                "unidad": "pz",
                 "cantidad": 200,
                 "cantidad_minima": 50,
                 "estado_stock": "DISPONIBLE"
             },
             {
                 "nombre": "Mantequilla",
-                "unidad": "kg",
+                "unidad": "g",
                 "cantidad": 30,
                 "cantidad_minima": 5,
                 "estado_stock": "DISPONIBLE"
