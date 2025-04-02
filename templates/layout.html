@@ -145,7 +145,53 @@
 
     <!-- Contenido principal -->
     <main class="pt-20 md:ml-64 min-h-screen">
-      {% block content %} {% endblock %}
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+              <div class="absolute top-5 right-5 z-50 space-y-4">
+                  {% for category, message in messages %}
+                      <!-- Usando clases de Flowbite para notificaciones -->
+                      <div class="flex items-center p-4 mb-4 text-sm font-medium text-white rounded-lg 
+                          {% if category == 'success' %} 
+                              bg-green-500 
+                          {% elif category == 'error' %}
+                              bg-red-500
+                          {% elif category == 'info' %}
+                              bg-blue-500
+                          {% elif category == 'warning' %}
+                              bg-yellow-500
+                          {% endif %}
+                          animate__animated animate__slideInRight animate__fadeOut animate__duration-1000ms notification">
+                          <!-- Icono dependiendo del tipo de mensaje -->
+                          {% if category == 'success' %}
+                              <svg class="w-5 h-5 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" 
+                                  viewBox="0 0 24 24" stroke-width="2">
+                                  <path d="M9 12l2 2l4-4"></path>
+                              </svg>
+                          {% elif category == 'error' %}
+                              <svg class="w-5 h-5 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" 
+                                  viewBox="0 0 24 24" stroke-width="2">
+                                  <path d="M6 18L18 6M6 6l12 12"></path>
+                              </svg>
+                          {% elif category == 'info' %}
+                              <svg class="w-5 h-5 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" 
+                                  viewBox="0 0 24 24" stroke-width="2">
+                                  <path d="M12 4v16m8-8H4"></path>
+                              </svg>
+                          {% elif category == 'warning' %}
+                              <svg class="w-5 h-5 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" 
+                                  viewBox="0 0 24 24" stroke-width="2">
+                                  <path d="M12 2L2 22h20L12 2z"></path>
+                              </svg>
+                          {% endif %}
+                          <!-- Mensaje -->
+                          <p>{{ message }}</p>
+                      </div>
+                  {% endfor %}
+              </div>
+          {% endif %}
+      {% endwith %}
+      {% block content %} 
+      {% endblock %}
     </main>
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
