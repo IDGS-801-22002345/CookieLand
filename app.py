@@ -57,6 +57,6 @@ app.register_blueprint(detalle_compras_bp)
 
 app.jinja_env.filters['b64encode'] = lambda x: base64.b64encode(x).decode('utf-8') if x else None
 
-if __name__ == '_main_':
+if __name__ == '__main__':
     app = create_app()
     app.run(debug=True)

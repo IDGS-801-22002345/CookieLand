@@ -24,15 +24,6 @@ class Usuario(db.Model, UserMixin):
 
     rol = db.relationship(Role, backref=db.backref('usuarios', lazy=True), lazy='joined')
 
-class Proveedores(db.Model):
-    __tablename__ = 'proveedores'
-    id = db.Column(db.Integer, primary_key=True)
-    nombre = db.Column(db.String(50))
-    telefono = db.Column(db.String(15))
-    email = db.Column(db.String(100))
-    estatus = db.Column(db.Integer, default=1)
-    create_date = db.Column(db.DateTime, default=datetime.datetime.now)
-
 class MateriaPrima(db.Model):  
     __tablename__ = 'materia_prima' 
     id = db.Column(db.Integer, primary_key=True)
