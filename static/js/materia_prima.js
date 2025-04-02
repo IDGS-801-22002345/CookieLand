@@ -57,27 +57,35 @@ document.addEventListener("DOMContentLoaded", function () {
       ocultarFondo();
     });
   });
-
-  // Función de búsqueda en la tabla
-  const searchInput = document.getElementById("search-input");
-  const table = document.getElementById("materia-prima-table");
-  const rows = table.getElementsByTagName("tr");
-
-  searchInput.addEventListener("input", function () {
-    const searchText = this.value.toLowerCase(); // Texto de búsqueda en minúsculas
-
-    // Recorre todas las filas de la tabla (excepto la primera, que es el encabezado)
-    for (let i = 1; i < rows.length; i++) {
-      const row = rows[i];
-      const cells = row.getElementsByTagName("td");
-
-      // Si la fila tiene celdas (para evitar errores si hay filas vacías)
-      if (cells.length > 0) {
-        // Busca solo en la primera columna (ajusta el índice si es necesario)
-        const cellText = cells[0].textContent.toLowerCase(); // primera columna
-        // Muestra o esconde la fila dependiendo de si la primera columna contiene el texto
-        row.style.display = cellText.includes(searchText) ? "" : "none";
-      }
-    }
-  });
 });
+
+            document.addEventListener("DOMContentLoaded", function () {
+              const searchInput = document.getElementById("search-input");
+              const table = document.getElementById("materia-prima-table");
+              const rows = table.getElementsByTagName("tr");
+
+              searchInput.addEventListener("input", function () {
+                  const searchText = this.value.toLowerCase(); // Texto de búsqueda en minúsculas
+
+                  // Recorre todas las filas de la tabla (excepto la primera, que es el encabezado)
+                  for (let i = 1; i < rows.length; i++) {
+                      const row = rows[i];
+                      const cells = row.getElementsByTagName("td");
+                      let found = false;
+
+                      // Recorre todas las celdas de la fila
+                      for (let j = 0; j < cells.length; j++) {
+                          const cellText = cells[j].textContent.toLowerCase();
+
+                          // Si el texto de la celda coincide con el texto de búsqueda, muestra la fila
+                          if (cellText.includes(searchText)) {
+                              found = true;
+                              break; // No es necesario seguir buscando en esta fila
+                          }
+                      }
+
+                      // Muestra u oculta la fila según si se encontró una coincidencia
+                      row.style.display = found ? "" : "none";
+                  }
+              });
+            });
