@@ -11,13 +11,13 @@ from models.models import db, Role, Usuario, MateriaPrima, InventarioMateria, Pr
 def run_seed():
     try:
         print("\n=== Iniciando carga de datos iniciales ===")
-        
+      
         # 1. Crear roles básicos
         roles = [
-            {"role_name": "ADMIN"},
-            {"role_name": "VENDEDOR"},
-            {"role_name": "PRODUCCION"},
-            {"role_name": "CLIENTE"}
+            {"role_name": "admin"},
+            {"role_name": "cliente"},
+            {"role_name": "produccion"},
+            {"role_name": "vendedor"}
         ]
         
         for rol in roles:
@@ -27,40 +27,48 @@ def run_seed():
                 print(f"✅ Rol {rol['role_name']} creado")
             else:
                 print(f"ℹ️ Rol {rol['role_name']} ya existe")
-        
+
         db.session.commit()
-        
+
         # 2. Crear usuarios iniciales
         usuarios = [
             {
                 "nombre": "Admin Principal",
                 "telefono": "5551234567",
-                "correo": "maico@gmail.com",
-                "username": "maico",
-                "contrasenia": "123",
-                "rol_name": "ADMIN"
+                "correo": "admin@gmail.com",
+                "username": "admin",
+                "contrasenia": "maicookies123", 
+                "rol_name": "admin"
             },
             {
                 "nombre": "Vendedor Ejemplo",
                 "telefono": "5557654321",
                 "correo": "vendedor@galletas.com",
                 "username": "vendedor1",
-                "contrasenia": "Vendedor123",
-                "rol_name": "VENDEDOR"
+                "contrasenia": "vendedor1",
+                "rol_name": "vendedor"
             },
             {
                 "nombre": "Jefe Producción",
                 "telefono": "5559876543",
                 "correo": "produccion@galletas.com",
                 "username": "jefeprod",
-                "contrasenia": "Produccion123",
-                "rol_name": "PRODUCCION"
+                "contrasenia": "produccion1",
+                "rol_name": "produccion"
+            },
+            {
+                "nombre": "Cliente Feliz",
+                "telefono": "5551112233",
+                "correo": "cliente@galletas.com",
+                "username": "cliente1",
+                "contrasenia": "cliente1",
+                "rol_name": "cliente"
             }
         ]
-        
+
         for user_data in usuarios:
             if not Usuario.query.filter_by(username=user_data["username"]).first():
-                rol = Role.query.filter_by(role_name=user_data["rol_name"]).first()
+                rol = Role.query.filter_by(role_name=user_data["rol_name"].lower()).first()
                 if rol:
                     new_user = Usuario(
                         nombre=user_data["nombre"],
@@ -68,6 +76,8 @@ def run_seed():
                         correo=user_data["correo"],
                         username=user_data["username"],
                         contrasenia=generate_password_hash(user_data["contrasenia"]),
+                        estatus=1,
+                        verificado=True,
                         rol_id=rol.id
                     )
                     db.session.add(new_user)
@@ -76,7 +86,7 @@ def run_seed():
                     print(f"⚠️ Rol {user_data['rol_name']} no encontrado para usuario {user_data['username']}")
             else:
                 print(f"ℹ️ Usuario {user_data['username']} ya existe")
-        
+
         db.session.commit()
         
         # 3. Crear materias primas con su inventario

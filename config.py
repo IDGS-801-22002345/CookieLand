@@ -1,5 +1,9 @@
 import os
-from dotenv import load_dotenv
+from flask.cli import load_dotenv
+import json
+import os
+from datetime import timedelta
+
 
 load_dotenv()  # Esto carga las variables del archivo .env
 
@@ -9,10 +13,20 @@ class Config(object):
     
 class DevelopmentConfig(Config):
     DEBUG = True
-    # Corrección 1: Nombre correcto de la variable de entorno (y quité el typo en TRACK_MODIFICATIONS)
-    SQLALCHEMY_DATABASE_URI = os.getenv('SQLALCHEMY_DATABASE_URI')  # ← ¡Cambiado de DATABASE_URL!
-    SQLALCHEMY_TRACK_MODIFICATIONS = False  # ← ¡Corregido el typo (TRACK no TRACK)!
-    
-    # Corrección 2: Nombre correcto de las variables de entorno (sin typo en PUBLIC)
-    RECAPTCHA_PUBLIC_KEY = os.getenv('RECAPTCHA_PUBLIC_KEY')  # ← ¡Corregido PUBLIC_KEY!
+    SQLALCHEMY_DATABASE_URI = os.getenv('SQLALCHEMY_DATABASE_URI')
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+    RECAPTCHA_PUBLIC_KEY = os.getenv('RECAPTCHA_PUBLIC_KEY')
     RECAPTCHA_PRIVATE_KEY = os.getenv('RECAPTCHA_PRIVATE_KEY')
+
+    MAIL_SERVER = 'smtp.gmail.com'
+    MAIL_PORT = 587
+    MAIL_USE_TLS = True
+    MAIL_USERNAME = os.getenv('MAIL_USERNAME')
+    MAIL_PASSWORD = os.getenv('MAIL_PASSWORD')
+    MAIL_DEFAULT_SENDER = os.getenv('MAIL_USERNAME')
+    
+    # Tiempo de la sesion activaaa
+    PERMANENT_SESSION_LIFETIME = timedelta(minutes=10)
+    SESSION_REFRESH_EACH_REQUEST = True
+

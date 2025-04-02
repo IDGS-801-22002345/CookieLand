@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Iniciar Sesión - Maicookies</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/output.css') }}">
-    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/js/all.min.js"></script>
 </head>
@@ -43,17 +42,19 @@
                 </a>                
             </div>
 
-            <div class="mt-4">
-                {{ form.recaptcha }}
+            <div class="mt-4 text-center">
+                <div class="inline-block">
+                    {{ form.recaptcha(class="block w-full") }}
+                </div>
                 {% for error in form.recaptcha.errors %}
-                    <p class="text-red-500 text-xs">{{ error }}</p>
+                    <p class="text-red-500 text-xs mt-2">{{ error }}</p>
                 {% endfor %}
             </div>
-        
             <div class="text-center mt-6">
                 <button type="submit" class="btn-custom">
                     Iniciar Sesión
                 </button>
+               
                 <p class="mt-4 text-sm text-gray-600">¿No tienes cuenta? 
                     <a href="{{ url_for('auth_bp.register_landing') }}" class="link-custom">Regístrate aquí</a>
                 </p>

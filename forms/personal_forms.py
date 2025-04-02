@@ -1,39 +1,45 @@
 from flask_wtf import FlaskForm
 from wtforms import *
 from wtforms.validators import *
-from wtforms import *
 
 class RegistroUsuarioForm(FlaskForm):
-    
     id = HiddenField('ID')
 
     nombre = StringField('Nombre', validators=[
-        DataRequired(),
-        Length(min=2, max=15),
+        DataRequired(message="El nombre es obligatorio"),
+        Length(min=2, max=40, message="Debe tener entre 2 y 40 caracteres"),
         Regexp(r'^[A-Za-zÁÉÍÓÚÑáéíóúñ\s]+$', message="Solo letras y espacios")
     ])
+
     telefono = StringField('Teléfono', validators=[
-        DataRequired(),
+        DataRequired(message="El teléfono es obligatorio"),
         Regexp(r'^\d{10}$', message="Debe ser un número de 10 dígitos")
     ])
+
     correo = StringField('Correo', validators=[
-        DataRequired(),
-        Email(),
+        DataRequired(message="Correo obligatorio"),
+        Email(message="Correo inválido"),
         Length(max=100)
     ])
-    username = StringField('Username', validators=[
+
+    username = StringField('Usuario', validators=[
         DataRequired(),
-        Length(min=4, max=10),
+        Length(min=4, max=15),
         Regexp(r'^[A-Za-z0-9_]+$', message="Solo letras, números y guiones bajos")
     ])
+
     contrasenia = PasswordField('Contraseña', validators=[
-        DataRequired(),
-        Length(min=6, max=20)
+        Optional(),
+        Length(min=6, max=20, message="Debe tener entre 6 y 20 caracteres"),
+        Regexp(r'^[A-Za-z0-9!@#$%^&*()_+]+$', message="No uses caracteres especiales inválidos")
     ])
-    estatus = IntegerField('estatus', [
-        DataRequired(message='El estatus es requerido'),
-        NumberRange(min=0, max=1, message='El estatus debe ser 0 o 1')
-    ])
+
+    estatus = SelectField('Estatus', choices=[
+        ('', 'Opcional'),
+        ('1', 'Activo'),
+        ('0', 'Inactivo')
+    ], validators=[Optional()])
+
     rol = SelectField('Rol', choices=[
         ('cliente', 'Cliente'),
         ('admin', 'Administrador'),

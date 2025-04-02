@@ -4,6 +4,7 @@ from wtforms.validators import DataRequired, Length,Email, Regexp
 from werkzeug.security import check_password_hash
 from models.models import Usuario
 
+# Validadores para login 
 class LoginForm(FlaskForm):
     email = StringField('Correo Electrónico', validators=[
         DataRequired(), Email()
@@ -43,4 +44,11 @@ class RegisterFormLandingPage(FlaskForm):
         DataRequired(),Length(min=6, max=12),
         Regexp(r'^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*?&]{8,}$', 
         message="La contraseña debe tener al menos 8 caracteres, una letra y un número.")
+    ])
+
+# Validadores para codigo de verificacion
+class CodigoVerificacionForm(FlaskForm):
+    codigo = StringField("Código de Verificación", validators=[
+        DataRequired(message="Este campo es obligatorio."),
+        Length(min=6, max=6, message="El código debe tener 6 dígitos.")
     ])

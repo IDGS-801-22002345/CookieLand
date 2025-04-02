@@ -1,37 +1,106 @@
 {% extends "cliente/layout.html" %}
-
 {% block title %}Productos - Maicookies{% endblock %}
 
 {% block content %}
 <div class="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-12 py-16">
-    <h1 class="text-4xl font-extrabold text-center text-[#5A3E1B] mb-6">Nuestros productos</h1>
+  <h1 class="text-4xl font-extrabold text-center text-[#5A3E1B] mb-12 tracking-wide">Nuestros productos</h1>
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10">
-        <!-- Tarjeta de producto -->
-        <div class="flex flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-xl hover:shadow-2xl transition duration-300">
-            <a href="#" class="h-72 overflow-hidden">
-                <img class="w-full h-full object-cover" src="https://images.unsplash.com/photo-1600185365483-26d7a4cc7519?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" alt="Chocolate gold">
-            </a>
-            <div class="p-6 flex flex-col justify-between flex-grow">
-                <h5 class="text-2xl font-semibold text-slate-900 mb-4">Chocolate gold</h5>
-                <div class="flex items-center justify-between mb-5">
-                    <span class="text-3xl font-bold text-slate-900">$14</span>
-                    <div class="flex items-center gap-2">
-                        <button onclick="decreaseQuantity(this)" class="px-3 py-1 text-lg bg-gray-200 rounded hover:bg-gray-300">−</button>
-                        <input type="number" value="1" min="1" class="w-14 text-center text-lg border rounded" />
-                        <button onclick="increaseQuantity(this)" class="px-3 py-1 text-lg bg-gray-200 rounded hover:bg-gray-300">+</button>
-                    </div>
-                </div>
-                <a href="#" class="mt-auto flex items-center justify-center rounded-md bg-amber-900 px-6 py-3 text-white text-lg font-semibold hover:bg-amber-800">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.3 2.3a1 1 0 00.7 1.7H17m0 0a2 2 0 100 4 2 2 0 000-4m-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
-                    </svg>
-                    Agregar
-                </a>
-            </div>
+  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10">
+    <div class="bg-white rounded-2xl shadow-xl border border-[#CDAA7D] overflow-hidden hover:shadow-2xl transition duration-300 flex flex-col">
+      <div class="w-full aspect-square overflow-hidden">
+        <img 
+          class="w-full h-full object-cover object-center"
+          src="{{ url_for('static', filename='img/img14.jpg') }}"
+          alt="Galletas Clásicas"
+        />
+      </div>
+
+      <div class="p-5 flex-1 flex flex-col justify-between">
+        <div>
+          <h2 class="text-2xl font-bold text-[#5A3E1B] mb-1">Galleta de Chocolate</h2>
+          <p class="text-[#8B5A2B] text-lg font-semibold">Desde $25.00 MXN</p>
+
+          <label for="presentacion" class="block mt-4 mb-2 text-sm font-medium text-[#5A3E1B]">Presentación:</label>
+          <select id="presentacion" name="presentacion"
+            class="w-full p-2 border border-[#CDAA7D] rounded-lg text-sm focus:ring-2 focus:ring-[#A0522D] focus:outline-none text-[#5A3E1B]">
+            <option value="pieza">Por pieza</option>
+            <option value="caja">Por caja</option>
+            <option value="kilo">Por kilo</option>
+          </select>
         </div>
+
+        <div class="mt-auto">
+          <div class="flex items-center justify-between mt-4 mb-4">
+            <label for="cantidad-galleta-chocolate" class="text-sm text-[#5A3E1B] font-medium">Cantidad:</label>
+            <input 
+              type="number"
+              id="cantidad-galleta-chocolate"
+              name="cantidad"
+              min="1"
+              max="200"
+              maxlength="3"
+              value="1"
+              class="w-24 p-2 border border-[#CDAA7D] rounded-lg focus:ring-2 focus:ring-[#A0522D] focus:outline-none text-center text-[#5A3E1B] font-medium"
+            />
+          </div>
+
+          <button type="button" class="btn-custom">
+            <i class="fas fa-cart-plus mr-2"></i> Agregar al carrito
+          </button>
+        </div>
+      </div>
     </div>
+  </div>
 </div>
 
+<style>
+  .btn-custom {
+    background-color: #8B5A2B;
+    color: white;
+    font-size: 1rem;
+    font-weight: 600;
+    padding: 10px 20px;
+    border-radius: 8px;
+    width: 100%;
+    text-align: center;
+    transition: background-color 0.3s ease-in-out, transform 0.2s ease-in-out;
+  }
+  .btn-custom:hover {
+    background-color: #966232;
+    transform: scale(1.03);
+  }
+  .btn-custom:active {
+    transform: scale(0.97);
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const cantidadInput = document.getElementById('cantidad-galleta-chocolate');
+
+    cantidadInput.addEventListener('input', function () {
+      this.value = this.value.replace(/\D/g, '');
+
+      if (this.value.length > 3) {
+        this.value = this.value.slice(0, 3);
+      }
+
+      if (parseInt(this.value) > 200) {
+        this.value = 200;
+      }
+
+      if (this.value === '' || parseInt(this.value) < 1) {
+        this.value = 1;
+      }
+    });
+
+    cantidadInput.addEventListener('keydown', function (e) {
+      const permitido = ['Backspace', 'ArrowLeft', 'ArrowRight', 'Tab', 'Delete'];
+
+      if (!/[0-9]/.test(e.key) && !permitido.includes(e.key)) {
+        e.preventDefault();
+      }
+    });
+  });
+</script>
 {% endblock %}

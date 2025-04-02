@@ -265,6 +265,3 @@ def editar_receta():
         flash(f'Error al actualizar: {str(e)}', 'warning')
     
     return redirect(url_for('galletas_bp.form_edit', galleta_id=galleta_id))
-
-
-
