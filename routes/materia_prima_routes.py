@@ -1,3 +1,4 @@
+from sqlite3 import IntegrityError
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
 from forms.materia_prima_form import MateriaPrimaForm
 from models.models import MateriaPrima, InventarioMateria, db
@@ -18,21 +19,26 @@ def index():
     return render_template('materia_prima/materia_prima.html', form=create_form, materia_prima=materia_prima)
 
 
+
+
 @materia_prima_bp.route("/agregar", methods=['POST'])
 def agregar():
     create_form = MateriaPrimaForm(request.form)
+    
     if request.method == "POST":
-        # Crear la materia prima
-        nueva_materia = MateriaPrima(
-            nombre=create_form.nombre.data,
-            unidad=create_form.unidad.data
-        )
-        db.session.add(nueva_materia)
-        db.session.commit()
-
-        flash("Materia Prima agregada con éxito", "success")
-    else:
-        flash("Error al agregar la materia prima", "error")
+        try:
+            # Crear la materia prima
+            nueva_materia = MateriaPrima(
+                nombre=create_form.nombre.data,
+                unidad=create_form.unidad.data
+            )
+            db.session.add(nueva_materia)
+            db.session.commit()
+            flash("Materia Prima agregada con éxito", "success")
+        
+        except IntegrityError:
+            db.session.rollback()  # Deshacer cambios en la base de datos
+            flash("Error: El insumo ya existe. Por favor, elige otro.", "danger")
     
     return redirect(url_for('materia_prima_bp.index'))
 
