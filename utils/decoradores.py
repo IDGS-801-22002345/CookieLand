@@ -1,9 +1,10 @@
 from functools import wraps
-from flask import redirect, url_for, flash
+from flask import redirect, request, url_for, flash
 from flask_login import current_user, login_required
 from itsdangerous import URLSafeTimedSerializer
 from flask import current_app
 
+# Sesion activa
 def anonymous_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
@@ -13,6 +14,7 @@ def anonymous_required(f):
         return f(*args, **kwargs)
     return decorated
 
+# Acceso con varios roles
 def role_required(*role_names):
     def decorator(f):
         @wraps(f)
@@ -24,3 +26,14 @@ def role_required(*role_names):
             return f(*args, **kwargs)
         return wrapper
     return decorator
+
+# log_excepciones
+def log_excepciones(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except Exception as e:
+            current_app.logger.error(f"Error en '{func.__name__}' - {request.url} - {str(e)}")
+            raise e  
+    return wrapper

@@ -11,6 +11,8 @@ recetas_bp = Blueprint('recetas_bp', __name__, url_prefix='/galletas')
 detalles_receta = []
 
 @recetas_bp.route("/")
+@log_excepciones
+@role_required('admin')
 @login_required
 def index():
     create_form = RecetaForm(request.form)
@@ -47,6 +49,8 @@ def index():
                          materiales=materiales)
 
 @recetas_bp.route('/guardar_receta', methods=['POST'])
+@log_excepciones
+@role_required('admin')
 def guardar_receta():
     nombre_receta = request.form.get('nombre')
     foto = request.files.get('foto')
@@ -97,6 +101,8 @@ def guardar_receta():
     return redirect(url_for('recetas_bp.index'))
 
 @recetas_bp.route('/actualizar/<int:receta_id>', methods=["GET", "POST"])
+@log_excepciones
+@role_required('admin')
 def actualizar_receta(receta_id):
     receta = Receta.query.get_or_404(receta_id)
     galleta = Galleta.query.filter_by(receta_id=receta_id).first()
@@ -145,6 +151,9 @@ def actualizar_receta(receta_id):
         return redirect(url_for('recetas_bp.index'))
 
 @recetas_bp.route('/cambiar-estatus/<int:receta_id>', methods=['POST'])
+@log_excepciones
+@role_required('admin')
+@login_required
 def cambiar_estatus(receta_id):
     if request.method == 'POST':
         try:

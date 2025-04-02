@@ -2,6 +2,7 @@ import os
 from flask.cli import load_dotenv
 import json
 import os
+from datetime import timedelta
 
 load_dotenv()
 
@@ -23,3 +24,8 @@ class DevelopmentConfig(Config):
     MAIL_USERNAME = os.getenv('MAIL_USERNAME')
     MAIL_PASSWORD = os.getenv('MAIL_PASSWORD')
     MAIL_DEFAULT_SENDER = os.getenv('MAIL_USERNAME')
+    
+    # Tiempo de la sesion activaaa
+    PERMANENT_SESSION_LIFETIME = timedelta(minutes=10)
+    SESSION_REFRESH_EACH_REQUEST = True
+

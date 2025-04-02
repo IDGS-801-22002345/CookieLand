@@ -1,34 +1,29 @@
 {% extends "layout.html" %} {% block content %} {% import "cliente/_macros.html" as macros %}
 
-<div class="flex flex-col self-start mt-10 w-[1200px]">
-	<h1 class="text-3xl font-bold text-center mb-4">Administración de usuarios</h1>
-	<div class="ml-28 w-full p-4 text-center bg-white border border-gray-300 rounded-lg shadow-sm sm:p-8 dark:bg-gray-800 dark:border-gray-700">
+<div class="flex flex-col w-full px-10">
+	<div class="pl-28 p-4 text-center bg-white border border-gray-300 rounded-lg shadow-sm sm:p-8 dark:bg-gray-800 dark:border-gray-700">
+		<h1 class="text-3xl font-bold text-center mb-4">Administración de usuarios</h1>
 
 		{{ macros.mostrar_flash() }}
 
-		
 		<div class="flex justify-end">
 			<button id="open-modal-btn" class="flex items-center gap-2 text-white bg-green-500 hover:bg-green-500 focus:outline-none focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-1 transition-colors duration-200 ease-in-out">
                 <i class="fas fa-user-plus"></i> Agregar
             </button>
 		</div>
 
-		<div class="flex items-center gap-4">
-			<div class="flex items-center border border-gray-300 rounded-md w-60 p-2">
+		<div class="flex items-center space-x-4 mt-4 mb-4">
+			<div class="flex items-center border border-gray-300 rounded-md w-96 p-2">
 				<i class="fas fa-search text-gray-500 px-2"></i>
-				<input type="search" id="search-input" class="w-full outline-none" placeholder="Buscar usuario">
+				<input type="search" id="search-input" class="w-full outline-none" placeholder="Buscar usuarios"/>
 			</div>
-			<!-- <div class="flex items-center border border-gray-300 rounded-md w-50 p-2">
-				<i class="fas fa-filter text-gray-500 px-2"></i>
-				<select id="role-filter" class="w-full outline-none">
-					<option value="">Filtrar por rol</option>
-					{% for rol in roles %}
-					<option value="{{ rol.id }}">{{ rol.role_name }}</option>
-					{% endfor %}
-				</select>
-			</div> -->
+		
+			<button id="btn-filtrar-clientes" class="text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2">
+				Clientes
+			</button>
 		</div>
-
+		
+		
 		<div class="overflow-x-auto overflow-y-auto max-h-[500px] mt-4">
 			<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
@@ -41,6 +36,7 @@
 						<th scope="col" class="px-6 py-3">Username</th>
 						<th scope="col" class="px-6 py-3">Estatus</th>
 						<th scope="col" class="px-6 py-3">Rol</th>
+						<th scope="col" class="px-6 py-3">R. Sesión</th>
 						<th scope="col" class="px-6 py-3 text-center align-middle">Acciones</th>
 					</tr>
 				</thead>
@@ -57,6 +53,8 @@
 							</span>
 						</td>
 						<td class="px-6 py-4">{{ usuario.rol.role_name }}</td>
+						<td class="px-6 py-4">{{ usuario.last_login }}</td>
+
 						<td class="px-6 py-4 text-center flex justify-center items-center space-x-4">
 							<a href="javascript:void(0)" class="btn-modificar text-yellow-500  hover:text-yellow-600 text-lg px-3 py-1 rounded" data-modal-target="modificar-modal" data-modal-toggle="modificar-modal" data-id="{{ usuario.id }}" data-nombre="{{ usuario.nombre }}" data-username="{{ usuario.username }}" data-correo="{{ usuario.correo }}" data-telefono="{{ usuario.telefono }}" data-rol="{{ usuario.rol.role_name }}" data-estatus="{{ usuario.estatus }}">
 								<i class="fas fa-edit"></i>
@@ -165,28 +163,22 @@
 					<input type="hidden" name="id" id="edit-id" value="{{ form.id.data }}">
 					<div class="grid grid-cols-2 gap-6 mb-4">
 						<div>
-							<label for="edit-nombre" class="block text-sm font-medium text-gray-700 text-left">Nombre</label>
-							{{ form.nombre(class="mt-1 p-2 w-full border border-gray-300 rounded-md", id="edit-nombre", placeholder="Ingrese el nombre") }}
+							<label for="edit-nombre" class="block text-sm font-medium text-gray-700 text-left">Nombre</label> {{ form.nombre(class="mt-1 p-2 w-full border border-gray-300 rounded-md", id="edit-nombre", placeholder="Ingrese el nombre") }}
 						</div>
 						<div>
-							<label for="edit-username" class="text-sm font-medium text-gray-700 text-left">Nombre de Usuario</label>
-							{{ form.username(class="mt-1 p-2 w-full border border-gray-300 rounded-md", id="edit-username", placeholder="Usuario") }}
+							<label for="edit-username" class="text-sm font-medium text-gray-700 text-left">Nombre de Usuario</label> {{ form.username(class="mt-1 p-2 w-full border border-gray-300 rounded-md", id="edit-username", placeholder="Usuario") }}
 						</div>
 						<div>
-							<label for="edit-correo" class="text-sm font-medium text-gray-700 text-left">Correo Electrónico</label>
-							{{ form.correo(class="mt-1 p-2 w-full border border-gray-300 rounded-md", id="edit-correo", placeholder="ejemplo@correo.com", type="email") }}
+							<label for="edit-correo" class="text-sm font-medium text-gray-700 text-left">Correo Electrónico</label> {{ form.correo(class="mt-1 p-2 w-full border border-gray-300 rounded-md", id="edit-correo", placeholder="ejemplo@correo.com", type="email") }}
 						</div>
 						<div>
-							<label for="edit-telefono" class="text-sm font-medium text-gray-700 text-left">Teléfono</label>
-							{{ form.telefono(class="mt-1 p-2 w-full border border-gray-300 rounded-md", id="edit-telefono", placeholder="Ingrese número", type="number") }}
+							<label for="edit-telefono" class="text-sm font-medium text-gray-700 text-left">Teléfono</label> {{ form.telefono(class="mt-1 p-2 w-full border border-gray-300 rounded-md", id="edit-telefono", placeholder="Ingrese número", type="number") }}
 						</div>
 						<div>
-							<label for="edit-rol" class="text-sm font-medium text-gray-700 text-left">Rol</label>
-							{{ form.rol(class="mt-1 p-2 w-full border border-gray-300 rounded-md", id="edit-rol") }}
+							<label for="edit-rol" class="text-sm font-medium text-gray-700 text-left">Rol</label> {{ form.rol(class="mt-1 p-2 w-full border border-gray-300 rounded-md", id="edit-rol") }}
 						</div>
 						<div>
-							<label for="edit-contrasenia" class="text-sm font-medium text-gray-700 text-left">Contraseña (opcional)</label>
-							{{ form.contrasenia(class="mt-1 p-2 w-full border border-gray-300 rounded-md", id="edit-contrasenia", placeholder="Ingrese la contraseña", type="password") }}
+							<label for="edit-contrasenia" class="text-sm font-medium text-gray-700 text-left">Contraseña (opcional)</label> {{ form.contrasenia(class="mt-1 p-2 w-full border border-gray-300 rounded-md", id="edit-contrasenia", placeholder="Ingrese la contraseña", type="password") }}
 						</div>
 						<div>
 							<label for="edit-estatus" class="text-sm font-medium text-gray-700 text-left">Estatus</label>
@@ -200,7 +192,7 @@
 						<button type="submit" style="background-color: #24985a !important;" class="text-white bg-green-500 hover:bg-green-600 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center">
 							Guardar Cambios
 						</button>
-						<button type="button" id="cancelar-editar" style="background-color:#c90704 !important;" class="text-white bg-red-500 hover:bg-red-600 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm w-1/2 sm:w-auto px-5 py-2.5 text-center ml-2" onclick="cerrarModalEditar()">
+						<button type="button" id="cancelar-editar"  onclick="cerrarModalEditar()" style="background-color:#c90704 !important;" class="text-white bg-red-500 hover:bg-red-600 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm w-1/2 sm:w-auto px-5 py-2.5 text-center ml-2">
 							Cancelar
 						</button>
 					</div>
@@ -208,9 +200,8 @@
 			</div>
 		</div>
 	</div>
+
 	
-
-
 	<!-- Modal de confirmación de actualización -->
 	<div id="actualizar-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60">
 		<div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8 animate-fade-in relative">
@@ -243,20 +234,21 @@
 	</div>
 	<style>
 		.animate-fade-in {
-			animation: fadeIn 0.25s ease-out;
-		}
+					animation: fadeIn 0.25s ease-out;
+				}
+				
+				@keyframes fadeIn {
+					from {
+					opacity: 0;
+					transform: scale(0.95);
+					}
+				
+					to {
+					opacity: 1;
+					transform: scale(1);
+					}
+				}	
 		
-		@keyframes fadeIn {
-			from {
-			opacity: 0;
-			transform: scale(0.95);
-			}
-		
-			to {
-			opacity: 1;
-			transform: scale(1);
-			}
-		}	
 	</style>
 
 
@@ -285,20 +277,21 @@
                 Eliminar
                 </button>
 			</form>
-			<button id="cerrar-eliminar" type="button" onclick="cerrarModalEliminar()" class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 text-lg">
+			<button id="cerrar-eliminar" type="button" onclick="cerrarModalEliminar()" class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 text-2xl">
 				&times;
 			</button>
 		</div>
 	</div>
 	<style>
 		.animate-fade-in {
-			animation: fadeIn 0.25s ease-out;
-		}
+					animation: fadeIn 0.25s ease-out;
+				}
+				
+				@keyframes fadeIn {
+					from { opacity: 0; transform: scale(0.95); }
+					to   { opacity: 1; transform: scale(1); }
+				}				
 		
-		@keyframes fadeIn {
-			from { opacity: 0; transform: scale(0.95); }
-			to   { opacity: 1; transform: scale(1); }
-		}				
 	</style>
 </div>
 
@@ -306,133 +299,171 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
 
 <script>
-		// Modal de agregar
-		document.getElementById('open-modal-btn').addEventListener('click', () => {
-		  document.getElementById('crud-modal').classList.remove('hidden');
-		});
-		
-		document.getElementById('close-modal-btn').addEventListener('click', () => {
-		  document.getElementById('crud-modal').classList.add('hidden');
-		});
-		
-		document.getElementById('cancel-btn').addEventListener('click', () => {
-		  document.getElementById('crud-modal').classList.add('hidden');
-		});
-		
-		document.addEventListener('DOMContentLoaded', () => {
-			const botonesEditar = document.querySelectorAll('.btn-modificar');
-			const modalEditar = document.getElementById('modal-edicion');
-			const cerrarBtn = document.getElementById('cerrar-modal-edicion');
-			const formEditar = document.getElementById('form-editar');
-		
-			// Abrir modal con datos
-			botonesEditar.forEach(btn => {
-			  btn.addEventListener('click', () => {
-				document.getElementById('edit-id').value = btn.dataset.id;
-				document.getElementById('edit-nombre').value = btn.dataset.nombre;
-				document.getElementById('edit-username').value = btn.dataset.username;
-				document.getElementById('edit-correo').value = btn.dataset.correo;
-				document.getElementById('edit-telefono').value = btn.dataset.telefono;
-				document.getElementById('edit-rol').value = btn.dataset.rol;
-				document.getElementById('edit-estatus').value = btn.dataset.estatus;
-				document.getElementById('edit-contrasenia').value = "";
-		
-				modalEditar.classList.remove('hidden');
-				modalEditar.classList.add('flex');
-				modalEditar.style.display = 'flex';
+	// Modal de agregar
+			document.getElementById('open-modal-btn').addEventListener('click', () => {
+			  document.getElementById('crud-modal').classList.remove('hidden');
+			});
+			
+			document.getElementById('close-modal-btn').addEventListener('click', () => {
+			  document.getElementById('crud-modal').classList.add('hidden');
+			});
+			
+			document.getElementById('cancel-btn').addEventListener('click', () => {
+			  document.getElementById('crud-modal').classList.add('hidden');
+			});
+			
+			document.addEventListener('DOMContentLoaded', () => {
+				const botonesEditar = document.querySelectorAll('.btn-modificar');
+				const modalEditar = document.getElementById('modal-edicion');
+				const cerrarBtn = document.getElementById('cerrar-modal-edicion');
+				const formEditar = document.getElementById('form-editar');
+			
+				// Abrir modal con datos
+				botonesEditar.forEach(btn => {
+				  btn.addEventListener('click', () => {
+					document.getElementById('edit-id').value = btn.dataset.id;
+					document.getElementById('edit-nombre').value = btn.dataset.nombre;
+					document.getElementById('edit-username').value = btn.dataset.username;
+					document.getElementById('edit-correo').value = btn.dataset.correo;
+					document.getElementById('edit-telefono').value = btn.dataset.telefono;
+					document.getElementById('edit-rol').value = btn.dataset.rol;
+					document.getElementById('edit-estatus').value = btn.dataset.estatus;
+					document.getElementById('edit-contrasenia').value = "";
+			
+					modalEditar.classList.remove('hidden');
+					modalEditar.classList.add('flex');
+					modalEditar.style.display = 'flex';
+				  });
+				});
+			
+				// Botón de cerrar
+				cerrarBtn.addEventListener('click', cerrarModalEditar);
+			
+				// Cerrar al hacer clic fuera del modal
+				window.addEventListener('click', (e) => {
+				  if (e.target === modalEditar) cerrarModalEditar();
+				});
+			
+				// Modal de confirmación de actualización
+				const modalConfirmar = document.getElementById('actualizar-modal');
+				const confirmarBtn = document.getElementById('confirmar-actualizacion');
+				const cancelarBtn = document.getElementById('cancelar-actualizacion');
+				const cerrarX = document.getElementById('cerrar-actualizar-modal');
+				let formSubmitEvent = null;
+			
+				formEditar.addEventListener('submit', (e) => {
+				  e.preventDefault();
+				  formSubmitEvent = e;
+				  modalConfirmar.classList.remove('hidden');
+				  modalConfirmar.style.display = 'flex';
+				});
+			
+				confirmarBtn.addEventListener('click', () => {
+				  modalConfirmar.classList.add('hidden');
+				  modalConfirmar.style.display = 'none';
+				  if (formSubmitEvent) formEditar.submit();
+				});
+			
+				cancelarBtn.addEventListener('click', () => {
+				  modalConfirmar.classList.add('hidden');
+				  modalConfirmar.style.display = 'none';
+				});
+			
+				cerrarX.addEventListener('click', () => {
+				  modalConfirmar.classList.add('hidden');
+				  modalConfirmar.style.display = 'none';
+				});
+			
+				window.addEventListener('click', (e) => {
+				  if (e.target === modalConfirmar) {
+					modalConfirmar.classList.add('hidden');
+					modalConfirmar.style.display = 'none';
+				  }
+				});
+			  });
+			
+			// Modal de eliminación
+			document.addEventListener('DOMContentLoaded', () => {
+			  const modalEliminar = document.getElementById('eliminar-modal');
+			  const formEliminar = document.getElementById('form-eliminar-usuario');
+			  const cancelEliminar = document.getElementById('cancelar-eliminar');
+			
+			  document.querySelectorAll('.btn-eliminar').forEach(button => {
+				button.addEventListener('click', () => {
+				  const userId = button.getAttribute('data-id');
+				  formEliminar.setAttribute('action', `/eliminar_usuario/${userId}`);
+				  modalEliminar.classList.remove('hidden');
+				  modalEliminar.style.display = 'flex';
+				});
+			  });
+			
+			  cancelEliminar.addEventListener('click', () => {
+				modalEliminar.classList.add('hidden');
+				modalEliminar.style.display = 'none';
+				formEliminar.removeAttribute('action');
+			  });
+			
+			  window.addEventListener('click', (e) => {
+				if (e.target === modalEliminar) {
+				  modalEliminar.classList.add('hidden');
+				  modalEliminar.style.display = 'none';
+				  formEliminar.removeAttribute('action');
+				}
 			  });
 			});
-		
-			// Botón de cerrar
-			cerrarBtn.addEventListener('click', cerrarModalEditar);
-		
-			// Cerrar al hacer clic fuera del modal
-			window.addEventListener('click', (e) => {
-			  if (e.target === modalEditar) cerrarModalEditar();
+			
+			function cerrarModalEliminar() {
+			  const modal = document.getElementById('eliminar-modal');
+			  const form = document.getElementById('form-eliminar-usuario');
+			  modal.classList.add('hidden');
+			  modal.style.display = 'none';
+			  form.removeAttribute('action');
+			}	
+
+			document.addEventListener("DOMContentLoaded", function () {
+				const btnFiltrar = document.getElementById("btn-filtrar-clientes");
+				const searchInput = document.getElementById("search-input");
+				let soloClientes = false;
+			
+				// Función que aplica tanto el filtro como la búsqueda
+				function filtrarFilas() {
+					const filtroTexto = searchInput.value.toLowerCase();
+			
+					document.querySelectorAll("tbody tr").forEach(fila => {
+						const celdas = fila.querySelectorAll("td");
+						const rol = celdas[5]?.textContent?.trim().toLowerCase();
+			
+						let coincideBusqueda = Array.from(celdas).some(td =>
+							td.textContent.toLowerCase().includes(filtroTexto)
+						);
+			
+						let coincideCliente = !soloClientes || rol === "cliente";
+			
+						fila.style.display = (coincideBusqueda && coincideCliente) ? "" : "none";
+					});
+				}
+			
+				// Evento para alternar filtro de clientes
+				btnFiltrar.addEventListener("click", function () {
+					soloClientes = !soloClientes;
+					btnFiltrar.textContent = soloClientes ? "Mostrar todos" : "Mostrar solo clientes";
+					filtrarFilas();
+				});
+			
+				// Evento para búsqueda
+				searchInput.addEventListener("input", filtrarFilas);
 			});
-		
-			// Función de cierre que limpia el formulario
+
 			function cerrarModalEditar() {
-			  modalEditar.classList.add('hidden');
-			  modalEditar.classList.remove('flex');
-			  modalEditar.style.display = 'none';
-			  formEditar.reset();
-			}
-		
-			// Modal de confirmación de actualización
-			const modalConfirmar = document.getElementById('actualizar-modal');
-			const confirmarBtn = document.getElementById('confirmar-actualizacion');
-			const cancelarBtn = document.getElementById('cancelar-actualizacion');
-			const cerrarX = document.getElementById('cerrar-actualizar-modal');
-			let formSubmitEvent = null;
-		
-			formEditar.addEventListener('submit', (e) => {
-			  e.preventDefault();
-			  formSubmitEvent = e;
-			  modalConfirmar.classList.remove('hidden');
-			  modalConfirmar.style.display = 'flex';
-			});
-		
-			confirmarBtn.addEventListener('click', () => {
-			  modalConfirmar.classList.add('hidden');
-			  modalConfirmar.style.display = 'none';
-			  if (formSubmitEvent) formEditar.submit();
-			});
-		
-			cancelarBtn.addEventListener('click', () => {
-			  modalConfirmar.classList.add('hidden');
-			  modalConfirmar.style.display = 'none';
-			});
-		
-			cerrarX.addEventListener('click', () => {
-			  modalConfirmar.classList.add('hidden');
-			  modalConfirmar.style.display = 'none';
-			});
-		
-			window.addEventListener('click', (e) => {
-			  if (e.target === modalConfirmar) {
-				modalConfirmar.classList.add('hidden');
-				modalConfirmar.style.display = 'none';
-			  }
-			});
-		  });
-		
-		// Modal de eliminación
-		document.addEventListener('DOMContentLoaded', () => {
-		  const modalEliminar = document.getElementById('eliminar-modal');
-		  const formEliminar = document.getElementById('form-eliminar-usuario');
-		  const cancelEliminar = document.getElementById('cancelar-eliminar');
-		
-		  document.querySelectorAll('.btn-eliminar').forEach(button => {
-			button.addEventListener('click', () => {
-			  const userId = button.getAttribute('data-id');
-			  formEliminar.setAttribute('action', `/eliminar_usuario/${userId}`);
-			  modalEliminar.classList.remove('hidden');
-			  modalEliminar.style.display = 'flex';
-			});
-		  });
-		
-		  cancelEliminar.addEventListener('click', () => {
-			modalEliminar.classList.add('hidden');
-			modalEliminar.style.display = 'none';
-			formEliminar.removeAttribute('action');
-		  });
-		
-		  window.addEventListener('click', (e) => {
-			if (e.target === modalEliminar) {
-			  modalEliminar.classList.add('hidden');
-			  modalEliminar.style.display = 'none';
-			  formEliminar.removeAttribute('action');
-			}
-		  });
-		});
-		
-		function cerrarModalEliminar() {
-		  const modal = document.getElementById('eliminar-modal');
-		  const form = document.getElementById('form-eliminar-usuario');
-		  modal.classList.add('hidden');
-		  modal.style.display = 'none';
-		  form.removeAttribute('action');
-		}	
+				const modal = document.getElementById('modal-edicion');
+				const form = document.getElementById('form-editar');
+	
+				if (modal && form) {
+					modal.classList.add('hidden');
+					modal.classList.remove('flex');
+					modal.style.display = 'none';
+					form.reset(); 
+				}
+			}	
 </script>
 {% endblock %}

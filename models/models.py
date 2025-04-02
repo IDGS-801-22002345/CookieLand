@@ -41,6 +41,8 @@ class Usuario(db.Model, UserMixin):
     verificado = db.Column(db.Boolean, default=False)
     username = db.Column(db.String(50), unique=True, nullable=False)
     rol_id = db.Column(db.Integer, db.ForeignKey('roles.id'), nullable=False)
+    last_login = db.Column(db.DateTime) 
+
 
     rol = db.relationship('Role', backref=db.backref('usuarios', lazy=True), lazy='joined')
 

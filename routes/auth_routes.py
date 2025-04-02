@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, request
+from flask import Blueprint, render_template, redirect, session, url_for, flash, request
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from forms.auth_forms import *
@@ -8,12 +8,14 @@ from utils.decoradores import *
 from flask_mail import Message
 import random
 from datetime import datetime, timedelta
+import pytz
 
 auth_bp = Blueprint('auth_bp', __name__, url_prefix='/auth')
 
 
 # Login
 @auth_bp.route('/login', methods=['GET', 'POST'])
+@log_excepciones
 @anonymous_required
 def login():
     form = LoginForm()
@@ -29,6 +31,9 @@ def login():
                 return redirect(url_for('auth_bp.login'))
            
             login_user(user)
+            mexico_tz = pytz.timezone("America/Mexico_City")
+            user.last_login = datetime.now(mexico_tz)
+            db.session.commit()
             flash('¡Inicio de sesión exitoso!', 'success')
             if user.has_role('admin'):
                 return redirect(url_for('inventario_bp.index'))
@@ -41,15 +46,18 @@ def login():
 
 # Cerrar sesion 
 @auth_bp.route('/logout')
+@log_excepciones
 @login_required
 def logout():
     logout_user()
-    flash('Has cerrado sesión exitosamente.', 'success')
-    return redirect(url_for('cliente_bp.index'))
+    session.clear()
+    flash("Sesión cerrada correctamente.", "info")
+    return redirect(url_for('auth_bp.login'))
 
 
 # Registrar usuario (solamente cliente)
 @auth_bp.route('/register', methods=['GET', 'POST'])
+@log_excepciones
 @anonymous_required
 def register_landing():
     form = RegisterFormLandingPage()
@@ -112,6 +120,7 @@ def enviar_codigo_verificacion(usuario):
 
 # Verificar codigo
 @auth_bp.route('/verificar/<int:user_id>', methods=['GET', 'POST'])
+@log_excepciones
 def verificar_codigo(user_id):
     form = CodigoVerificacionForm()
     usuario = Usuario.query.get_or_404(user_id)
@@ -146,6 +155,7 @@ def enviar_correo_verificado(usuario):
 
 # Reenviar codigo de verificacion 
 @auth_bp.route('/reenviar_codigo/<int:user_id>')
+@log_excepciones
 def reenviar_codigo(user_id):
     usuario = Usuario.query.get_or_404(user_id)
     if usuario.verificado:
@@ -158,6 +168,7 @@ def reenviar_codigo(user_id):
 
 # Datos personales del cliente
 @auth_bp.route('/profile')
+@log_excepciones
 @role_required('cliente')
 def profile():
     return render_template('auth/profile.html')
@@ -165,6 +176,7 @@ def profile():
 
 # Pedidos del cliente
 @auth_bp.route('/orders')
+@log_excepciones
 @role_required('cliente')
 def orders():
     return render_template('auth/orders.html')
@@ -172,5 +184,6 @@ def orders():
 
 # Restablecer contraseña
 @auth_bp.route('/reset_password')
+@log_excepciones
 def resetpassword():
     return render_template('auth/resetpassword.html')

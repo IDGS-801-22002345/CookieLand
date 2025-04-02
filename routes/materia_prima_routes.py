@@ -7,6 +7,7 @@ materia_prima_bp = Blueprint('materia_prima_bp', __name__, url_prefix='/')
 
 
 @materia_prima_bp.route('/materia-prima', methods=['GET', 'POST'])
+@log_excepciones
 @login_required
 def index():
     create_form = MateriaPrimaForm(request.form)
@@ -21,6 +22,7 @@ def index():
 
 
 @materia_prima_bp.route("/agregar", methods=['POST'])
+@log_excepciones
 @login_required
 def agregar():
     create_form = MateriaPrimaForm(request.form)
@@ -41,6 +43,7 @@ def agregar():
 
 
 @materia_prima_bp.route('/modificar', methods=["GET", "POST"])
+@log_excepciones
 @login_required
 def modificar():
     create_form = MateriaPrimaForm(request.form)

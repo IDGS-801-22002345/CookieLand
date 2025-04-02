@@ -10,6 +10,7 @@ personal_bp = Blueprint('personal_bp', __name__, url_prefix='/')
 
 # Registro de personal interno y (tambien clientes)
 @personal_bp.route('/usuarios', methods=['GET', 'POST'])
+@log_excepciones
 @login_required
 @role_required('admin')
 def usuarios():
@@ -35,7 +36,7 @@ def usuarios():
             nombre=form.nombre.data,
             telefono=form.telefono.data,
             correo=form.correo.data,
-            username=form.username.data,
+            username=form.username,
             estatus=1,
             verificado=True,
             contrasenia=generate_password_hash(form.contrasenia.data),
@@ -59,6 +60,7 @@ def usuarios():
 
 # Ruta para modificar un usuario
 @personal_bp.route('/modificar_usuario', methods=["GET", "POST"])
+@log_excepciones
 @login_required
 @role_required('admin')
 def modificar_usuario():
@@ -103,6 +105,7 @@ def modificar_usuario():
 
 # Ruta para eliminar un usuario
 @personal_bp.route('/eliminar_usuario/<int:usuario_id>', methods=['POST'])
+@log_excepciones
 @login_required
 @role_required('admin')
 def eliminar_usuario(usuario_id):
@@ -121,12 +124,15 @@ def eliminar_usuario(usuario_id):
 
 # Ruta para la ventana de ventas
 @personal_bp.route('/ventas')
+@log_excepciones
+@role_required('admin')
 @login_required
 def ventas():
     return render_template('personal/ventas.html')
 
 # Ruta para del layout
 @personal_bp.route('/layout')
+@log_excepciones
 @login_required
 def layout():
     return render_template('personal/layout.html')

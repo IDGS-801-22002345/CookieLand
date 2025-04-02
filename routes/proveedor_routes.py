@@ -6,6 +6,8 @@ from utils.decoradores import *
 provedor_bp = Blueprint('provedor_bp', __name__, url_prefix='/proveedores')
  
 @provedor_bp.route("/proveedores")
+@log_excepciones
+@role_required('admin')
 @login_required
 def index():
     create_form = ProveedorForm(request.form)
@@ -15,6 +17,8 @@ def index():
 
 
 @provedor_bp.route("/cambiar-estatus/<int:id>", methods=["POST"])
+@log_excepciones
+@role_required('admin')
 @login_required
 def cambiar_estatus(id):
     data = request.get_json()
@@ -28,6 +32,8 @@ def cambiar_estatus(id):
 
 
 @provedor_bp.route("/agregar", methods=['POST'])
+@log_excepciones
+@role_required('admin')
 @login_required
 def agregar_proveedor():
     create_form = ProveedorForm(request.form)
@@ -46,6 +52,8 @@ def agregar_proveedor():
 
 
 @provedor_bp.route('/modificar', methods=["GET", "POST"])
+@log_excepciones
+@role_required('admin')
 @login_required
 def modificar():
     create_form = ProveedorForm(request.form)
@@ -78,6 +86,8 @@ def modificar():
 
 
 @provedor_bp.route("/eliminar", methods=["GET", "POST"])
+@log_excepciones
+@role_required('admin')
 @login_required
 def eliminar():
     if request.method == "GET":
