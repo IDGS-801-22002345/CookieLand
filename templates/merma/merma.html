@@ -3,6 +3,12 @@
 {% import "_macros.html" as macros %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/output.css') }}" />
 <script src="{{ url_for('static', filename='js/merma.js') }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+{{ macros.mostrar_flash() }}  
+
+
+<title>Merma</title>
 
 
 <!-- Contenedor principal con margen superior -->
@@ -12,14 +18,14 @@
         <div class="flex justify-end">
             <button data-modal-target="crud-modal" data-modal-toggle="crud-modal"
                 class="flex items-center gap-2 text-white focus:outline-none bg-green-500 hover:bg-green-500 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-1 dark:bg-green-600 dark:hover:bg-[#3b82f6]">
-                <i class="fas fa-box-open"></i>
+                <i class="fas fa-boxes"></i> <i class="fas fa-arrow-down text-xs"></i> 
                 Agregar Merma
             </button>
         </div>
         
         <div class="flex items-center border border-gray-300 rounded-md w-96 p-2">
             <i class="fas fa-search text-gray-500 px-2"></i>
-            <input type="search" id="search-input" class="w-full outline-none" placeholder="Buscar merma"/>
+            <input type="search" id="search-input" class="w-full outline-none" placeholder="Buscar merma por descripción, nombre o tipo"/>
         </div>
 
         <!-- Contenedor de la tabla con scroll -->
@@ -63,114 +69,115 @@
     </div>
 </div>
 
-<!-- Modal para Agregar Merma -->
-<div 
-id="modal-backdrop" 
-class="hidden fixed inset-0 bg-black bg-opacity-50 z-40"
-></div>
+<div id="modal-backdrop" class="{% if modal_error %} {% else %}hidden{% endif %} fixed inset-0 bg-black bg-opacity-50 z-40"></div>
 
+<!-- Modal para Agregar Merma -->
 <div 
 id="crud-modal" 
 tabindex="-1" 
 aria-hidden="true"
-data-modal-backdrop="static"
-class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 flex justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
-
-<div class="relative p-4 w-full max-w-md max-h-full">
+class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 flex justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full"
+>
+    <div class="relative p-4 w-full max-w-md max-h-full">
         <!-- Modal content -->
         <div class="relative bg-gray-100 rounded-lg shadow-sm dark:bg-gray-700">
             <!-- Modal header -->
-            <div
-            class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600 border-gray-300 mb-4"
-            >                
-            <h3 
-            class="text-lg font-semibold text-gray-900 dark:text-white text-center"
-            >
-                Agregar Merma
-            </h3>
-            <button
-              type="button"
-              class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
-              data-modal-hide="crud-modal"
-             >
-            <svg 
-            class="w-3 h-3" 
-            aria-hidden="true" 
-            xmlns="http://www.w3.org/2000/svg" 
-            fill="none" 
-            viewBox="0 0 14 14"
-            >
-            <path 
-            stroke="currentColor" 
-            stroke-linecap="round" 
-            stroke-linejoin="round" 
-            stroke-width="2" 
-            d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
-            />
-            </svg>
-            <span class="sr-only">Cerrar modal</span>
-            </button>
+            <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600 border-gray-300 mb-4">                
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white text-center">
+                    Agregar Merma
+                </h3>
+                <button type="button"
+                    class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
+                    data-modal-hide="crud-modal">
+                    <svg 
+                    class="w-3 h-3" 
+                    aria-hidden="true" 
+                    xmlns="http://www.w3.org/2000/svg" 
+                    fill="none" 
+                    viewBox="0 0 14 14">
+                        <path 
+                        stroke="currentColor" 
+                        stroke-linecap="round" 
+                        stroke-linejoin="round" 
+                        stroke-width="2" 
+                        d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                    </svg>
+                    <span class="sr-only">Cerrar modal</span>
+                </button>
             </div>
             
             <!-- Formulario -->
-            <form 
-            method="POST" 
-            action="{{ url_for('merma_bp.crear') }}" 
-            novalidate 
-            class="p-4 md:p-5"
-            >
-                {{ form.csrf_token }}
+            <form method="POST" action="{{ url_for('merma_bp.crear') }}" class="p-4 md:p-5" id="merma-form">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 
-                <div class="grid gap-4 mb-4">
+                {% if form.errors %}
+                <div class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+                    <strong>Por favor corrige los siguientes errores:</strong>
+                    <ul class="mt-1">
+                        {% for field_name, field_errors in form.errors.items() %}
+                            {% for error in field_errors %}
+                                <li>{{ form[field_name].label.text }}: {{ error }}</li>
+                            {% endfor %}
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+            
+                <div class="grid gap-4 mb-4 grid-cols-1 md:grid-cols-2">
                     <!-- Campo Descripción -->
-                    <div class="col-span-2">
-                        {{ macros.campoNuevo(form.descripcion, class="bg-gray-50 border...", placeholder="Descripción") }}
+                    <div class="md:col-span-2">
+                        {{ macros.campoNuevo(form.descripcion, 
+                            class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500",
+                            placeholder="Ingrese una descripción detallada") }}
                     </div>
-
-                    <!-- Campo Tipo Merma -->
-                    <div>
-                        <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                            Tipo de Merma
-                        </label>
-                        {{ macros.campoNuevo(form.tipo_merma, class="bg-gray-50 border...", onchange="toggleMermaFields(this.value)") }}
+            
+                    <!-- Primera fila de campos -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:col-span-2">
+                        <!-- Campo Tipo Merma -->
+                        <div class="md:col-span-1">
+                            <label class="block mb-1 text-sm font-medium text-gray-900">{{ form.tipo_merma.label.text }}</label>
+                            {{ form.tipo_merma(class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500", 
+                                onchange="toggleMermaFields(this.value)") }}
+                        </div>
+            
+                        <!-- Campo Cantidad -->
+                        <div class="md:col-span-1">
+                            <label class="block mb-1 text-sm font-medium text-gray-900">{{ form.cantidad.label.text }}</label>
+                            {{ form.cantidad(class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500",
+                                placeholder="Ej. 5") }}
+                        </div>
+            
+                        <div class="md:col-span-1"></div>
                     </div>
+            
+                    <!-- Campos ocultos dependiento del tipo de merma -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:col-span-2">
+                        <!-- Campo Insumo -->
+                        <div id="insumo-field" class="hidden">
+                            <label class="block mb-1 text-sm font-medium text-gray-900">{{ form.inventario_materia_id.label.text }}</label>
+                            {{ form.inventario_materia_id(class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500") }}
+                        </div>
+            
+                        <!-- Campo Galleta -->
+                        <div id="galleta-field" class="hidden">
+                            <label class="block mb-1 text-sm font-medium text-gray-900">{{ form.inventario_galletas_id.label.text }}</label>
+                            {{ form.inventario_galletas_id(class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500") }}
+                        </div>
+                    </div>
+                </div>
 
-                    <!-- Campo Cantidad -->
-                     <div class="w-full">
-                         {{ macros.campoNuevo(form.cantidad, class="bg-gray-50 border ... w-full", placeholder="Cantidad") }}
-                     </div>
-
-
-                      <!-- Campo Insumo (oculto inicialmente) -->
-        <div id="insumo-field" class="hidden">
-            <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                Seleccione Insumo
-            </label>
-            {{ macros.campoNuevo(form.inventario_materia_id, class="bg-gray-50 border...") }}
-        </div>
-
-        <!-- Campo Galleta (oculto inicialmente) -->
-        <div id="galleta-field" class="hidden">
-            <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                Seleccione Galleta
-            </label>
-            {{ macros.campoNuevo(form.inventario_galletas_id, class="bg-gray-50 border...") }}
-        </div>
-    </div>
                 <!-- Botones del formulario -->
                 <div class="flex justify-center mt-6">
-                    <button 
-                    type="submit" 
-                    style="background-color: #24985a !important" 
-                    class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                    <button type="submit"
+                            id="btn-guardar-merma"
+                            style="background-color: #24985a !important" 
+                            class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
                         Guardar
                     </button>
-                    <button 
-                    type="submit" 
-                    data-modal-hide="crud-modal" 
-                    style="background-color: #c90704 !important" 
-                    class="text-white btn-cancelar bg-gray-500 hover:bg-gray-600 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center ml-2">
+                    <button type="button" 
+                            data-modal-hide="crud-modal"
+                            style="background-color: #c90704 !important" 
+                            class="text-white btn-cancelar bg-gray-500 hover:bg-gray-600 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center ml-2">
                         Cancelar
                     </button>
                 </div>
@@ -179,6 +186,33 @@ class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 
     </div>
 </div>
 
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+    const searchInput = document.getElementById("search-input");
+    const table = document.getElementById("mermas-table");
+    const tbody = table.querySelector("tbody");
+    
+    searchInput.addEventListener("input", function () {
+        const searchText = this.value.toLowerCase();
+        const rows = tbody.getElementsByTagName("tr"); 
+
+        Array.from(rows).forEach(row => {
+            const cells = row.querySelectorAll("th, td"); 
+            let found = false;
+
+            cells.forEach(cell => {
+                const cellText = cell.textContent.toLowerCase();
+                if (cellText.includes(searchText)) {
+                    found = true;
+                }
+            });
+
+            row.style.display = found ? "" : "none";
+        });
+    });
+});
+</script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
 {% endblock %}
