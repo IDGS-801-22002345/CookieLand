@@ -53,12 +53,13 @@
                         <td class="px-6 py-4">
                             {% if merma.tipo_merma == 'insumo' and merma.inventario_materia %}
                                 {{ merma.inventario_materia.materia_prima.nombre }}
-                            {% elif merma.tipo_merma == 'galleta' and merma.inventario_galletas %}
-                                {{ merma.inventario_galletas.galleta.nombre }}
+                            {% elif merma.tipo_merma == 'galleta' and merma.produccion %}
+                                {{ merma.produccion.galleta.nombre }}
                             {% else %}
                                 Sin nombre
                             {% endif %}
                         </td>
+                        
                         
                         <td class="px-6 py-4">{{ merma.tipo_merma }}</td>
                     </tr>
@@ -159,10 +160,14 @@ class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 
                         </div>
             
                         <!-- Campo Galleta -->
+                       <!-- Campo Galleta -->
                         <div id="galleta-field" class="hidden">
-                            <label class="block mb-1 text-sm font-medium text-gray-900">{{ form.inventario_galletas_id.label.text }}</label>
-                            {{ form.inventario_galletas_id(class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500") }}
+                            <label class="block mb-1 text-sm font-medium text-gray-900">
+                                {{ form.produccion_id.label.text }}
+                            </label>
+                            {{ form.produccion_id(class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500") }}
                         </div>
+
                     </div>
                 </div>
 

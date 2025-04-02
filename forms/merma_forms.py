@@ -18,7 +18,7 @@ class MermaForm(Form):
                                       coerce=int, 
                                       choices=[], 
                                       validators=[DataRequired(message='Seleccione un insumo')])
-    inventario_galletas_id = SelectField('Galleta', 
+    produccion_id = SelectField('Galleta', 
                                        coerce=int, 
                                        choices=[], 
                                        validators=[DataRequired(message='Seleccione una galleta')])

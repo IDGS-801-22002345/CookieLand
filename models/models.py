@@ -100,9 +100,19 @@ class Galleta(db.Model):
     foto = db.Column(db.LargeBinary(length=16777215), nullable=False)  
     
     receta = db.relationship('Receta', back_populates='galletas')
+    producciones = db.relationship('Produccion', back_populates='galleta')
 
-    inventario = db.relationship('InventarioGalletas', back_populates='galleta', uselist=False)
 
+class Produccion(db.Model):
+    __tablename__ = 'produccion'
+    id = db.Column(db.Integer, primary_key=True)
+    galleta_id = db.Column(db.Integer, db.ForeignKey('galletas.id'), nullable=False)  
+    stock = db.Column(db.Integer, nullable=False, default=0)
+    estadoStock = db.Column(db.String(50), nullable=False)
+    estadoProduccion = db.Column(db.String(50), nullable=False)
+    
+    galleta = db.relationship('Galleta', back_populates='producciones')
+    mermas = db.relationship('Merma', back_populates='produccion')
 
 class Merma(db.Model):
     __tablename__ = 'Merma'  
@@ -114,33 +124,7 @@ class Merma(db.Model):
     
     inventario_materia_id = db.Column('inventarioMateriaId', db.Integer, 
                                     db.ForeignKey('inventario_materia.id'), nullable=True)
-    inventario_galletas_id = db.Column('inventarioGalletasId', db.Integer, 
-                                     db.ForeignKey('InventarioGalletas.id'), nullable=True)
+    produccion_id = db.Column(db.Integer, db.ForeignKey('produccion.id'), nullable=True)  
 
     inventario_materia = db.relationship('InventarioMateria', back_populates='mermas')
-    inventario_galletas = db.relationship('InventarioGalletas', back_populates='mermas')
-
-
-class InventarioGalletas(db.Model):
-    __tablename__ = 'InventarioGalletas'
-    
-    id = db.Column(db.Integer, primary_key=True)
-    cantidad = db.Column(db.Integer, nullable=False, default=0)
-    cantidad_minima = db.Column("cantidadMinima",db.Integer, nullable=False)
-    estado_stock = db.Column("estadoStock",db.String(50), nullable=False)
-
-    galleta_id = db.Column("galletaId",db.Integer, db.ForeignKey('galletas.id'), unique=True, nullable=False)
-    galleta = db.relationship('Galleta', back_populates='inventario')
-    
-    mermas = db.relationship('Merma', back_populates='inventario_galletas')
-    producciones = db.relationship('Produccion', back_populates='galleta', cascade="all, delete-orphan")  
-
-class Produccion(db.Model):
-    __tablename__ = 'produccion'
-    id = db.Column(db.Integer, primary_key=True)
-    galleta_id = db.Column(db.Integer, db.ForeignKey('galletas.id'), nullable=False)  
-    stock = db.Column(db.Integer, nullable=False, default=0)
-    estadoStock = db.Column(db.String(50), nullable=False)
-    estadoProduccion = db.Column(db.String(50), nullable=False)
-    
-    galleta = db.relationship('Galleta', back_populates='producciones')
+    produccion = db.relationship('Produccion', back_populates='mermas')
