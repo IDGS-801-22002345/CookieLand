@@ -1,6 +1,8 @@
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import UserMixin # type: ignore
+from flask_login import UserMixin
 import datetime
+from sqlalchemy.dialects.mysql import JSON
+
 
 db = SQLAlchemy()
 
@@ -22,15 +24,6 @@ class Usuario(db.Model, UserMixin):
 
     rol = db.relationship(Role, backref=db.backref('usuarios', lazy=True), lazy='joined')
 
-class Proveedores(db.Model):
-    __tablename__ = 'proveedores'
-    id = db.Column(db.Integer, primary_key=True)
-    nombre = db.Column(db.String(50))
-    telefono = db.Column(db.String(15))
-    email = db.Column(db.String(100))
-    estatus = db.Column(db.Integer, default=1)
-    create_date = db.Column(db.DateTime, default=datetime.datetime.now)
-
 class MateriaPrima(db.Model):  
     __tablename__ = 'materia_prima' 
     id = db.Column(db.Integer, primary_key=True)
@@ -50,6 +43,33 @@ class InventarioMateria(db.Model):
     material_id = db.Column(db.Integer, db.ForeignKey('materia_prima.id'), unique=True, nullable=False)
     
     materia_prima = db.relationship('MateriaPrima', back_populates='inventario')
+
+    create_date = db.Column(db.DateTime, default=datetime.datetime.now, server_default=db.func.now())
+    update_date = db.Column(db.DateTime, default=datetime.datetime.now, server_default=db.func.now())
+
+
+class Proveedores(db.Model):  # Cambiamos de Alumnos a Proveedores
+    __tablename__ = 'proveedores'  # Cambiamos el nombre de la tabla
+    id = db.Column(db.Integer, primary_key=True)
+    nombre = db.Column(db.String(50))
+    telefono = db.Column(db.String(15))  # Nuevo campo para el teléfono
+    email = db.Column(db.String(100))
+    estatus = db.Column(db.Integer, default=1)  # Estatus (0 o 1, por defecto 1)
+    create_date = db.Column(db.DateTime, default=datetime.datetime.now, server_default=db.func.now())
+
+import datetime
+from sqlalchemy.dialects.postgresql import JSON
+from models.models import db
+
+class Compra(db.Model):
+    __tablename__ = 'compras'
+
+    id = db.Column(db.Integer, primary_key=True)
+    total = db.Column(db.Float, nullable=False)
+    create_date = db.Column(db.DateTime, default=datetime.datetime.now, server_default=db.func.now())
+    proveedor_id = db.Column(db.Integer, db.ForeignKey('proveedores.id'), nullable=True)
+    # Lista de materias primas en formato JSON
+    materias_primas = db.Column(JSON, nullable=False, default=[])  
 
 class Receta(db.Model):
     __tablename__ = 'recetas'

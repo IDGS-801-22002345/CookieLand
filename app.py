@@ -13,6 +13,7 @@ from routes.galletas_routes import galletas_bp
 from routes.inventario_routes import inventario_bp
 from routes.materia_prima_routes import materia_prima_bp
 from routes.produccion_routes import produccion_bp
+from routes.detalle_compras import detalle_compras_bp
 
 
 
@@ -51,6 +52,7 @@ app.register_blueprint(provedor_bp)
 app.register_blueprint(inventario_bp)
 app.register_blueprint(galletas_bp)
 app.register_blueprint(produccion_bp)
+app.register_blueprint(detalle_compras_bp)
 
 
 app.jinja_env.filters['b64encode'] = lambda x: base64.b64encode(x).decode('utf-8') if x else None
