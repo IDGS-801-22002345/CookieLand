@@ -1,0 +1,77 @@
+{% extends "layout.html" %} {% block content %} {% import
+"component/galletas/_macroGalletas.html" as macro %}
+
+<div class="flex flex-col w-full px-4 md:px-10">
+  <div
+    class="w-full p-4 text-center bg-white border border-gray-200 rounded-lg shadow-sm"
+  >
+    <!-- Titulo  y Estatus -->
+
+    <div class="flex justify-between items-center pb-6">
+      <div class="w-6"></div>
+
+      <div class="flex flex-col gap-4 items-center">
+        <span class="text-2xl">Estatus de producción</span>
+        <div class="flex gap-5">
+          <div class="flex items-center gap-1">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="#00a63e"
+              class="w-6 h-6"
+            >
+              <circle cx="12" cy="12" r="10" />
+            </svg>
+            <span class="text-lg">Completo</span>
+          </div>
+
+          <div class="flex items-center gap-1">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="#e17100"
+              class="w-6 h-6"
+            >
+              <circle cx="12" cy="12" r="10" />
+            </svg>
+            <span class="text-lg">Bajo</span>
+          </div>
+
+          <div class="flex items-center gap-1">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="#e7000b"
+              class="w-6 h-6"
+            >
+              <circle cx="12" cy="12" r="10" />
+            </svg>
+            <span class="text-lg">Agotado</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex-none">
+        <a
+          href="/produccion"
+          class="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
+        >
+          <img
+            src="{{ url_for('static', filename='svg/arrowLeft.svg') }}"
+            alt="Volver"
+            class="w-6 h-6"
+          />
+        </a>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-8">
+      {% for produccion in producciones %} {% include
+      "component/produccion/_galleta_card.html" %} {% endfor %}
+    </div>
+  </div>
+</div>
+
+<!-- <script src="{{ url_for('static', filename='js/receta.js') }}"></script> -->
+
+{% endblock %}
