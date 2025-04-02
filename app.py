@@ -18,6 +18,7 @@ import logging
 from logging.handlers import TimedRotatingFileHandler
 from routes.produccion_routes import produccion_bp
 from routes.detalle_compras import detalle_compras_bp
+from routes.merma_routes import merma_bp
 
 app = Flask(__name__)
 
@@ -99,16 +100,6 @@ def create_app():
     app.logger.addHandler(file_handler)
     app.logger.setLevel(logging.INFO)
     
-    
-    # Cabecera de seguridad 
-    @app.after_request
-    def aplicar_cabeceras_seguridad(response):
-        response.headers['X-Content-Type-Options'] = 'nosniff'
-        response.headers['X-Frame-Options'] = 'DENY'
-        response.headers['X-XSS-Protection'] = '1; mode=block'
-        return response
-
-    return app
 
 if __name__ == '__main__':
     app = create_app()

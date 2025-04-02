@@ -1,0 +1,15 @@
+{% macro campoNuevo(field, class='', placeholder='') %}
+<div class="mb-4">
+    {{ field.label(class="block mb-2 text-sm font-medium text-gray-900 dark:text-white") }}
+    {{ field(class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white " + 
+          (" border-red-500 dark:border-red-500" if field.errors else "") + " " + class, 
+          placeholder=placeholder) }}
+    {% if field.errors %}
+        <div class="mt-1 text-sm text-red-600 dark:text-red-500">
+            {% for error in field.errors %}
+                <p>{{ error }}</p>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+{% endmacro %}

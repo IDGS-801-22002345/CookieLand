@@ -4,7 +4,8 @@ import json
 import os
 from datetime import timedelta
 
-load_dotenv()
+
+load_dotenv()  # Esto carga las variables del archivo .env
 
 class Config(object):
     SECRET_KEY = 'Clave Nueva'
