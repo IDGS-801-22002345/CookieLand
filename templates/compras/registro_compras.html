@@ -1,255 +1,209 @@
-{% extends "layout.html" %} {% block content %}
-<div>
-  <div class="text-center py-8">
-    <h1 class="text-3xl font-bold">Compra de Insumos</h1>
-  </div>
+{% extends "layout.html" %} 
+{% block content %}
+{% import "_macros.html" as macros %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/output.css') }}">
+<script src="{{ url_for('static', filename='js/materia_prima.js') }}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
 
-  <div class="grid grid-cols-12 gap-6 py-6">
-    <!-- Formulario -->
-    <div class="col-span-5 bg-amber-50 p-6 rounded-lg shadow-lg">
-      <h2 class="text-2xl font-semibold mb-4">Formulario de Insumo</h2>
-      <form id="insumo-form">
-        <!-- Botones para Proveedor u Otro -->
-        <div class="mb-4">
-          <label class="block text-sm font-medium text-gray-700"
-            >Tipo de Compra</label
-          >
-          <div class="flex items-center space-x-4">
-            <!-- Botón para Proveedor -->
-            <button
-              type="button"
-              id="btn-proveedor"
-              class="px-4 py-2 text-sm font-medium text-white bg-gray-300 rounded-lg hover:bg-gray-400 focus:outline-none"
-              onclick="mostrarProveedor(); cambiarColor('proveedor')"
-            >
-              Proveedor
-            </button>
+<div class="flex flex-col w-full px-4 md:px-10">
+  <div class="w-full p-4 text-center bg-white border border-gray-200 rounded-lg shadow-sm">
+    <div class="flex flex-col self-start mt-10 w-full h-full">
+      <h1 class="text-3xl font-bold text-center align-middle mb-4">COMPRA</h1>
+      <div class="flex flex-col md:flex-row gap-8 mt-10 w-full h-full">
+        
+        <!-- Formulario -->
+        <div class="w-full md:w-5/12 bg-white p-6 rounded-lg shadow-lg border border-gray-300 flex-grow flex flex-col justify-between min-h-[400px]">
+          <h2 class="font-bold text-center mb-4">COMPRA DE INSUMOS</h2>
+          <form method="POST" novalidate class="w-full max-w-[1200px] mx-auto flex flex-col gap-6 mt-6">
+            {{ form.hidden_tag() }}
+  
+            <!-- Proveedor -->
+            <div class="mb-6">
+              <label class="block text-sm font-medium text-gray-700">{{ form.proveedor.label.text }}</label>
+              <div class="mt-1">
+                <select name="proveedor" class="block w-full border border-gray-300 rounded-md text-sm text-gray-400 font-semibold bg-white hover:bg-gray-50 focus:outline-none focus:ring-2">
+                  <option value="" disabled selected>Selecciona proveedor</option>
+                  {% for value, label in form.proveedor.choices %}
+                    <option value="{{ value }}">{{ label }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              {% if form.proveedor.errors %}
+                <ul class="text-red-500 text-xs mt-1">
+                  {% for error in form.proveedor.errors %}
+                    <li>{{ error }}</li>
+                  {% endfor %}
+                </ul>
+              {% endif %}
+            </div>
+  
+            <!-- Producto -->
+            <div class="mb-6">
+              <label class="block text-sm font-medium text-gray-700">{{ form.producto.label.text }}</label>
+              <div class="mt-1">
+                <select name="producto" class="block w-full border border-gray-300 rounded-md text-sm text-gray-400 font-semibold bg-white hover:bg-gray-50 focus:outline-none focus:ring-2">
+                  <option value="" disabled selected>Selecciona producto</option>
+                  {% for value, label in form.producto.choices %}
+                    <option value="{{ value }}">{{ label }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              {% if form.producto.errors %}
+                <ul class="text-red-500 text-xs mt-1">
+                  {% for error in form.producto.errors %}
+                    <li>{{ error }}</li>
+                  {% endfor %}
+                </ul>
+              {% endif %}
+            </div>
+  
+            <!-- Cantidad, Unidad de Medida y Precio Unitario -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <!-- Cantidad -->
+              <div class="flex flex-col">
+                <label for="cantidad" class="block text-sm font-medium text-gray-700">{{ form.cantidad.label.text }}</label>
+                <div class="mt-1">
+                  {{ form.cantidad(class="block w-full border text-gray-700 border-gray-300 rounded-md pl-2 text-sm", placeholder="Cantidad") }}
+                </div>
+                {% if form.cantidad.errors %}
+                  <ul class="text-red-500 text-xs mt-1">
+                    {% for error in form.cantidad.errors %}
+                      <li>{{ error }}</li>
+                    {% endfor %}
+                  </ul>
+                {% endif %}
+              </div>
+  
+              <!-- Unidad de Medida -->
+              <div class="flex flex-col">
+                <label for="unidad_medida" class="block text-sm font-medium text-gray-700">{{ form.unidad_medida.label.text }}</label>
+                <div class="mt-1">
+                  <select name="unidad_medida" class="block w-full border border-gray-300 rounded-md text-sm text-gray-400 font-semibold bg-white hover:bg-gray-50 focus:outline-none focus:ring-2">
+                    <option value="" disabled selected class="text-gray-400">Selecciona unidad</option>
+                    {% for value, label in form.unidad_medida.choices %}
+                      <option value="{{ value }}">{{ label }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+                {% if form.unidad_medida.errors %}
+                  <ul class="text-red-500 text-xs mt-1">
+                    {% for error in form.unidad_medida.errors %}
+                      <li>{{ error }}</li>
+                    {% endfor %}
+                  </ul>
+                {% endif %}
+              </div>
+  
+              <!-- Precio Unitario -->
+              <div class="flex flex-col">
+                <label for="precio_unitario" class="block text-sm font-medium text-gray-700">{{ form.precio_unitario.label.text }}</label>
+                <div class="mt-1 flex items-center space-x-2">
+                  <span class="text-gray-400 text-lg">$</span>
+                  {{ form.precio_unitario(class="block w-full border text-gray-700 text-sm border-gray-300 rounded-md pl-2", placeholder="Precio") }}
+                </div>
+                {% if form.precio_unitario.errors %}
+                  <ul class="text-red-500 text-xs mt-1">
+                    {% for error in form.precio_unitario.errors %}
+                      <li>{{ error }}</li>
+                    {% endfor %}
+                  </ul>
+                {% endif %}
+              </div>
+            </div>
+  
+            <!-- Botón de Enviar -->
+            <div class="flex justify-center mt-6">
+              <button type="submit" class="flex w-full text-white justify-center bg-blue-700 hover:bg-blue-900 focus:outline-none focus:ring-4 focus:ring-blue-900 font-medium rounded-lg text-sm px-5 py-2.5 text-center">
+                Agregar +
+              </button>
+            </div>
+          </form>      
+        </div>
+        
+        <!-- Tabla de compras (Carrito) -->
+        <div class="w-full md:w-7/12 bg-white p-6 rounded-lg shadow-lg border border-gray-300 flex-grow flex flex-col">
+          <h1 class="text-2xl font-bold text-center mb-4 flex items-center" style="color: #7c5454;">
+            <img src="{{ url_for('static', filename='icons/carrito-de-compras.svg') }}" alt="Carrito de Compras" class="mr-2 w-6 h-6" />
+            Carrito de Materia Prima
+          </h1>
+          <div class="relative overflow-x-auto flex-grow">
+            <table id="tabla_carrito" class="w-full text-sm text-left rtl:text-right text-gray-500">
+              <thead class="text-xs text-white uppercase sticky top-0" style="background-color: #7c5454 !important; z-index: 10;">
+                <tr>
+                  <th class="px-6 py-3">Insumo</th>
+                  <th class="px-6 py-3">Proveedor</th>
+                  <th class="px-6 py-3">Cantidad</th>
+                  <th class="px-6 py-3">Unidad</th>
+                  <th class="px-6 py-3">Precio Total</th>
+                  <th class="px-6 py-3">Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for compra in compras %}
+                <tr class="bg-white border-b border-gray-200">
+                  <td class="px-6 py-4">{{ compra.nombre }}</td>
+                  <td class="px-6 py-4">{{ compra.proveedor }}</td>
+                  <td class="px-6 py-4">{{ compra.cantidad }}</td>
+                  <td class="px-6 py-4">{{ compra.unidad_medida }}</td>
+                  <td class="px-6 py-4">{{ compra.precio_unitario }}</td>
+                  <td class="px-6 py-4">
+                    <form action="{{ url_for('registro_compras_bp.eliminar_producto') }}" method="POST" style="display:inline;">
+                      {{ form.hidden_tag() }}  <!-- token CSRF -->
+                      <input type="hidden" name="producto_index" value="{{ loop.index0 }}">
+                      <button type="submit" class="text-red-600 hover:text-red-800 focus:outline-none">Eliminar</button>
+                    </form>
+                  </td>
+                </tr>
+                {% else %}
+                <tr>
+                  <td colspan="6" class="text-center py-4">No hay articulos</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
 
-            <!-- Botón para Otro -->
-            <button
-              type="button"
-              id="btn-otro"
-              class="px-4 py-2 text-sm font-medium text-white bg-gray-300 rounded-lg hover:bg-gray-400 focus:outline-none"
-              onclick="mostrarOtro(); cambiarColor('otro')"
-            >
-              Otro
-            </button>
+            <!-- Total y botones -->
+            <div class="flex flex-col justify-between mt-4 space-y-4 flex-grow">
+              <div class="flex justify-between items-center">
+                <label class="text-lg font-bold text-gray-700">Total: ${{ total_general }}</label>
+              </div>
+
+              <!-- Botones de Cancelar y Finalizar Compra -->
+              <div class="flex space-x-4 mt-4">
+                <!-- Botón de Cancelar -->
+                <button type="button" class="w-full md:w-1/2 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-800 focus:outline-none" onclick="cancelarCompra()">
+                  Cancelar
+                </button>
+                <!-- Botón de Finalizar Compra -->
+                <form method="POST" action="{{ url_for('registro_compras_bp.finalizar_compra') }}" class="w-full md:w-1/2">
+                  {{ form.hidden_tag() }}
+                  <button type="submit" class="w-full bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-800 focus:outline-none">
+                    Finalizar Compra
+                  </button>
+                </form>
+              </div>
+            </div>
           </div>
         </div>
 
-        <!-- Campos del formulario (comunes para ambos tipos de compra) -->
-        <div class="mb-4">
-          <label for="nombre" class="block text-sm font-medium text-gray-700"
-            >Nombre del insumo</label
-          >
-          <input
-            type="text"
-            id="nombre"
-            name="nombre"
-            class="mt-1 p-2 w-full border border-gray-300 rounded-md"
-            placeholder="Nombre del insumo"
-            required
-          />
-        </div>
+        <script>
+          function cancelarCompra() {
+            // Obtener la tabla por su ID
+            var tabla = document.getElementById("tabla_carrito");
 
-        <div class="mb-4">
-          <label for="cantidad" class="block text-sm font-medium text-gray-700"
-            >Cantidad</label
-          >
-          <input
-            type="number"
-            id="cantidad"
-            name="cantidad"
-            class="mt-1 p-2 w-full border border-gray-300 rounded-md"
-            placeholder="Cantidad"
-            required
-          />
-        </div>
+            // Eliminar todas las filas excepto la cabecera
+            var filas = tabla.getElementsByTagName("tbody")[0].getElementsByTagName("tr");
+            for (var i = filas.length - 1; i >= 0; i--) {
+              filas[i].remove();
+            }
 
-        <div class="mb-4">
-          <label for="precio" class="block text-sm font-medium text-gray-700"
-            >Precio por unidad</label
-          >
-          <input
-            type="number"
-            id="precio"
-            name="precio"
-            class="mt-1 p-2 w-full border border-gray-300 rounded-md"
-            placeholder="Precio"
-            required
-          />
-        </div>
-
-        <!-- Campo dependiente de "Proveedor" -->
-        <div id="proveedor-container" class="mb-4">
-          <label
-            for="proveedor-select"
-            class="block text-sm font-medium text-gray-700"
-            >Proveedor</label
-          >
-          <select
-            id="proveedor-select"
-            name="proveedor"
-            class="mt-1 p-2 w-full border border-gray-300 rounded-md"
-          >
-            <option value="">Seleccionar proveedor...</option>
-            <option value="proveedor1">Proveedor 1</option>
-            <option value="proveedor2">Proveedor 2</option>
-          </select>
-        </div>
-
-        <!-- Campo dependiente de "Otro" -->
-        <div id="otro-container" class="mb-4 hidden">
-          <label
-            for="lugar-compra"
-            class="block text-sm font-medium text-gray-700"
-            >Lugar de compra</label
-          >
-          <input
-            type="text"
-            id="lugar-compra"
-            name="lugar_compra"
-            class="mt-1 p-2 w-full border border-gray-300 rounded-md"
-            placeholder="Lugar de compra"
-          />
-        </div>
-        <div class="flex justify-center items-center">
-          <button
-            type="submit"
-            class="w-30 bg-green-500 text-white py-2 rounded-md hover:bg-green-700"
-          >
-            Agregar
-          </button>
-        </div>
-      </form>
-    </div>
-
-    <!-- Tabla del carrito -->
-    <div class="col-span-7 bg-amber-50 p-6 rounded-lg shadow-lg">
-      <h2 class="text-2xl font-semibold mb-4 flex items-center">
-        <img
-          src="{{ url_for('static', filename='icons/carrito-de-compras.svg') }}"
-          alt="Carrito de Compras"
-          class="mr-2 w-6 h-6"
-        />
-        Carrito de Insumos
-      </h2>
-      <div class="relative overflow-x-auto">
-        <table class="w-full text-sm text-left text-gray-500">
-          <thead class="text-xs text-white uppercase bg-amber-700">
-            <tr>
-              <th class="px-6 py-3 rounded-s-lg">Insumo</th>
-              <th class="px-6 py-3">Proveedor</th>
-              <th class="px-6 py-3">Cantidad</th>
-              <th class="px-6 py-3">Precio</th>
-              <th class="px-6 py-3 rounded-e-lg">Acciones</th>
-            </tr>
-          </thead>
-          <tbody id="carrito-body">
-            <tr class="bg-white">
-              <td class="px-6 py-4 font-medium text-gray-900">Harina</td>
-              <td class="px-6 py-4">Proveedor 1</td>
-              <td class="px-6 py-4">50 kg</td>
-              <td class="px-6 py-4">$120</td>
-              <td class="px-6 py-4 text-center">
-                <button class="text-red-500 hover:text-red-700">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="red" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 inline-block">
-                    <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path>
-                    <path d="M10 11v6"></path>
-                    <path d="M14 11v6"></path>
-                    <path d="M4 6h16"></path>
-                  </svg>
-                </button>
-              </td>
-                         
-                          
-            </tr>
-            <!-- Agrega más filas aquí si es necesario -->
-          </tbody>
-          <tfoot>
-            <tr class="font-semibold text-gray-900">
-              <td class="px-6 py-3"></td>
-              <td class="px-6 py-3"></td>
-              <th scope="row" class="px-6 py-3 text-base">Total</th>
-              <td class="px-6 py-3">$21,000</td>
-              <td class="px-6 py-3"></td>
-            </tr>
-          </tfoot>
-        </table>
-      </div>
-
-      <!-- Botones al final de la tabla -->
-      <div class="mt-4 flex justify-end space-x-4">
-        <!-- Botón Confirmar -->
-        <button
-          class="w-30 bg-green-500 text-white py-2 rounded-md hover:bg-green-700"
-        >
-          Confirmar
-        </button>
-
-        <!-- Botón Cancelar -->
-        <button
-          class="w-30 bg-red-500 text-white py-2 rounded-md hover:bg-red-700"
-        >
-          Cancelar
-        </button>
+            // Opcional: Puedes actualizar el total también
+            document.querySelector('.text-lg.font-bold.text-gray-700').innerText = "Total: $0.00";
+          }
+        </script>
       </div>
     </div>
   </div>
 </div>
-
-<script>
-  // Función para mostrar el campo de Proveedor
-  function mostrarProveedor() {
-    document.getElementById("proveedor-container").classList.remove("hidden");
-    document.getElementById("otro-container").classList.add("hidden");
-  }
-
-  // Función para mostrar el campo de Lugar de Compra
-  function mostrarOtro() {
-    document.getElementById("proveedor-container").classList.add("hidden");
-    document.getElementById("otro-container").classList.remove("hidden");
-  }
-
-  function cambiarColor(tipo) {
-    const btnProveedor = document.getElementById("btn-proveedor");
-    const btnOtro = document.getElementById("btn-otro");
-
-    // Restablece ambos botones a gris y les agrega hover
-    btnProveedor.classList.remove(
-      "bg-amber-800",
-      "text-white",
-      "hover:bg-gray-400"
-    );
-    btnProveedor.classList.add(
-      "bg-gray-300",
-      "text-white",
-      "hover:bg-gray-400"
-    );
-
-    btnOtro.classList.remove("bg-amber-800", "text-white", "hover:bg-gray-400");
-    btnOtro.classList.add("bg-gray-300", "text-white", "hover:bg-gray-400");
-
-    // Aplica el color de selección y quita el hover del botón seleccionado
-    if (tipo === "proveedor") {
-      btnProveedor.classList.remove(
-        "bg-gray-300",
-        "text-white",
-        "hover:bg-gray-400"
-      );
-      btnProveedor.classList.add("bg-amber-700", "text-white");
-    } else if (tipo === "otro") {
-      btnOtro.classList.remove(
-        "bg-gray-300",
-        "text-white",
-        "hover:bg-gray-400"
-      );
-      btnOtro.classList.add("bg-amber-700", "text-white");
-    }
-  }
-
-  // Inicializa con "Proveedor" como seleccionado
-  cambiarColor("proveedor");
-</script>
 
 {% endblock %}

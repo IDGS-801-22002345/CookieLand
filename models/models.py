@@ -1,16 +1,10 @@
-# models/materia_prima_model.py
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import UserMixin # type: ignore
+from flask_login import UserMixin
 import datetime
+from sqlalchemy.dialects.mysql import JSON
 
-db=SQLAlchemy()
 
-detalle_recetas = db.Table(
-    'DetalleRecetas',
-    db.Column('recetaId', db.Integer, db.ForeignKey('recetas.id'), primary_key=True),  
-    db.Column('insumoId', db.Integer, db.ForeignKey('materia_prima.id'), primary_key=True),  
-    db.Column('cantidad', db.Integer, nullable=False)
-)
+db = SQLAlchemy()
 
 class Role(db.Model):
     __tablename__ = 'roles'
@@ -30,27 +24,15 @@ class Usuario(db.Model, UserMixin):
 
     rol = db.relationship(Role, backref=db.backref('usuarios', lazy=True), lazy='joined')
 
-    def __repr__(self):
-        return f'<Usuario {self.nombre}>'
-
-    def has_role(self, role_name):
-        return self.rol and self.rol.role_name.lower() == role_name.lower()
-    
 class MateriaPrima(db.Model):  
     __tablename__ = 'materia_prima' 
     id = db.Column(db.Integer, primary_key=True)
     nombre = db.Column(db.String(50), unique=True, nullable=False)
     unidad = db.Column(db.String(50), nullable=False)
-    create_date = db.Column(db.DateTime, default=datetime.datetime.now, server_default=db.func.now())
-    update_date = db.Column(db.DateTime, default=datetime.datetime.now, server_default=db.func.now())
+    create_date = db.Column(db.DateTime, default=datetime.datetime.now)
     
     inventario = db.relationship('InventarioMateria', back_populates='materia_prima', uselist=False)
-
-    recetas = db.relationship(
-        'Receta',
-        secondary=detalle_recetas, 
-        back_populates='insumos' 
-    )
+    detalles_receta = db.relationship('DetalleReceta', back_populates='insumo')
 
 class InventarioMateria(db.Model):  
     __tablename__ = 'inventario_materia' 
@@ -58,8 +40,8 @@ class InventarioMateria(db.Model):
     cantidad = db.Column(db.Integer, nullable=False, default=0)
     cantidad_minima = db.Column(db.Integer, nullable=False)
     estado_stock = db.Column(db.String(50), nullable=False)
-
     material_id = db.Column(db.Integer, db.ForeignKey('materia_prima.id'), unique=True, nullable=False)
+    
     materia_prima = db.relationship('MateriaPrima', back_populates='inventario')
 
     create_date = db.Column(db.DateTime, default=datetime.datetime.now, server_default=db.func.now())
@@ -77,29 +59,46 @@ class Proveedores(db.Model):
     estatus = db.Column(db.Integer, default=1) 
     create_date = db.Column(db.DateTime, default=datetime.datetime.now, server_default=db.func.now())
 
+import datetime
+from sqlalchemy.dialects.postgresql import JSON
+from models.models import db
+
+class Compra(db.Model):
+    __tablename__ = 'compras'
+
+    id = db.Column(db.Integer, primary_key=True)
+    total = db.Column(db.Float, nullable=False)
+    create_date = db.Column(db.DateTime, default=datetime.datetime.now, server_default=db.func.now())
+    proveedor_id = db.Column(db.Integer, db.ForeignKey('proveedores.id'), nullable=True)
+    # Lista de materias primas en formato JSON
+    materias_primas = db.Column(JSON, nullable=False, default=[])  
+
 class Receta(db.Model):
     __tablename__ = 'recetas'
-    
     id = db.Column(db.Integer, primary_key=True)
     nombre = db.Column(db.String(255), unique=True, nullable=False)
-    estatus =  db.Column(db.Integer, default=1)
-
-    insumos = db.relationship(
-        'MateriaPrima',
-        secondary=detalle_recetas,  
-        back_populates='recetas'  
-    )
+    estatus = db.Column(db.Integer, default=1)
     
+    detalles = db.relationship('DetalleReceta', back_populates='receta')
     galletas = db.relationship('Galleta', back_populates='receta')
 
+class DetalleReceta(db.Model):
+    __tablename__ = 'detalle_recetas'
+    
+    receta_id = db.Column(db.Integer, db.ForeignKey('recetas.id'), primary_key=True)
+    insumo_id = db.Column(db.Integer, db.ForeignKey('materia_prima.id'), primary_key=True)
+    cantidad = db.Column(db.Integer, nullable=False)
+    
+    receta = db.relationship('Receta', back_populates='detalles')
+    insumo = db.relationship('MateriaPrima', back_populates='detalles_receta')
 
 class Galleta(db.Model):
     __tablename__ = 'galletas'
-    
     id = db.Column(db.Integer, primary_key=True)
     nombre = db.Column(db.String(255), unique=True, nullable=False)
-    receta_id    = db.Column(db.Integer, db.ForeignKey('recetas.id'))
-    foto = db.Column(db.LargeBinary, nullable=False) 
+    receta_id = db.Column(db.Integer, db.ForeignKey('recetas.id'))
+    foto = db.Column(db.LargeBinary(length=16777215), nullable=False)  
+    
     receta = db.relationship('Receta', back_populates='galletas')
 
     inventario = db.relationship('InventarioGalletas', back_populates='galleta', uselist=False)
@@ -134,3 +133,14 @@ class InventarioGalletas(db.Model):
     galleta = db.relationship('Galleta', back_populates='inventario')
     
     mermas = db.relationship('Merma', back_populates='inventario_galletas')
+    producciones = db.relationship('Produccion', back_populates='galleta', cascade="all, delete-orphan")  
+
+class Produccion(db.Model):
+    __tablename__ = 'produccion'
+    id = db.Column(db.Integer, primary_key=True)
+    galleta_id = db.Column(db.Integer, db.ForeignKey('galletas.id'), nullable=False)  
+    stock = db.Column(db.Integer, nullable=False, default=0)
+    estadoStock = db.Column(db.String(50), nullable=False)
+    estadoProduccion = db.Column(db.String(50), nullable=False)
+    
+    galleta = db.relationship('Galleta', back_populates='producciones')
