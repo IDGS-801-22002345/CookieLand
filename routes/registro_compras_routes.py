@@ -1,270 +1,146 @@
-from sqlite3 import IntegrityError
-from flask import Blueprint, Response, render_template, request, redirect, send_from_directory, url_for, flash
-from models.models import Receta, Galleta, MateriaPrima, DetalleReceta, Produccion
-from forms.galletas_forms import GalletasForm, InsumosForm, GalletasEditForm
-from models.models import db
+from flask import Blueprint, render_template, request, redirect, url_for, flash, session
+from models.models import Proveedores, MateriaPrima, Compra, InventarioMateria, db
+from forms.compra_forms import FormCompra
+import datetime
 
+registro_compras_bp = Blueprint('registro_compras_bp', __name__, url_prefix='/')
 
-galletas_bp = Blueprint('galletas_bp', __name__, url_prefix='/recetas')
+def convertir_a_unidad_base(cantidad, unidad_medida):
+    conversiones = {
+        'kg': 1000,   # 1 kilo = 1000 gramos
+        'g': 1,     # 1 gramo = 1 gramo
+        'lt': 1000,  # 1 litro = 1000 mililitros
+        'ml': 1, # 1 mililitro = 1 mililitro
+        'pz': 1,      # 1 pieza = 1 pieza
+    }
 
-detalles_receta=[]
-
-# Pagina de Recetas
-
-@galletas_bp.route("/")
-def index():
-    global detalles_receta
-    detalles_receta.clear()
-    galletasForm = GalletasForm()
-    galletas = Galleta.query.options(db.joinedload(Galleta.receta)).all()
-    return render_template("recetas/recetas.html", galletas = galletas, form=galletasForm)
-
-@galletas_bp.route('/imagen/<int:galleta_id>')
-def mostrar_imagen(galleta_id):
-    galleta = Galleta.query.get_or_404(galleta_id)
-    if not galleta.foto:
-        return send_from_directory('static', 'images/default-cookie.png')
-    return Response(galleta.foto, mimetype='image/jpeg')  
-
-# Pagina para formulario de agregar receta
-
-@galletas_bp.route("/receta-galleta")
-def form():
-    global detalles_receta
-    galletasForm = GalletasForm()
-    insumosForm= InsumosForm()
-    return render_template("recetas/formGalletas.html", galletasForm=galletasForm, insumosForm=insumosForm, detalles_receta = detalles_receta)
-
-
-@galletas_bp.route("/add_insumos", methods=["POST"])
-def add_insumos():
-    global detalles_receta
-    insumosForm = InsumosForm(request.form)
-    if request.method == 'POST' and insumosForm.validate():
-        insumo_id = insumosForm.insumo.data
-        cantidad = insumosForm.cantidad.data
-        
-        insumo_existente = None
-        for item in detalles_receta:
-            if item['id'] == insumo_id:
-                insumo_existente = item
-                break
-        
-        if insumo_existente:
-            insumo_existente['cantidad'] += cantidad
-            mensaje = 'Cantidad actualizada correctamente'
-        else:
-            nombreInsumo = MateriaPrima.query.get(insumo_id).nombre
-            unidadInsumo = MateriaPrima.query.get(insumo_id).unidad
-            detalles = {
-                'id': insumo_id,
-                'insumo': nombreInsumo,
-                'cantidad': cantidad,
-                'unidad': unidadInsumo
-            }
-            detalles_receta.append(detalles)
-            mensaje = 'Material agregado correctamente'
-        
-        flash(mensaje, 'success')
-        return redirect(url_for('galletas_bp.form'))
+    # Si la unidad no está en el diccionario de conversiones, lanzamos un error
+    if unidad_medida not in conversiones:
+        raise ValueError(f"Unidad de medida '{unidad_medida}' no válida.")
     
-@galletas_bp.route("/eliminar_insumo", methods=["POST"])
-def eliminar_insumo():
-    global detalles_receta
-    insumo_id = request.form.get('insumo_id')
-    detalles_receta = [item for item in detalles_receta if str(item['id']) != insumo_id]
-    flash('Insumo eliminado de la receta', 'success')
-    return redirect(url_for('galletas_bp.form'))
-    
+    # Convertimos la cantidad a la unidad base
+    return cantidad * conversiones[unidad_medida]
 
-@galletas_bp.route("/guardar_receta", methods=["POST"])
-def guardar_receta():
-    global detalles_receta
-    print('Entro?')
-    galletasForm = GalletasForm(formdata=request.form, **request.files)
-    if request.method == 'POST' and galletasForm.validate():
-        try:
-            if not detalles_receta:
-                flash('Debe agregar al menos un ingrediente', 'warning')
-                return redirect(url_for('galletas_bp.form'))
-            
-            nombre_receta = f"Receta de {galletasForm.nombre.data}"
-            nueva_receta = Receta(nombre=nombre_receta)
-            db.session.add(nueva_receta)
-            db.session.flush()
-            
-            for detalle in detalles_receta:
-                nuevo_detalle = DetalleReceta(
-                    receta_id=nueva_receta.id,
-                    insumo_id=detalle['id'],
-                    cantidad=detalle['cantidad']
+@registro_compras_bp.route('/registro-compras', methods=['GET', 'POST'])
+def compras():
+    form = FormCompra()
+
+    # Cargar proveedores y productos desde la base de datos
+    proveedores = Proveedores.query.all()
+    form.proveedor.choices = [(str(prov.id), prov.nombre) for prov in proveedores] + [("otro", "Otro")]
+    
+    productos = MateriaPrima.query.all()
+    form.producto.choices = [(str(prod.id), prod.nombre) for prod in productos]
+
+    if 'carrito' not in session:
+        session['carrito'] = []
+
+    if form.validate_on_submit():
+        proveedor_id = form.proveedor.data
+        proveedor_nombre = "Otro" if proveedor_id == "otro" else Proveedores.query.get(proveedor_id).nombre
+        producto_id = form.producto.data
+        cantidad = int(form.cantidad.data or 0)
+        unidad_medida = form.unidad_medida.data
+        precio_unitario = float(form.precio_unitario.data or 0)
+
+        # Aquí ya no se convierte la cantidad a la unidad base para el total
+        total = precio_unitario  # El total es solo el precio unitario del producto
+
+        # Verificamos que el total no sea 0 para evitar agregar productos vacíos
+        if total <= 0:
+            flash("El precio o la cantidad no son válidos", "danger")
+            return redirect(url_for('registro_compras_bp.compras'))
+
+        item = {
+            'materia_prima_id': producto_id,
+            'nombre': MateriaPrima.query.get(producto_id).nombre,
+            'proveedor': proveedor_nombre,
+            'cantidad': cantidad,
+            'unidad_medida': unidad_medida,
+            'precio_unitario': precio_unitario,
+            'total': total  # Guardamos el total calculado como solo el precio unitario
+        }
+        session['carrito'].append(item)
+        session.modified = True  # Guardar cambios en sesión
+
+        flash('Producto agregado al carrito', 'success')
+        return redirect(url_for('registro_compras_bp.compras'))
+
+    # ✅ Evitar error KeyError asegurando que 'carrito' existe
+    compras = session.get('carrito', [])
+    total_general = sum(item.get('total', 0) for item in compras)  # Sumamos los totales de cada item, usando get para evitar KeyError
+
+    return render_template('compras/registro_compras.html', form=form, compras=compras, total_general=total_general)
+
+
+
+@registro_compras_bp.route('/eliminar-producto', methods=['POST'])
+def eliminar_producto():
+    producto_index = int(request.form['producto_index'])  
+
+    if 'carrito' in session and 0 <= producto_index < len(session['carrito']):
+        session['carrito'].pop(producto_index)
+        session.modified = True  
+        flash('Producto eliminado del carrito', 'success')
+    
+    return redirect(url_for('registro_compras_bp.compras'))  
+
+@registro_compras_bp.route('/finalizar-compra', methods=['POST'])
+def finalizar_compra():
+    if 'carrito' not in session or not session['carrito']:
+        flash("No hay productos en el carrito", "warning")
+        return redirect(url_for('registro_compras_bp.compras'))
+
+    # Calcular total de la compra, utilizando .get para evitar KeyError
+    total_general = sum(item.get('total', 0) for item in session['carrito'])  # Sumamos los totales de cada item
+
+    # Obtener proveedor_id si existe en la BD
+    proveedor_id = None
+    for item in session['carrito']:
+        if item['proveedor'] != "Otro":
+            proveedor = Proveedores.query.filter_by(nombre=item['proveedor']).first()
+            if proveedor:
+                proveedor_id = proveedor.id
+            break  # Solo tomamos el primer proveedor
+
+    # Crear la compra con los productos en JSON
+    nueva_compra = Compra(
+        total=total_general,
+        proveedor_id=proveedor_id,
+        materias_primas=session['carrito']  # Se guarda directamente como JSON
+    )
+    db.session.add(nueva_compra)
+    db.session.commit()
+
+    # Actualizar el inventario
+    for item in session['carrito']:
+        # Asegúrate de que el producto existe en la base de datos
+        materia_prima = MateriaPrima.query.get(item['materia_prima_id'])
+        if materia_prima:
+            # Convertimos la cantidad a la unidad base (gramos o mililitros)
+            cantidad_convertida = convertir_a_unidad_base(item['cantidad'], item['unidad_medida'])
+
+            # Verificamos si ya existe el producto en el inventario
+            inventario = InventarioMateria.query.filter_by(material_id=materia_prima.id).first()
+            if inventario:
+                # Si ya existe, actualizamos la cantidad
+                inventario.cantidad += cantidad_convertida
+            else:
+                # Si no existe, lo creamos
+                inventario = InventarioMateria(
+                    material_id=materia_prima.id,
+                    cantidad=cantidad_convertida,
+                    cantidad_minima=0,
+                    estado_stock="Disponible"
                 )
-                db.session.add(nuevo_detalle)
-            
-            foto_binaria = None
-            
-            if galletasForm.foto.data:
-                foto_binaria = galletasForm.foto.data.read()
-            
-            nueva_galleta = Galleta(
-                nombre=galletasForm.nombre.data,
-                receta_id=nueva_receta.id,
-                foto=foto_binaria,
-            )
-            db.session.add(nueva_galleta)
-            
-            db.session.flush()  
-            nueva_produccion = Produccion(
-            galleta_id=nueva_galleta.id,
-            stock=0,
-            estadoStock='Agotado',
-            estadoProduccion='Listo',)
-            db.session.add(nueva_produccion)
-        
-            db.session.commit()
-            detalles_receta = []
-            
-            flash('Receta guardada exitosamente!', 'success')
-            return redirect(url_for('galletas_bp.index'))
-            
-        except IntegrityError:
-            db.session.rollback()
-            flash('El nombre de la galleta ya existe', 'warning')
-        except Exception as e:
-            db.session.rollback()
-            flash(f'Error al guardar: {str(e)}', 'warning')
-        
-    return redirect(url_for('galletas_bp.form'))
+                db.session.add(inventario)
 
+        db.session.commit()  # Guardar todos los cambios en la BD
 
-# ------------Pagina para formulario de editar receta---------------
-
-@galletas_bp.route("/form_edit", methods=["GET", "POST"]) 
-def form_edit():
-    global detalles_receta
-    galleta_id = request.args.get('galleta_id') if request.method == 'GET' else request.form.get('galleta_id')
-    if not galleta_id:
-        flash('No se especificó la galleta a editar', 'error')
-        return redirect(url_for('galletas_bp.index'))
-
-    galleta = Galleta.query.options(
-        db.joinedload(Galleta.receta).joinedload(Receta.detalles).joinedload(DetalleReceta.insumo)
-    ).get_or_404(galleta_id)
+    session.pop('carrito', None)  # Vaciar carrito
+    flash("Compra finalizada con éxito", "success")
     
-    if not detalles_receta:
-        detalles_receta = [{
-            'id': detalle.insumo_id,
-            'insumo': detalle.insumo.nombre,
-            'cantidad': detalle.cantidad,
-            'unidad': detalle.insumo.unidad
-        } for detalle in galleta.receta.detalles]
-    
-    galletasForm = GalletasEditForm(nombre=galleta.nombre)
-    insumosForm = InsumosForm()
-    
-    return render_template("recetas/formGalletas.html",
-                         galletasForm=galletasForm,
-                         insumosForm=insumosForm,
-                         detalles_receta=detalles_receta,
-                         editar=True,
-                         galleta=galleta)
-
-   
-
-@galletas_bp.route("/edit_insumos", methods=["POST"])
-def edit_insumos():
-    global detalles_receta
-    insumosForm = InsumosForm(request.form)
-    
-    if insumosForm.validate():
-        galleta_id = request.form.get('galleta_id') 
-        insumo_id = insumosForm.insumo.data
-        cantidad = insumosForm.cantidad.data
-        
-        insumo_existente = next((i for i in detalles_receta if i['id'] == insumo_id), None)
-        
-        if insumo_existente:
-            insumo_existente['cantidad'] += cantidad
-            flash('Cantidad actualizada', 'success')
-        else:
-            materia = MateriaPrima.query.get_or_404(insumo_id)
-            detalles_receta.append({
-                'id': insumo_id,
-                'insumo': materia.nombre,
-                'cantidad': cantidad,
-                'unidad': materia.unidad
-            })
-            flash('Ingrediente agregado', 'success')
-        
-        if galleta_id:
-            return redirect(url_for('galletas_bp.form_edit', galleta_id=galleta_id))
-        return redirect(url_for('galletas_bp.form_edit'))
-    
-    flash('Error en el formulario', 'warning')
-    return redirect(url_for('galletas_bp.index'))
-
-@galletas_bp.route("/edit_eliminar_insumo", methods=["POST"])
-def edit_eliminar_insumo():
-    galleta_id = request.form.get('galleta_id') 
-    global detalles_receta
-    insumo_id = request.form.get('insumo_id')
-    detalles_receta = [item for item in detalles_receta if str(item['id']) != insumo_id]
-    flash('Insumo eliminado de la receta', 'success')
-    return redirect(url_for('galletas_bp.form_edit', galleta_id=galleta_id))
-    
-    
-@galletas_bp.route("/editar_receta", methods=["POST"])
-def editar_receta():
-    global detalles_receta
-    galleta_id = request.form.get('galleta_id')
-    
-    if not galleta_id:
-        flash('No se especificó la galleta a editar', 'error')
-        return redirect(url_for('galletas_bp.index'))
-
-    galletasForm = GalletasEditForm(formdata=request.form, **request.files)
-    
-    if not galletasForm.validate():
-        flash('Corrija los errores en el formulario', 'warning')
-        return redirect(url_for('galletas_bp.form_edit', galleta_id=galleta_id))
-
-    try:
-        if not detalles_receta:
-            flash('Debe agregar al menos un ingrediente', 'warning')
-            return redirect(url_for('galletas_bp.form_edit', galleta_id=galleta_id))
-
-        galleta = Galleta.query.get_or_404(galleta_id)
-        receta = galleta.receta
-
-        galleta.nombre = galletasForm.nombre.data
-        receta.nombre = f"Receta de {galletasForm.nombre.data}"
-
-        if galletasForm.foto.data:
-            galleta.foto = galletasForm.foto.data.read()
-
-        DetalleReceta.query.filter_by(receta_id=receta.id).delete()
-        
-        for detalle in detalles_receta:
-            db.session.add(DetalleReceta(
-                receta_id=receta.id,
-                insumo_id=detalle['id'],
-                cantidad=detalle['cantidad']
-            ))
-
-        db.session.commit()
-        detalles_receta = [] 
-        
-        flash('Receta actualizada exitosamente!', 'success')
-        return redirect(url_for('galletas_bp.index'))
-        
-    except IntegrityError:
-        db.session.rollback()
-        flash('El nombre de la galleta ya existe', 'warning')
-    except Exception as e:
-        db.session.rollback()
-        flash(f'Error al actualizar: {str(e)}', 'warning')
-    
-    return redirect(url_for('galletas_bp.form_edit', galleta_id=galleta_id))
+    return redirect(url_for('registro_compras_bp.compras'))
 
 
 

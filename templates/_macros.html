@@ -1,24 +1,18 @@
 {%macro datos(name,placeholder,type="text")%}
-<p><input name="{{name}}" type="{{type}}" placeholder="{{placeholder}}"></p>
+<p><input name="{{name}}" type="{{type}}" placeholder="{{placeholder}}" /></p>
 
-{%endmacro%}
+{%endmacro%} {%macro campoNuevo(field)%}
 
-{%macro campoNuevo(field)%}
- 
 <dd>{{field(**kwargs)|safe}}</dd>
 
 {%if field.errors%}
-<ul >
-    {% for error in field.errors %}
-        <li style="color: red;"> {{ error }}</li>
-    {% endfor %}
+<ul>
+  {% for error in field.errors %}
+  <li style="color: red">{{ error }}</li>
+  {% endfor %}
 </ul>
-{% endif %}
-
-
-
-{%endmacro%}
-{% macro mostrar_flash(exclude_modal_errors=false) %}
+{% endif %} {%endmacro%}
+<!-- {% macro mostrar_flash(exclude_modal_errors=false) %}
 {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
         <div class="fixed top-5 right-5 z-50 space-y-4">
@@ -56,4 +50,4 @@
     }, 2500);
   </script> 
 
-{% endmacro %}
+{% endmacro %} -->
