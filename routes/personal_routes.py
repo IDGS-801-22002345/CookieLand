@@ -15,28 +15,27 @@ personal_bp = Blueprint('personal_bp', __name__, url_prefix='/')
 @role_required('admin')
 def usuarios():
     form = RegistroUsuarioForm()
-
     usuarios = Usuario.query.all()
 
     if form.validate_on_submit():
         if Usuario.query.filter_by(correo=form.correo.data).first():
-            flash("Este correo ya está registrado.", "danger")
+            flash("Este correo ya está registrado.", "error")
             return render_template('personal/usuarios.html', form=form, usuarios=usuarios)
 
         if Usuario.query.filter_by(username=form.username.data).first():
-            flash("Este nombre de usuario ya está registrado.", "danger")
+            flash("Este nombre de usuario ya está registrado.", "error")
             return render_template('personal/usuarios.html', form=form, usuarios=usuarios)
 
         rol = Role.query.filter_by(role_name=form.rol.data).first()
         if not rol:
-            flash("Rol no encontrado. Contacta al administrador.", "danger")
+            flash("Rol no encontrado. Contacta al administrador.", "error")
             return render_template('personal/usuarios.html', form=form, usuarios=usuarios)
 
         nuevo_usuario = Usuario(
             nombre=form.nombre.data,
             telefono=form.telefono.data,
             correo=form.correo.data,
-            username=form.username,
+            username=form.username.data,
             estatus=1,
             verificado=True,
             contrasenia=generate_password_hash(form.contrasenia.data),
