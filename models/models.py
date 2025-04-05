@@ -5,7 +5,6 @@ from werkzeug.security import generate_password_hash
 import datetime
 from sqlalchemy.dialects.mysql import JSON
 
-
 db = SQLAlchemy()
 
 class Role(db.Model):
@@ -117,9 +116,6 @@ class Proveedores(db.Model):
     estatus = db.Column(db.Integer, default=1) 
     create_date = db.Column(db.DateTime, default=datetime.datetime.now, server_default=db.func.now())
 
-import datetime
-from sqlalchemy.dialects.postgresql import JSON
-from models.models import db
 
 class Compra(db.Model):
     __tablename__ = 'compras'

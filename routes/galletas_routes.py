@@ -24,6 +24,9 @@ def index():
     return render_template("recetas/recetas.html", galletas = galletas, form=galletasForm)
 
 @galletas_bp.route('/imagen/<int:galleta_id>')
+@login_required
+@log_excepciones
+@role_required('admin')
 def mostrar_imagen(galleta_id):
     galleta = Galleta.query.get_or_404(galleta_id)
     if not galleta.foto:

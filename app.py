@@ -1,9 +1,8 @@
-from dotenv import load_dotenv
 import os
 from flask import Flask, current_app, render_template, request, redirect, session, url_for
 from flask_wtf.csrf import CSRFProtect
 import base64
-from flask_login import LoginManager
+from flask_login import LoginManager # type: ignore
 from config import *
 from models.models import *
 from flask_mail import Mail
@@ -15,8 +14,9 @@ from datetime import datetime
 from routes.auth_routes import auth_bp
 from routes.cliente_routes import cliente_bp
 from routes.detalle_compras import detalle_compras_bp
-from routes.registro_compras_routes import galletas_bp
+from routes.registro_compras_routes import registro_compras_bp
 from routes.inventario_routes import inventario_bp
+from routes.galletas_routes import galletas_bp
 from routes.materia_prima_routes import materia_prima_bp
 from routes.merma_routes import merma_bp
 from routes.personal_routes import personal_bp
@@ -67,12 +67,14 @@ def create_app():
     app.register_blueprint(cliente_bp)
     app.register_blueprint(auth_bp)
     app.register_blueprint(personal_bp)
-    app.register_blueprint(galletas_bp)
+    app.register_blueprint(registro_compras_bp)
     app.register_blueprint(materia_prima_bp)
     app.register_blueprint(provedor_bp)
     app.register_blueprint(inventario_bp)
     app.register_blueprint(produccion_bp)
     app.register_blueprint(detalle_compras_bp)
+    app.register_blueprint(merma_bp)
+    app.register_blueprint(galletas_bp)
 
 
     app.jinja_env.filters['b64encode'] = lambda x: base64.b64encode(x).decode('utf-8') if x else None

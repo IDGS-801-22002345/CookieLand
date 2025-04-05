@@ -1,17 +1,15 @@
 {%macro datos(name,placeholder,type="text")%}
-<p><input name="{{name}}" type="{{type}}" placeholder="{{placeholder}}"></p>
+<p><input name="{{name}}" type="{{type}}" placeholder="{{placeholder}}" /></p>
 
-{%endmacro%}
+{%endmacro%} {%macro campoNuevo(field)%}
 
-{%macro campoNuevo(field)%}
- 
 <dd>{{field(**kwargs)|safe}}</dd>
 
 {%if field.errors%}
-<ul >
-    {% for error in field.errors %}
-        <li style="color: red;"> {{ error }}</li>
-    {% endfor %}
+<ul>
+  {% for error in field.errors %}
+  <li style="color: red">{{ error }}</li>
+  {% endfor %}
 </ul>
 {% endif %}
 {%endmacro%}
