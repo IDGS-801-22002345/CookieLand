@@ -55,21 +55,14 @@
 
       <!-- Items del menú -->
       <div class="p-2 space-y-2 overflow-y-auto">
-        <!-- Inicio -->
-        <button
-          class="w-full px-3 py-3 flex items-center space-x-4 justify-start text-gray-500 hover:bg-blue-200 hover:text-blue-600 rounded-lg group transition-colors"
-        >
-          <i class="fas fa-home text-lg"></i>
-          <span class="font-medium">Inicio</span>
-        </button>
-
         <!-- Dashboard -->
-        <button
+        <a
+          href="{{ url_for('dashboard_bp.index') }}"
           class="w-full px-3 py-3 flex items-center space-x-4 justify-start text-gray-500 hover:bg-blue-200 hover:text-blue-600 rounded-lg group transition-colors"
         >
-          <i class="fas fa-tachometer-alt"></i>
+          <i class="fas fa-users"></i>
           <span class="font-medium">Dashboard</span>
-        </button>
+        </a>
 
         <!-- Usuarios -->
         <a

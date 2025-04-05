@@ -19,6 +19,7 @@ from routes.produccion_routes import produccion_bp
 from routes.detalle_compras import detalle_compras_bp
 from routes.merma_routes import merma_bp
 from routes.galletas_routes import galletas_bp
+from routes.dashboard_joel_routes import dashboard_bp
 
 app = Flask(__name__)
 
@@ -74,6 +75,7 @@ def create_app():
     app.register_blueprint(detalle_compras_bp)
     app.register_blueprint(merma_bp)
     app.register_blueprint(galletas_bp)
+    app.register_blueprint(dashboard_bp)
 
 
     app.jinja_env.filters['b64encode'] = lambda x: base64.b64encode(x).decode('utf-8') if x else None

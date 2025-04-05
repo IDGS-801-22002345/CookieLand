@@ -5,8 +5,7 @@ from forms.auth_forms import *
 from models.models import *
 from sqlalchemy.exc import IntegrityError
 from utils.decoradores import *
-from Flask_mail import Message # type: ignore
-import random
+from flask_mail import Message 
 from datetime import datetime, timedelta
 import pytz
 
