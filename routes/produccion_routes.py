@@ -13,7 +13,13 @@ produccion_bp = Blueprint('produccion_bp', __name__, url_prefix='/produccion')
 
 @produccion_bp.route("/")
 def index():
-    galletas = Galleta.query.all()
+    galletas = Galleta.query.options(
+        db.joinedload(Galleta.receta)
+    ).filter(
+        Galleta.estatus == 1  
+    ).order_by(
+        Galleta.nombre.asc()  
+    )
     return render_template("produccion/produccion.html", galletas=galletas)
 
 @produccion_bp.route('/imagen/<int:galleta_id>')
@@ -28,7 +34,13 @@ def mostrar_imagen(galleta_id):
 @produccion_bp.route("/abrirmodal", methods=["POST"])
 def abrir_modal():
     form = ProduccionForm()
-    galletas = Galleta.query.all()
+    galletas = Galleta.query.options(
+        db.joinedload(Galleta.receta)
+    ).filter(
+        Galleta.estatus == 1  
+    ).order_by(
+        Galleta.nombre.asc()  
+    )
     
     producciones = Produccion.query.options(
         db.joinedload(Produccion.galleta)
@@ -49,7 +61,13 @@ def cerrar_modal():
 @produccion_bp.route("/produccion-prod")
 def prod():
     form = ProduccionForm()
-    galletas = Galleta.query.all()
+    galletas = Galleta.query.options(
+        db.joinedload(Galleta.receta)
+    ).filter(
+        Galleta.estatus == 1  
+    ).order_by(
+        Galleta.nombre.asc()  
+    )
     producciones = Produccion.query.options(
         db.joinedload(Produccion.galleta)
     ).all()
@@ -96,10 +114,12 @@ def producir():
             cantidad_necesaria = detalle.cantidad * cantidad
             detalle.insumo.inventario.cantidad -= cantidad_necesaria
 
-            # if detalle.insumo.inventario.cantidad < detalle.insumo.inventario.cantidad_minima:
-            #     detalle.insumo.inventario.estado_stock = "Bajo"
-            # else:
-            #     detalle.insumo.inventario.estado_stock = "Suficiente"
+            if inventario.cantidad <= 0:
+                inventario.estado_stock = "Agotado"
+            elif inventario.cantidad < inventario.cantidad_minima:
+                inventario.estado_stock = "Bajo"
+            else:
+                inventario.estado_stock = "Completo"
             
             detalle.insumo.inventario.update_date = datetime.datetime.now()
         
@@ -137,6 +157,7 @@ def horneado():
     
     try:
         produccion.estadoProduccion = "Horneado"
+        produccion.fechaDeHorneado = datetime.datetime.now()
         
         db.session.commit()
         flash(f"Producción {produccion.id}ID actualizada a 'Horneado'", "success")

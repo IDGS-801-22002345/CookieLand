@@ -167,6 +167,7 @@ class Produccion(db.Model):
     galleta_id = db.Column(db.Integer, db.ForeignKey('galletas.id'), nullable=False)  
     estadoProduccion = db.Column(db.String(50), nullable=False)
     fechaDeProduccion = db.Column(db.DateTime, default=datetime.datetime.now,)
+    fechaDeHorneado = db.Column(db.DateTime, nullable=True)
     fechaFinalizacion = db.Column(db.DateTime, nullable=True)
     galleta = db.relationship('Galleta', back_populates='producciones')
 

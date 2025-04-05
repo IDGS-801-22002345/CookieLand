@@ -20,7 +20,12 @@ def index():
     global detalles_receta
     detalles_receta.clear()
     galletasForm = GalletasForm()
-    galletas = Galleta.query.options(db.joinedload(Galleta.receta)).all()
+    galletas = Galleta.query.options(
+        db.joinedload(Galleta.receta)
+     ).order_by(
+        db.desc(Galleta.estatus), 
+        Galleta.nombre.asc()       
+     ).all()
     return render_template("recetas/recetas.html", galletas = galletas, form=galletasForm)
 
 @galletas_bp.route('/imagen/<int:galleta_id>')

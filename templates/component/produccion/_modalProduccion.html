@@ -58,6 +58,9 @@
                   Nombre
                 </th>
                 <th scope="col" class="px-6 py-3 text-center align-middle">
+                  Fecha de producción
+                </th>
+                <th scope="col" class="px-6 py-3 text-center align-middle">
                   Acciones
                 </th>
               </tr>
@@ -81,6 +84,13 @@
                 </td>
                 <td class="px-6 py-4 text-center">
                   {{ produccion.galleta.nombre }}
+                </td>
+                <td class="px-6 py-4 text-center">
+                  {% if produccion.estadoProduccion == 'Proceso' %} {{
+                  produccion.fechaDeProduccion.strftime('%d/%m/%Y %I:%M %p') }}
+                  {% elif produccion.estadoProduccion == 'Horneado' %} {{
+                  produccion.fechaDeHorneado.strftime('%d/%m/%Y %I:%M %p') }}
+                  {%endif %}
                 </td>
                 <td class="px-6 py-4 text-center">
                   {% if produccion.estadoProduccion == 'Proceso' %}
