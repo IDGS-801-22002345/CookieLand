@@ -116,35 +116,44 @@ class Galleta(db.Model):
     __tablename__ = 'galletas'
     id = db.Column(db.Integer, primary_key=True)
     nombre = db.Column(db.String(255), unique=True, nullable=False)
-    receta_id = db.Column(db.Integer, db.ForeignKey('recetas.id'))
     foto = db.Column(db.LargeBinary(length=16777215), nullable=False)  
-    
+    receta_id = db.Column(db.Integer, db.ForeignKey('recetas.id'))
+    estatus = db.Column(db.Integer, default=1)
+    stock = db.Column(db.Integer, nullable=False, default=0)
     receta = db.relationship('Receta', back_populates='galletas')
-    producciones = db.relationship('Produccion', back_populates='galleta')
+    estadoStock = db.Column(db.String(50), nullable=False)
+    producciones = db.relationship('Produccion', back_populates='galleta') 
+    mermas = db.relationship('Merma', back_populates='galleta') 
 
 
 class Produccion(db.Model):
     __tablename__ = 'produccion'
     id = db.Column(db.Integer, primary_key=True)
     galleta_id = db.Column(db.Integer, db.ForeignKey('galletas.id'), nullable=False)  
-    stock = db.Column(db.Integer, nullable=False, default=0)
-    estadoStock = db.Column(db.String(50), nullable=False)
     estadoProduccion = db.Column(db.String(50), nullable=False)
-    
+    fechaDeProduccion = db.Column(db.DateTime, default=datetime.datetime.now,)
+    fechaFinalizacion = db.Column(db.DateTime, nullable=True)
     galleta = db.relationship('Galleta', back_populates='producciones')
-    mermas = db.relationship('Merma', back_populates='produccion')
 
 class Merma(db.Model):
-    __tablename__ = 'Merma'  
+    __tablename__ = 'mermas'  
     id = db.Column(db.Integer, primary_key=True)
     descripcion = db.Column(db.String(255), nullable=False)
     cantidad = db.Column(db.Integer, nullable=False)
-    fecha = db.Column('fecha', db.DateTime, default=datetime.datetime.now, server_default=db.func.now())  
-    tipo_merma = db.Column(db.String(50), nullable=True)
+    fecha = db.Column(db.DateTime, default=datetime.datetime.now)
+    tipo_merma = db.Column(db.String(50), nullable=False)
     
-    inventario_materia_id = db.Column('inventarioMateriaId', db.Integer, 
-                                    db.ForeignKey('inventario_materia.id'), nullable=True)
-    produccion_id = db.Column(db.Integer, db.ForeignKey('produccion.id'), nullable=True)  
-
+    galleta_id = db.Column(db.Integer, db.ForeignKey('galleta.id'), nullable=True)  
+    inventario_materia_id = db.Column(
+        db.Integer, 
+        db.ForeignKey('inventario_materia.id'),  
+        nullable=True
+    )
+    galleta_id = db.Column(
+        db.Integer, 
+        db.ForeignKey('galletas.id'),  
+        nullable=True
+    )
+    
+    galleta = db.relationship('Galleta', back_populates='mermas')  
     inventario_materia = db.relationship('InventarioMateria', back_populates='mermas')
-    produccion = db.relationship('Produccion', back_populates='mermas')

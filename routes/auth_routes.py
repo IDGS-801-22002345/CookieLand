@@ -1,11 +1,11 @@
 from flask import Blueprint, render_template, redirect, session, url_for, flash, request
-from flask_login import login_user, logout_user, login_required # type: ignore
+from flask_login import login_user, logout_user, login_required 
 from werkzeug.security import generate_password_hash, check_password_hash
 from forms.auth_forms import *
 from models.models import *
 from sqlalchemy.exc import IntegrityError
 from utils.decoradores import *
-from Flask_mail import Message # type: ignore
+from flask_mail import Message 
 import random
 from datetime import datetime, timedelta
 import pytz
@@ -14,18 +14,42 @@ auth_bp = Blueprint('auth_bp', __name__, url_prefix='/auth')
 
 
 # Login
+MAX_ATTEMPTS = 3
+LOCKOUT_TIME = timedelta(minutes=5)  
+
 @auth_bp.route('/login', methods=['GET', 'POST'])
 @log_excepciones
 @anonymous_required
 def login():
     form = LoginForm()
+    ip_address = request.remote_addr  # Obtener IP del cliente
+    
+    # Verificar si la IP está bloqueada
+    if 'blocked_ips' in session and ip_address in session['blocked_ips']:
+        if datetime.now(pytz.utc) < session['blocked_ips'][ip_address]:
+            remaining_time = session['blocked_ips'][ip_address] - datetime.now(pytz.utc)
+            flash(f'Demasiados intentos fallidos. Intenta nuevamente en {remaining_time.seconds//60} minutos', 'error')
+            return render_template('auth/login.html', form=form)
+        else:
+            # Eliminar bloqueo si ha expirado
+            session['blocked_ips'].pop(ip_address)
+    
     if form.validate_on_submit():
         user = Usuario.query.filter_by(correo=form.email.data).first()
+        
+        # Verificar intentos fallidos
+        attempt_key = f'login_attempts_{ip_address}'
+        session[attempt_key] = session.get(attempt_key, 0) + 1
+        
         if user and check_password_hash(user.contrasenia, form.password.data):
+            # Restablecer contador de intentos si el login es exitoso
+            session.pop(attempt_key, None)
+            
             if not user.verificado:
                 enviar_codigo_verificacion(user)
                 flash('Tu cuenta aún no está verificada. Te hemos reenviado un nuevo código.', 'warning')
                 return redirect(url_for('auth_bp.verificar_codigo', user_id=user.id))
+            
             if user.estatus == 0:
                 flash('Tu cuenta está desactivada. Contacta al administrador.', 'warning')
                 return redirect(url_for('auth_bp.login'))
@@ -35,14 +59,24 @@ def login():
             user.last_login = datetime.now(mexico_tz)
             db.session.commit()
             flash('¡Inicio de sesión exitoso!', 'success')
+            
             if user.has_role('admin'):
                 return redirect(url_for('inventario_bp.index'))
             elif user.has_role('cliente'):
                 return redirect(url_for('cliente_bp.index'))
         else:
-            flash('Las credenciales son incorrectas', 'danger')
+            # Manejar intentos fallidos
+            if session.get(attempt_key, 0) >= MAX_ATTEMPTS:
+                # Bloquear la IP
+                if 'blocked_ips' not in session:
+                    session['blocked_ips'] = {}
+                session['blocked_ips'][ip_address] = datetime.now(pytz.utc) + LOCKOUT_TIME
+                session.pop(attempt_key, None)
+                flash(f'Demasiados intentos fallidos. Tu acceso ha sido bloqueado por {LOCKOUT_TIME.seconds//60} minutos.', 'error')
+            else:
+                flash(f'Credenciales incorrectas. Intentos restantes: {MAX_ATTEMPTS - session[attempt_key]}', 'error')
+    
     return render_template('auth/login.html', form=form)
-
 
 # Cerrar sesion 
 @auth_bp.route('/logout')

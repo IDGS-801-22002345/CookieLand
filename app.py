@@ -2,7 +2,7 @@ import os
 from flask import Flask, current_app, render_template, request, redirect, session, url_for
 from flask_wtf.csrf import CSRFProtect
 import base64
-from flask_login import LoginManager # type: ignore
+from flask_login import LoginManager 
 from config import *
 from routes.cliente_routes import cliente_bp
 from routes.auth_routes import auth_bp
@@ -12,7 +12,7 @@ from models.models import *
 from routes.proveedor_routes import provedor_bp
 from routes.inventario_routes import inventario_bp
 from routes.materia_prima_routes import materia_prima_bp
-from flask_mail import Mail
+from flask_mail import Mail, Message
 import logging
 from logging.handlers import TimedRotatingFileHandler
 from routes.produccion_routes import produccion_bp

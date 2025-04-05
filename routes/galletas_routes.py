@@ -33,6 +33,36 @@ def mostrar_imagen(galleta_id):
         return send_from_directory('static', 'images/default-cookie.png')
     return Response(galleta.foto, mimetype='image/jpeg')  
 
+@galletas_bp.route("/estatus", methods=["POST"])
+@login_required
+@log_excepciones
+@role_required('admin')
+def estatus():
+    galleta_id = request.form.get('galleta_id')
+    
+    if not galleta_id:
+        flash('ID de galleta no proporcionado', 'error')
+        return redirect(url_for('galletas_bp.index'))
+    
+    galleta = Galleta.query.get(galleta_id)
+    
+    if not galleta:
+        flash('Galleta no encontrada', 'error')
+        return redirect(url_for('galletas_bp.index'))
+    
+    try:
+        galleta.estatus = 0 if galleta.estatus == 1 else 1
+        
+        db.session.commit()
+        estado = "activada" if galleta.estatus == 1 else "desactivada"
+        flash(f'Galleta {estado} correctamente', 'success')
+        
+    except Exception as e:
+        db.session.rollback()
+        flash('Error al actualizar el estado de la galleta', 'error')
+    
+    return redirect(url_for('galletas_bp.index'))
+
 # Pagina para formulario de agregar receta
 
 @galletas_bp.route("/receta-galleta")
@@ -53,6 +83,13 @@ def form():
 def add_insumos():
     global detalles_receta
     insumosForm = InsumosForm(request.form)
+
+    if  not insumosForm.validate():
+         if 'insumo' in insumosForm.errors:
+            flash('Debe seleccionar un insumo', 'error')
+         return redirect(url_for('galletas_bp.form'))
+    
+    
     if request.method == 'POST' and insumosForm.validate():
         insumo_id = insumosForm.insumo.data
         cantidad = insumosForm.cantidad.data
@@ -129,16 +166,10 @@ def guardar_receta():
                 nombre=galletasForm.nombre.data,
                 receta_id=nueva_receta.id,
                 foto=foto_binaria,
+                estadoStock='Agotado',
             )
             db.session.add(nueva_galleta)
             
-            db.session.flush()  
-            nueva_produccion = Produccion(
-            galleta_id=nueva_galleta.id,
-            stock=0,
-            estadoStock='Agotado',
-            estadoProduccion='Listo',)
-            db.session.add(nueva_produccion)
         
             db.session.commit()
             detalles_receta = []

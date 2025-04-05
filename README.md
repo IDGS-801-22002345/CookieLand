@@ -41,3 +41,5 @@ git commit -m "merge con main"
 git push
 
 ## En caso de no les salio ningun problema y se hizo bien el push, van hacer el PR en la pagina de git y me avisan por el grupo de whast (Dudas o comentarios me dicen)
+
+pip install -r requirements.txt

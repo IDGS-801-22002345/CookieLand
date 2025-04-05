@@ -1,0 +1,152 @@
+<div
+  id="crud-modal"
+  tabindex="-1"
+  aria-hidden="true"
+  class="fixed inset-0 z-50 w-full h-full overflow-y-auto overflow-x-hidden"
+>
+  <!-- Fondo oscuro -->
+  <div class="fixed inset-0 bg-black opacity-50"></div>
+
+  <!-- Contenedor principal del modal -->
+  <div class="relative w-full h-full p-4 flex items-center justify-center">
+    <div
+      class="relative bg-white rounded-lg w-full max-w-2xl md:max-w-3xl shadow-lg"
+    >
+      <!-- Modal header -->
+      <div
+        class="flex items-center justify-between p-4 md:p-5 border-b rounded-t"
+      >
+        <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
+          Producciones
+        </h3>
+        <form
+          method="POST"
+          action="{{ url_for('produccion_bp.cerrar_modal') }}"
+        >
+          {{ form.csrf_token }}
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+          <button
+            type="submit"
+            class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center"
+          >
+            <img
+              src="{{ url_for('static', filename='svg/Cerrar.svg') }}"
+              alt="Cerrar"
+              class="w-4 h-4"
+            />
+            <span class="sr-only">Cerrar modal</span>
+          </button>
+        </form>
+      </div>
+
+      <div class="grid gap-4 mb-4">
+        <!-- Tabla de insumos agregados -->
+        <div class="overflow-x-auto px-4">
+          {% if producciones %}
+          <table
+            class="w-full text-sm text-left text-gray-500 dark:text-gray-400"
+          >
+            <thead
+              class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400"
+            >
+              <tr
+                class="text-white"
+                style="background-color: #7c5454; z-index: 10"
+              >
+                <th scope="col" class="px-6 py-3 text-center align-middle"></th>
+                <th scope="col" class="px-6 py-3 text-center align-middle">
+                  Nombre
+                </th>
+                <th scope="col" class="px-6 py-3 text-center align-middle">
+                  Acciones
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for produccion in producciones %}
+              <tr>
+                <td class="px-6 py-4">
+                  {% if produccion.galleta.foto %}
+                  <img
+                    src="{{ url_for('produccion_bp.mostrar_imagen', galleta_id=produccion.galleta.id) }}"
+                    class="h-20"
+                    alt="{{ produccion.galleta.nombre }}"
+                  />
+                  {% else %}
+                  <div class="text-center py-4 bg-light">
+                    <i class="fas fa-cookie fa-3x text-secondary"></i>
+                    <p class="mt-2">Sin imagen</p>
+                  </div>
+                  {% endif %}
+                </td>
+                <td class="px-6 py-4 text-center">
+                  {{ produccion.galleta.nombre }}
+                </td>
+                <td class="px-6 py-4 text-center">
+                  {% if produccion.estadoProduccion == 'Proceso' %}
+                  <form
+                    method="POST"
+                    action="{{ url_for('produccion_bp.horneado') }}"
+                  >
+                    {{ form.csrf_token }}
+                    <input
+                      type="hidden"
+                      name="csrf_token"
+                      value="{{ csrf_token() }}"
+                    />
+                    <input
+                      type="hidden"
+                      name="produccion_id"
+                      value="{{ produccion.id }}"
+                    />
+                    <button
+                      class="text-white px-4 py-2 rounded transition-colors courser-pointer"
+                      style="background-color: #fd9a00"
+                    >
+                      Hornear
+                    </button>
+                  </form>
+                  {% elif produccion.estadoProduccion == 'Horneado' %}
+                  <form
+                    method="POST"
+                    action="{{ url_for('produccion_bp.finalizar') }}"
+                  >
+                    {{ form.csrf_token }}
+                    <input
+                      type="hidden"
+                      name="csrf_token"
+                      value="{{ csrf_token() }}"
+                    />
+                    <input
+                      type="hidden"
+                      name="produccion_id"
+                      value="{{ produccion.id }}"
+                    />
+                    <button
+                      class="text-white px-4 py-2 rounded transition-colors bg-green-600 hover:bg-green-700 cursor-pointer"
+                    >
+                      Finalizar
+                    </button>
+                  </form>
+                  {% endif %}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          {% else %}
+          <div class="text-center py-8 bg-gray-50 rounded-lg">
+            <i class="fas fa-info-circle text-gray-400 text-4xl mb-3"></i>
+            <p class="text-gray-500">No hay producciones en proceso</p>
+            <p class="text-sm text-gray-400 mt-1">
+              Inicie nuevas producciones desde el los card de galletas
+            </p>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="flex justify-end gap-8 py-4 pr-8 border-t"></div>
+    </div>
+  </div>
+</div>
