@@ -77,6 +77,7 @@ def form():
 
 
 @galletas_bp.route("/add_insumos", methods=["POST"])
+@registrar_accion("Agrego insumos")
 @login_required
 @log_excepciones
 @role_required('admin')
@@ -119,6 +120,7 @@ def add_insumos():
         return redirect(url_for('galletas_bp.form'))
     
 @galletas_bp.route("/eliminar_insumo", methods=["POST"])
+@registrar_accion("Elimino insumos")
 @login_required
 @log_excepciones
 @role_required('admin')
@@ -131,6 +133,7 @@ def eliminar_insumo():
     
 
 @galletas_bp.route("/guardar_receta", methods=["POST"])
+@registrar_accion("Guardo receta")
 @login_required
 @log_excepciones
 @role_required('admin')
@@ -189,10 +192,11 @@ def guardar_receta():
 
 # ------------Pagina para formulario de editar receta---------------
 
-@galletas_bp.route("/form_edit", methods=["GET", "POST"]) 
+@galletas_bp.route("/form_edit", methods=["GET", "POST"])
+@registrar_accion("Edito insumo")
 @login_required
 @log_excepciones
-@role_required('admin')
+@role_required('admin') 
 def form_edit():
     global detalles_receta
     galleta_id = request.args.get('galleta_id') if request.method == 'GET' else request.form.get('galleta_id')
@@ -225,6 +229,7 @@ def form_edit():
    
 
 @galletas_bp.route("/edit_insumos", methods=["POST"])
+@registrar_accion("Edito insumos")
 @login_required
 @log_excepciones
 @role_required('admin')
@@ -260,6 +265,10 @@ def edit_insumos():
     return redirect(url_for('galletas_bp.index'))
 
 @galletas_bp.route("/edit_eliminar_insumo", methods=["POST"])
+@registrar_accion("Elimino insumo")
+@login_required
+@log_excepciones
+@role_required('admin')
 def edit_eliminar_insumo():
     galleta_id = request.form.get('galleta_id') 
     global detalles_receta
@@ -270,6 +279,7 @@ def edit_eliminar_insumo():
     
     
 @galletas_bp.route("/editar_receta", methods=["POST"])
+@registrar_accion("Edito receta")
 @login_required
 @log_excepciones
 @role_required('admin')

@@ -6,7 +6,10 @@ from flask_login import login_required
 from utils.decoradores import *
 provedor_bp = Blueprint('provedor_bp', __name__, url_prefix='/')
  
-@provedor_bp.route("/proveedores")
+@provedor_bp.route("/mk_proveedores")
+@login_required
+@log_excepciones
+@role_required('admin')
 
  
 def index():
@@ -15,7 +18,11 @@ def index():
     proveedores_ordenados = sorted(proveedores, key=lambda x: x.estatus, reverse=True)
     return render_template("proveedores/index.html", form=create_form, proveedores=proveedores_ordenados)
  
-@provedor_bp.route("/cambiar-estatus", methods=["POST"])
+@provedor_bp.route("/mk_cambiar-estatus", methods=["POST"])
+@registrar_accion("Cambio estatus proveedor")
+@login_required
+@log_excepciones
+@role_required('admin')
 def cambiar_estatus():
     proveedor_id = request.form.get("id")
     proveedor = Proveedores.query.get(proveedor_id)
@@ -35,7 +42,12 @@ def cambiar_estatus():
         flash("¡Proveedor desactivado correctamente!", "warning")
     return redirect(url_for("provedor_bp.index"))
  
-@provedor_bp.route("/agregar-proveedor", methods=['POST'])
+ 
+@provedor_bp.route("/mk_agregar-proveedor", methods=['POST'])
+@registrar_accion("Agrego proveedor")
+@login_required
+@log_excepciones
+@role_required('admin')
 def agregar_proveedor():
     form = ProveedorForm(request.form)
    
@@ -91,7 +103,11 @@ def agregar_proveedor():
                          mostrar_modal=True,
                          modal_error=True)
  
-@provedor_bp.route('/modificar-proveedor', methods=["GET", "POST"])
+@provedor_bp.route('/mk_modificar-proveedor', methods=["GET", "POST"])
+@registrar_accion("Modifico proveedor")
+@login_required
+@log_excepciones
+@role_required('admin')
 def modificar():
     create_form = ProveedorForm(request.form)
    
@@ -171,7 +187,11 @@ def modificar():
                          modal_error=True)
  
  
-@provedor_bp.route("/eliminar", methods=["GET", "POST"])
+@provedor_bp.route("/mk_eliminar", methods=["GET", "POST"])
+@registrar_accion("Eliminó un proveedor")
+@login_required
+@log_excepciones
+@role_required('admin')
 def eliminar():
     if request.method == "GET":
         id = request.args.get('id')

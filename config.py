@@ -5,11 +5,16 @@ import os
 from datetime import timedelta
 
 
-load_dotenv()  # Esto carga las variables del archivo .env
+load_dotenv() 
 
 class Config(object):
     SECRET_KEY = 'Clave Nueva'
     SESSION_COOKIE_SECURE = False
+    
+    DEBUG = False  
+    TESTING = False
+    PROPAGATE_EXCEPTIONS = False 
+    EXPLAIN_TEMPLATE_LOADING = False
     
 class DevelopmentConfig(Config):
     DEBUG = True
@@ -27,6 +32,6 @@ class DevelopmentConfig(Config):
     MAIL_DEFAULT_SENDER = os.getenv('MAIL_USERNAME')
     
     # Tiempo de la sesion activaaa
-    PERMANENT_SESSION_LIFETIME = timedelta(minutes=10)
+    PERMANENT_SESSION_LIFETIME = timedelta(minutes=60)
     SESSION_REFRESH_EACH_REQUEST = True
 

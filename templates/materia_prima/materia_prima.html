@@ -1,12 +1,12 @@
-{% extends "layout.html" %} {% block content %} {% import "_macros.html" as
-macros %}
+{% extends "layout.html" %} {% block content %}
+
 <link
   rel="stylesheet"
   href="{{ url_for('static', filename='css/output.css') }}"
 />
 <script src="{{ url_for('static', filename='js/materia_prima.js') }}"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
-{{ macros.mostrar_flash() }}
+
 <!-- Contenedor principal con margen superior -->
 <div class="flex flex-col w-full px-10">
   <!-- Título INVENTARIO centrado -->

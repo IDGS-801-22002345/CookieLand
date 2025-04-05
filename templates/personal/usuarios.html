@@ -1,10 +1,8 @@
-{% extends "layout.html" %} {% block content %} {% import "cliente/_macros.html" as macros %}
+{% extends "layout.html" %} {% block content %}
 
 <div class="flex flex-col w-full px-10">
 	<div class="pl-28 p-4 text-center bg-white border border-gray-300 rounded-lg shadow-sm sm:p-8 dark:bg-gray-800 dark:border-gray-700">
 		<h1 class="text-3xl font-bold text-center mb-4">Administración de usuarios</h1>
-
-		{{ macros.mostrar_flash() }}
 
 		<div class="flex justify-end">
 			<button id="open-modal-btn" class="flex items-center gap-2 text-white bg-green-500 hover:bg-green-500 focus:outline-none focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-1 transition-colors duration-200 ease-in-out">
@@ -180,13 +178,6 @@
 						<div>
 							<label for="edit-contrasenia" class="text-sm font-medium text-gray-700 text-left">Contraseña (opcional)</label> {{ form.contrasenia(class="mt-1 p-2 w-full border border-gray-300 rounded-md", id="edit-contrasenia", placeholder="Ingrese la contraseña", type="password") }}
 						</div>
-						<div>
-							<label for="edit-estatus" class="text-sm font-medium text-gray-700 text-left">Estatus</label>
-							<select id="edit-estatus" name="estatus" class="mt-1 p-2 w-full border border-gray-300 rounded-md">
-								<option value="1" {% if form.estatus.data == 1 %}selected{% endif %}>Activo</option>
-								<option value="0" {% if form.estatus.data == 0 %}selected{% endif %}>Inactivo</option>
-							</select>
-						</div>
 					</div>
 					<div class="flex justify-center mt-6 gap-4">
 						<button type="submit" style="background-color: #24985a !important;" class="text-white bg-green-500 hover:bg-green-600 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center">
@@ -327,7 +318,6 @@
 					document.getElementById('edit-correo').value = btn.dataset.correo;
 					document.getElementById('edit-telefono').value = btn.dataset.telefono;
 					document.getElementById('edit-rol').value = btn.dataset.rol;
-					document.getElementById('edit-estatus').value = btn.dataset.estatus;
 					document.getElementById('edit-contrasenia').value = "";
 			
 					modalEditar.classList.remove('hidden');
