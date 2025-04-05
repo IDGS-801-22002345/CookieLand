@@ -1,0 +1,19 @@
+{% macro Input(field) %}
+<div class="">
+  <label
+    for="{{ field.id }}"
+    class="block mb-2 text-sm font-medium text-gray-900"
+  >
+    {{ field.label }}
+    <span class="text-red-500">*</span>
+  </label>
+  {{ field(class="bg-gray-50 border border-gray-300 text-gray-900 text-sm
+  rounded-lg block p-2.5 text-center w-20") }} {% if field.errors %}
+  <ul class="mt-2">
+    {% for error in field.errors %}
+    <li class="text-sm text-red-600">{{ error }}</li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+</div>
+{% endmacro %}

@@ -1,26 +1,71 @@
-<div
-  class="bg-white py-4 px-2 xl:px-10 rounded-lg shadow-md text-center flex flex-col gap-2"
->
-  <div class="h-40 bg-gray-50 rounded pb-2 flex items-center justify-center">
-    {% if produccion.galleta.foto %}
-    <img
-      class="w-full h-full rounded-lg object-contain object-center"
-      src="{{ url_for('galletas_bp.mostrar_imagen', galleta_id=produccion.galleta.id) }}"
-      alt="Galletas Clásicas"
-    />
-    {% else %}
-    <div class="text-gray-400 flex flex-col items-center justify-center">
-      <i class="fas fa-cookie text-4xl mb-2"></i>
-      <span class="text-sm">Sin imagen</span>
+{% import "component/produccion/_macroProduccion.html" as macro %}
+
+<form method="POST" action="{{ url_for('produccion_bp.producir') }}">
+  {{ form.csrf_token }}
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+  <input type="hidden" name="galleta_id" value="{{ galleta.id }}" />
+
+  <div
+    class="bg-white py-4 px-2 xl:px-10 rounded-lg shadow-md text-center flex flex-col gap-2"
+  >
+    <div class="h-40 bg-gray-50 rounded pb-2 flex items-center justify-center">
+      {% if galleta.foto %}
+      <img
+        class="w-full h-full rounded-lg object-contain object-center"
+        src="{{ url_for('produccion_bp.mostrar_imagen', galleta_id=galleta.id) }}"
+        alt="Galletas Clásicas"
+      />
+      {% else %}
+      <div class="text-gray-400 flex flex-col items-center justify-center">
+        <i class="fas fa-cookie text-4xl mb-2"></i>
+        <span class="text-sm">Sin imagen</span>
+      </div>
+      {% endif %}
     </div>
-    {% endif %}
-  </div>
-  <h2 class="font-semibold">{{ produccion.galleta.nombre }}</h2>
-  <div class="flex justify-center items-center mt-2">
-    <button
-      class="text-white px-4 py-2 rounded transition-colors {% if produccion.estadoStock == 'Alto' %}bg-green-600 cursor-not-allowed opacity-75 {% elif produccion.estadoStock == 'Bajo' %}bg-amber-600 {% else %}bg-red-600 {% endif %}"
+    <h2 class="font-semibold">{{ galleta.nombre }}</h2>
+    <div class="flex items-center justify-center">
+      {{ macro.Input(form.cantidad) }}
+    </div>
+
+    <div class="flex justify-center items-center mt-2">
+      {% if galleta.estadoStock == 'Completo' %}
+
+      <button
+        id="producirBtn"
+        class="text-white px-4 py-2 rounded transition-colors bg-green-600"
+      >
+        Producir
+      </button>
+      {% elif galleta.estadoStock == 'Bajo' %}
+
+      <button
+        class="text-white px-4 py-2 rounded transition-colors"
+        style="background-color: #e17100"
+        id="producirBtn"
+      >
+        Producir
+      </button>
+      {% else %}
+      <button
+        id="producirBtn"
+        class="text-white px-4 py-2 rounded transition-colors bg-red-600"
+      >
+        Producir
+      </button>
+      {% endif %}
+      <!-- <button
+      class="text-white px-4 py-2 rounded transition-colors {% if galleta.estadoStock == 'Completo' %}bg-green-600 cursor-not-allowed opacity-75 {% elif galleta.estadoStock == 'Bajo' %}bg-amber-600 {% else %}bg-red-600 {% endif %}"
     >
       Producir
-    </button>
+    </button> -->
+    </div>
   </div>
-</div>
+</form>
+<script>
+  function handleSubmit(form) {
+    const btn = form.querySelector("#producirBtn");
+    btn.disabled = true;
+    btn.innerHTML = "Procesando...";
+    form.submit();
+  }
+</script>

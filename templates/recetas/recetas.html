@@ -67,12 +67,35 @@
             </th>
 
             <!-- Columna Estatus -->
-            <th scope="row" class="px-6 py-4 font-medium text-gray-900">
-              {{ galleta.receta.estatus }}
-            </th>
+            <td class="px-6 py-4">
+              <div class="flex items-center gap-2">
+                {% if galleta.estatus == 1 %}
+                <div class="h-2.5 w-2.5 rounded-full bg-green-500 me-2"></div>
+                Activo {% else %}
+                <div class="h-2.5 w-2.5 rounded-full bg-red-500 me-2"></div>
+                Inactivo {% endif %}
+              </div>
+            </td>
 
             <td class="px-6 py-4">
               <div class="flex justify-center space-x-2">
+                <form
+                  method="POST"
+                  action="{{ url_for('galletas_bp.estatus') }}"
+                >
+                  <input
+                    type="hidden"
+                    name="galleta_id"
+                    value="{{ galleta.id }}"
+                  />
+                  {{ form.csrf_token }}
+                  <button
+                    type="submit"
+                    class="p-2 text-white rounded-full focus:outline-none {% if galleta.estatus == 1 %} bg-green-500 hover:bg-green-600 {% else %} bg-red-500 hover:bg-red-600 {% endif %}"
+                  >
+                    <i class="fas fa-power-off"></i>
+                  </button>
+                </form>
                 <form
                   method="POST"
                   action="{{ url_for('galletas_bp.form_edit') }}"
@@ -83,7 +106,9 @@
                     name="galleta_id"
                     value="{{ galleta.id }}"
                   />
-                  <button class="p-1 text-gray-700 hover:text-blue-600">
+                  <button
+                    class="p-2 rounded-full bg-yellow-500 hover:bg-yellow-600 text-white focus:outline-none"
+                  >
                     <svg
                       class="w-5 h-5"
                       aria-hidden="true"

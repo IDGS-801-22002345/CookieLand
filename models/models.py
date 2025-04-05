@@ -153,6 +153,7 @@ class Galleta(db.Model):
     nombre = db.Column(db.String(255), unique=True, nullable=False)
     foto = db.Column(db.LargeBinary(length=16777215), nullable=False)  
     receta_id = db.Column(db.Integer, db.ForeignKey('recetas.id'))
+    estatus = db.Column(db.Integer, default=1)
     stock = db.Column(db.Integer, nullable=False, default=0)
     receta = db.relationship('Receta', back_populates='galletas')
     estadoStock = db.Column(db.String(50), nullable=False)
@@ -166,11 +167,11 @@ class Produccion(db.Model):
     galleta_id = db.Column(db.Integer, db.ForeignKey('galletas.id'), nullable=False)  
     estadoProduccion = db.Column(db.String(50), nullable=False)
     fechaDeProduccion = db.Column(db.DateTime, default=datetime.datetime.now,)
+    fechaDeHorneado = db.Column(db.DateTime, nullable=True)
     fechaFinalizacion = db.Column(db.DateTime, nullable=True)
     galleta = db.relationship('Galleta', back_populates='producciones')
 
-
-
+    
 class Merma(db.Model):
     __tablename__ = 'mermas'  
     id = db.Column(db.Integer, primary_key=True)

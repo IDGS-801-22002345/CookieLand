@@ -1,74 +1,91 @@
 {% extends "layout.html" %} {% block content %} {% import
 "component/galletas/_macroGalletas.html" as macro %}
 
-<div class="flex flex-col w-full px-4 md:px-10">
-  <div
-    class="w-full p-4 text-center bg-white border border-gray-200 rounded-lg shadow-sm"
-  >
-    <!-- Titulo  y Estatus -->
+<div class="relative w-full h-full">
+  <div class="flex flex-col w-full px-4 md:px-10">
+    <div
+      class="w-full p-4 text-center bg-white border border-gray-200 rounded-lg shadow-sm"
+    >
+      <!-- Titulo  y Estatus -->
 
-    <div class="flex justify-between items-center pb-6">
-      <div class="w-6"></div>
+      <div class="flex justify-between items-center pb-6">
+        <div class="w-6"></div>
 
-      <div class="flex flex-col gap-4 items-center">
-        <span class="text-2xl">Estatus de producción</span>
-        <div class="flex gap-5">
-          <div class="flex items-center gap-1">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="#00a63e"
-              class="w-6 h-6"
-            >
-              <circle cx="12" cy="12" r="10" />
-            </svg>
-            <span class="text-lg">Completo</span>
+        <div class="flex flex-col gap-4 items-center">
+          <span class="text-2xl">Estatus de producción</span>
+          <div class="flex gap-5">
+            <div class="flex items-center gap-1">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="#00a63e"
+                class="w-6 h-6"
+              >
+                <circle cx="12" cy="12" r="10" />
+              </svg>
+              <span class="text-lg">Completo</span>
+            </div>
+
+            <div class="flex items-center gap-1">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="#e17100"
+                class="w-6 h-6"
+              >
+                <circle cx="12" cy="12" r="10" />
+              </svg>
+              <span class="text-lg">Bajo</span>
+            </div>
+
+            <div class="flex items-center gap-1">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="#e7000b"
+                class="w-6 h-6"
+              >
+                <circle cx="12" cy="12" r="10" />
+              </svg>
+              <span class="text-lg">Agotado</span>
+            </div>
           </div>
+        </div>
 
-          <div class="flex items-center gap-1">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="#e17100"
+        <div class="flex-none">
+          <a
+            href="/produccion"
+            class="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
+          >
+            <img
+              src="{{ url_for('static', filename='svg/arrowLeft.svg') }}"
+              alt="Volver"
               class="w-6 h-6"
-            >
-              <circle cx="12" cy="12" r="10" />
-            </svg>
-            <span class="text-lg">Bajo</span>
-          </div>
-
-          <div class="flex items-center gap-1">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="#e7000b"
-              class="w-6 h-6"
-            >
-              <circle cx="12" cy="12" r="10" />
-            </svg>
-            <span class="text-lg">Agotado</span>
-          </div>
+            />
+          </a>
         </div>
       </div>
 
-      <div class="flex-none">
-        <a
-          href="/produccion"
-          class="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
-        >
-          <img
-            src="{{ url_for('static', filename='svg/arrowLeft.svg') }}"
-            alt="Volver"
-            class="w-6 h-6"
-          />
-        </a>
+      <div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        {% for galleta in galletas %} {% include
+        "component/produccion/_galleta_card.html" %} {% endfor %}
       </div>
     </div>
-
-    <div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-8">
-      {% for produccion in producciones %} {% include
-      "component/produccion/_galleta_card.html" %} {% endfor %}
-    </div>
   </div>
+  {% if modal %} {% include"component/produccion/_modalProduccion.html" %} {%
+  endif %}
+</div>
+<!-- -->
+<div class="fixed right-10 bottom-12">
+  <form method="POST" action="{{ url_for('produccion_bp.abrir_modal') }}">
+    {{ form.csrf_token }}
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+    <button
+      class="w-20 h-20 flex items-center justify-center rounded-full shadow-lg"
+      style="background-color: #7c5454"
+    >
+      <i class="fa-solid fa-clipboard-list text-5xl text-white"></i>
+    </button>
+  </form>
 </div>
 {% endblock %}

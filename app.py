@@ -2,7 +2,7 @@ import os
 from flask import Flask, current_app, render_template, request, redirect, session, url_for
 from flask_wtf.csrf import CSRFProtect
 import base64
-from flask_login import LoginManager # type: ignore
+from flask_login import LoginManager 
 from config import *
 from models.models import *
 from flask_mail import Mail

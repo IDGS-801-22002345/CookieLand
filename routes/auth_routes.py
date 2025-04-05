@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, redirect, session, url_for, flash, request
-from flask_login import login_user, logout_user, login_required # type: ignore
+from flask_login import login_user, logout_user, login_required 
 from werkzeug.security import generate_password_hash, check_password_hash
 from forms.auth_forms import *
 from models.models import *
@@ -72,7 +72,6 @@ def login():
             flash('El correo no está registrado. Por favor, regístrate o verifica tu correo.', 'danger')
 
     return render_template('auth/login.html', form=form)
-
 
 # Cerrar sesion 
 @auth_bp.route('/logout')
