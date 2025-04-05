@@ -11,4 +11,5 @@ __pycache__/
 credentials.json
 .env
 output.css
-**/output.css
+**output.css
+logs/

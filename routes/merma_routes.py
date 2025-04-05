@@ -3,6 +3,7 @@ from models.models import Merma, db, InventarioMateria, Galleta, MateriaPrima, P
 from forms.merma_forms import MermaForm
 import traceback 
 import datetime
+from utils.decoradores import *
 
 merma_bp = Blueprint('merma_bp', __name__, url_prefix='/mk_merma')
 
@@ -21,6 +22,10 @@ def index():
     return render_template("merma/merma.html", form=create_form, mermas=mermas)
 
 @merma_bp.route("/crear", methods=['POST'])
+@registrar_accion("Agrego merma")
+@login_required
+@log_excepciones
+@role_required('admin')
 def crear():  
     create_form = MermaForm(request.form)
     

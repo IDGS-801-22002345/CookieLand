@@ -8,8 +8,8 @@ from utils.decoradores import *
 
 personal_bp = Blueprint('personal_bp', __name__, url_prefix='/')
 
-# Registro de personal interno y (tambien clientes)
-@personal_bp.route('/usuarios', methods=['GET', 'POST'])
+
+@personal_bp.route('/mk_usuarios', methods=['GET', 'POST'])
 @log_excepciones
 @login_required
 @role_required('admin')
@@ -56,12 +56,12 @@ def usuarios():
         
     return render_template('personal/usuarios.html', form=form, usuarios=usuarios)
 
-
 # Ruta para modificar un usuario
-@personal_bp.route('/modificar_usuario', methods=["GET", "POST"])
+@personal_bp.route('/mk_modificar_usuario', methods=["GET", "POST"])
 @log_excepciones
 @login_required
 @role_required('admin')
+@registrar_accion("Modifico un usuario")
 def modificar_usuario():
     form = RegistroUsuarioForm(request.form)
 
@@ -107,11 +107,12 @@ def modificar_usuario():
 @log_excepciones
 @login_required
 @role_required('admin')
+@registrar_accion("Eliminó un usuario")
 def eliminar_usuario(usuario_id):
     usuario = Usuario.query.get_or_404(usuario_id)
 
     try:
-        usuario.estatus = 0  
+        usuario.estatus = 0
         db.session.commit()
         flash(f"Usuario '{usuario.username}' desactivado correctamente.", "success")
     except Exception as e:
@@ -135,3 +136,21 @@ def ventas():
 @login_required
 def layout():
     return render_template('personal/layout.html')
+
+
+# Ruta para el dashboard
+@personal_bp.route('/mk_dashboard')  
+@log_excepciones
+@login_required
+@role_required('admin')
+def dashboard():
+    return render_template('dashboard/dashboard.html')
+
+
+# Ruta para el pedidos
+@personal_bp.route('/mk_pedidos')  
+@log_excepciones
+@login_required
+@role_required('admin')
+def pedidos():
+    return render_template('pedidos/pedidos.html')
