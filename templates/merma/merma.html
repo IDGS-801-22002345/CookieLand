@@ -28,45 +28,55 @@
             <input type="search" id="search-input" class="w-full outline-none" placeholder="Buscar merma por descripción, nombre o tipo"/>
         </div>
 
-        <!-- Contenedor de la tabla con scroll -->
-        <div class="overflow-x-auto overflow-y-auto max-h-[500px] mt-4">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <!-- Contenedor de la tabla con scroll -->
+       <div class="overflow-x-auto overflow-y-auto max-h-[500px] mt-4">
+       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
-            <table id="mermas-table" class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                <thead class="text-xs text-white uppercase sticky top-0" style="background-color: #7c5454; z-index: 10;">
-                    <tr>
-                        <th scope="col" class="px-6 py-3">Descripción</th>
-                        <th scope="col" class="px-6 py-3">Cantidad</th>
-                        <th scope="col" class="px-6 py-3">Fecha y Hora</th>
-                        <th scope="col" class="px-6 py-3">Nombre</th>
-                        <th scope="col" class="px-6 py-3">Tipo Merma</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for merma in mermas %}
-                    <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200 relative">
-                        <th scope="row" class="px-6 py-4 font-medium text-gray-900 dark:text-white">
-                            {{ merma.descripcion }}
-                        </th>
-                        <td class="px-6 py-4">{{ merma.cantidad }}</td>
-                        <td class="px-6 py-4">{{ merma.fecha }}</td>
-                        <td class="px-6 py-4">
-                            {% if merma.tipo_merma == 'insumo' and merma.inventario_materia %}
-                                {{ merma.inventario_materia.materia_prima.nombre }}
-                            {% elif merma.tipo_merma == 'galleta' and merma.produccion %}
-                                {{ merma.produccion.galleta.nombre }}
-                            {% else %}
-                                Sin nombre
-                            {% endif %}
-                        </td>
-                        
-                        
-                        <td class="px-6 py-4">{{ merma.tipo_merma }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+    <table id="mermas-table" class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+        <thead class="text-xs text-white uppercase sticky top-0" style="background-color: #7c5454; z-index: 10;">
+            <tr>
+                <th scope="col" class="px-6 py-3">Descripción</th>
+                <th scope="col" class="px-6 py-3">Cantidad</th>
+                <th scope="col" class="px-6 py-3">Fecha y Hora</th>
+                <th scope="col" class="px-6 py-3">Nombre</th>
+                <th scope="col" class="px-6 py-3">Tipo Merma</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if mermas %}  
+                {% for merma in mermas %}
+                <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200 relative">
+                    <th scope="row" class="px-6 py-4 font-medium text-gray-900 dark:text-white">
+                        {{ merma.descripcion }}
+                    </th>
+                    <td class="px-6 py-4">{{ merma.cantidad }}</td>
+                    <td class="px-6 py-4">{{ merma.fecha }}</td>
+                    <td class="px-6 py-4">
+                        {% if merma.tipo_merma == 'insumo' and merma.inventario_materia %}
+                    {{ merma.inventario_materia.materia_prima.nombre }}
+                    {% elif merma.tipo_merma == 'galleta' and merma.galleta %}
+                        {{ merma.galleta.nombre }}
+                    {% else %}
+                        Sin nombre
+                    {% endif %}
+                    </td>
+                    <td class="px-6 py-4">{{ merma.tipo_merma }}</td>
+                </tr>
+                {% endfor %}
+            {% else %}  
+                <tr>
+                    <td colspan="5" class="text-center py-8 bg-gray-50 rounded-lg">
+                        <i class="fas fa-info-circle text-gray-400 text-4xl mb-3"></i>
+                        <p class="text-gray-500">No hay mermas registradas aún</p>
+                        <p class="text-sm text-gray-400 mt-1">
+                            Agregue mermas usando el formulario
+                        </p>
+                    </td>
+                </tr>
+            {% endif %}
+        </tbody>
+    </table>
+</div>
     </div>
 </div>
 
@@ -161,12 +171,12 @@ class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 
             
                         <!-- Campo Galleta -->
                        <!-- Campo Galleta -->
-                        <div id="galleta-field" class="hidden">
-                            <label class="block mb-1 text-sm font-medium text-gray-900">
-                                {{ form.produccion_id.label.text }}
-                            </label>
-                            {{ form.produccion_id(class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500") }}
-                        </div>
+                       <div id="galleta-field" class="hidden">
+                        <label class="block mb-1 text-sm font-medium text-gray-900">
+                            {{ form.galleta_id.label.text }}
+                        </label>
+                        {{ form.galleta_id(class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500") }}
+                    </div>
 
                     </div>
                 </div>
