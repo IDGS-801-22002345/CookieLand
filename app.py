@@ -17,16 +17,13 @@ from routes.detalle_compras import detalle_compras_bp
 from routes.registro_compras_routes import registro_compras_bp
 from routes.inventario_routes import inventario_bp
 from routes.galletas_routes import galletas_bp
-<<<<<<< HEAD
 from routes.dashboard_joel_routes import dashboard_bp
-=======
 from routes.materia_prima_routes import materia_prima_bp
 from routes.merma_routes import merma_bp
 from routes.personal_routes import personal_bp
 from routes.produccion_routes import produccion_bp
 from routes.proveedor_routes import provedor_bp
 
->>>>>>> main
 
 app = Flask(__name__)
 
