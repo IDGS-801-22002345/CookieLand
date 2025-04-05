@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #FDF6EC;
+      color: #5A3E1B;
+      padding: 20px;
+    }
+    .container {
+      max-width: 600px;
+      background: #fff;
+      border: 1px solid #E0C6A5;
+      border-radius: 10px;
+      padding: 30px;
+      margin: auto;
+    }
+    .header {
+      text-align: center;
+      color: #8B5A2B;
+    }
+    .code {
+      font-size: 2em;
+      font-weight: bold;
+      color: #8B5A2B;
+      text-align: center;
+      margin: 20px 0;
+    }
+    .footer {
+      text-align: center;
+      font-size: 0.9em;
+      color: #A0522D;
+      margin-top: 30px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2 class="header">¡Bienvenido a Maicookies, {{ usuario.nombre }}!</h2>
+    <p>Gracias por registrarte. Para completar tu registro, por favor utiliza el siguiente código de verificación:</p>
+    
+    <div class="code">{{ codigo }}</div>
+
+    <p>Este código expirará en poco tiempo.</p>
+    
+    <p>Si no solicitaste esta verificación, puedes ignorar este mensaje.</p>
+
+    <div class="footer"><strong>Maicookies®</strong></div>
+  </div>
+</body>
+</html>

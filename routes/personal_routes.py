@@ -8,26 +8,27 @@ from utils.decoradores import *
 
 personal_bp = Blueprint('personal_bp', __name__, url_prefix='/')
 
-# Registro de personal interno y (tambien clientes)
-@personal_bp.route('/usuarios', methods=['GET', 'POST'])
+
+@personal_bp.route('/mk_usuarios', methods=['GET', 'POST'])
+@log_excepciones
+@login_required
 @role_required('admin')
 def usuarios():
     form = RegistroUsuarioForm()
-
     usuarios = Usuario.query.all()
 
     if form.validate_on_submit():
         if Usuario.query.filter_by(correo=form.correo.data).first():
-            flash("Este correo ya está registrado.", "danger")
+            flash("Este correo ya está registrado.", "error")
             return render_template('personal/usuarios.html', form=form, usuarios=usuarios)
 
         if Usuario.query.filter_by(username=form.username.data).first():
-            flash("Este nombre de usuario ya está registrado.", "danger")
+            flash("Este nombre de usuario ya está registrado.", "error")
             return render_template('personal/usuarios.html', form=form, usuarios=usuarios)
 
         rol = Role.query.filter_by(role_name=form.rol.data).first()
         if not rol:
-            flash("Rol no encontrado. Contacta al administrador.", "danger")
+            flash("Rol no encontrado. Contacta al administrador.", "error")
             return render_template('personal/usuarios.html', form=form, usuarios=usuarios)
 
         nuevo_usuario = Usuario(
@@ -36,6 +37,7 @@ def usuarios():
             correo=form.correo.data,
             username=form.username.data,
             estatus=1,
+            verificado=True,
             contrasenia=generate_password_hash(form.contrasenia.data),
             rol_id=rol.id 
         )
@@ -55,8 +57,11 @@ def usuarios():
     return render_template('personal/usuarios.html', form=form, usuarios=usuarios)
 
 # Ruta para modificar un usuario
-@personal_bp.route('/modificar_usuario', methods=["GET", "POST"])
+@personal_bp.route('/mk_modificar_usuario', methods=["GET", "POST"])
+@log_excepciones
+@login_required
 @role_required('admin')
+@registrar_accion("Modifico un usuario")
 def modificar_usuario():
     form = RegistroUsuarioForm(request.form)
 
@@ -99,12 +104,15 @@ def modificar_usuario():
 
 # Ruta para eliminar un usuario
 @personal_bp.route('/eliminar_usuario/<int:usuario_id>', methods=['POST'])
+@log_excepciones
+@login_required
 @role_required('admin')
+@registrar_accion("Eliminó un usuario")
 def eliminar_usuario(usuario_id):
     usuario = Usuario.query.get_or_404(usuario_id)
 
     try:
-        usuario.estatus = 0  # ← Estatus desactivado
+        usuario.estatus = 0
         db.session.commit()
         flash(f"Usuario '{usuario.username}' desactivado correctamente.", "success")
     except Exception as e:
@@ -114,33 +122,35 @@ def eliminar_usuario(usuario_id):
     return redirect(url_for('personal_bp.usuarios'))
 
 
-@personal_bp.route('/cargar_usuario', methods=['POST'])
-@role_required('admin')
-def cargar_usuario():
-    form = RegistroUsuarioForm()
-    id = request.form.get('id')
-
-    usuario = Usuario.query.get_or_404(id)
-    form.id.data = usuario.id
-    form.nombre.data = usuario.nombre
-    form.username.data = usuario.username
-    form.correo.data = usuario.correo
-    form.telefono.data = usuario.telefono
-    form.rol.data = usuario.rol.role_name if usuario.rol else ''
-    form.estatus.data = usuario.estatus
-
-    usuarios = Usuario.query.all()
-    return render_template("personal/usuarios.html", form=form, usuarios=usuarios, modificar_modal=True)
-
-
-
-
 # Ruta para la ventana de ventas
 @personal_bp.route('/ventas')
+@log_excepciones
+@role_required('admin')
+@login_required
 def ventas():
     return render_template('personal/ventas.html')
 
 # Ruta para del layout
 @personal_bp.route('/layout')
+@log_excepciones
+@login_required
 def layout():
     return render_template('personal/layout.html')
+
+
+# Ruta para el dashboard
+@personal_bp.route('/mk_dashboard')  
+@log_excepciones
+@login_required
+@role_required('admin')
+def dashboard():
+    return render_template('dashboard/dashboard.html')
+
+
+# Ruta para el pedidos
+@personal_bp.route('/mk_pedidos')  
+@log_excepciones
+@login_required
+@role_required('admin')
+def pedidos():
+    return render_template('pedidos/pedidos.html')

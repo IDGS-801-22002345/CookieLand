@@ -13,7 +13,7 @@
 </head>
 <body class="bg-[#e1d9ce] text-gray-900 flex-col min-h-screen">
 
-    {% import "cliente/_macros.html" as macros %}   
+    {% import "_macros.html" as macros %}   
     {{ macros.mostrar_flash() }}  
 
     <!-- Nav -->
@@ -57,7 +57,12 @@
                             <a href="{{ url_for('auth_bp.orders') }}" class="block px-4 py-2 text-sm text-gray-900 hover:bg-gray-200 dark:hover:bg-gray-600 dark:text-gray-100 dark:hover:text-white">Pedidos</a>
                         </li>
                         <li>
-                            <a href="{{ url_for('auth_bp.logout') }}" class="block px-4 py-2 text-sm text-gray-900 hover:bg-gray-200 dark:hover:bg-gray-600 dark:text-gray-100 dark:hover:text-white">Cerrar sesión</a>
+                            <button
+                                onclick="document.getElementById('modal-logout').classList.remove('hidden')"
+                                class="block px-4 py-2 text-sm text-gray-900 hover:bg-gray-200 dark:hover:bg-gray-600 dark:text-gray-100 dark:hover:text-white"
+                            >
+                                Cerrar sesión
+                            </button>
                         </li>
                     </ul>
                 {% else %}
@@ -108,12 +113,64 @@
     </script>
     
 
-
     <!-- Contenido de las demas paginas -->
     <main>
         {% block content %}
         {% endblock %}
     </main>
+
+    
+    <!-- Modal de Cerrar Sesión -->
+    <div
+      id="modal-logout"
+      class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60"
+    >
+      <div
+        class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8 animate-fade-in relative"
+      >
+        <div class="flex justify-center mb-4">
+          <div class="bg-red-100 text-red-600 rounded-full p-4 shadow-md">
+            <i class="fas fa-sign-out-alt text-2xl"></i>
+          </div>
+        </div>
+
+        <h2 class="text-2xl font-bold text-gray-800 text-center mb-2">
+          ¿Cerrar sesión?
+        </h2>
+        <p class="text-gray-600 text-sm text-center mb-6">
+          Confirma si deseas cerrar tu sesión actual.
+        </p>
+
+        <div class="flex justify-center gap-4">
+          <button
+            type="button"
+            onclick="cerrarLogoutModal()"
+            class="px-5 py-2 rounded-md bg-gray-200 text-gray-700 hover:bg-gray-300 transition font-medium"
+          >
+            Cancelar
+          </button>
+          <a
+            href="{{ url_for('auth_bp.logout') }}"
+            class="px-5 py-2 rounded-md bg-red-600 text-white hover:bg-red-700 transition font-medium shadow-sm"
+          >
+            Cerrar sesión
+          </a>
+        </div>
+        <button
+          type="button"
+          onclick="cerrarLogoutModal()"
+          class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 text-2xl"
+        >
+          &times;
+        </button>
+      </div>
+    </div>
+    
+    <script>
+      function cerrarLogoutModal() {
+        document.getElementById('modal-logout').classList.add('hidden');
+      }
+    </script>
 
 
     <!-- Footer -->

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Verificación - Maicookies</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/output.css') }}">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/js/all.min.js"></script>
+</head>
+<body class="bg-[#D2B48C] flex items-center justify-center min-h-screen">
+
+    <!-- Mensajes flash personalizados -->
+    {% import "_macros.html" as macros %}   
+    {{ macros.mostrar_flash() }}  
+  
+  <div class="bg-white py-12 px-12 rounded-2xl shadow-xl w-96 max-w-md mx-auto relative">
+    <a href="{{ url_for('cliente_bp.index') }}" class="absolute top-4 left-4 text-[#8B5A2B] hover:text-[#A0522D] transition-all">
+      <i class="fas fa-home text-2xl"></i>
+    </a>
+
+    <div class="text-center">
+      <i class="fas fa-key text-6xl text-[#5A3E1B]"></i>
+      <h1 class="text-3xl font-bold text-[#5A3E1B] mt-4">Verificar Cuenta</h1>
+    </div>
+
+    <p class="text-sm text-gray-600 text-center mt-2">
+      Ingresa el código de 6 dígitos que te enviamos por correo electrónico.
+    </p>
+
+    <form method="POST" class="space-y-6 mt-6">
+      {{ form.hidden_tag() }}
+
+      <!-- Estilo tipo OTP -->
+      <div class="flex justify-between gap-2 text-center">
+        {% for i in range(6) %}
+          <input type="text" maxlength="1" pattern="[0-9]" inputmode="numeric"
+                 class="w-12 h-12 border border-[#8B5A2B] rounded-lg text-center text-lg font-semibold focus:ring-2 focus:ring-[#A0522D] focus:outline-none otp-input"
+                 oninput="moveFocus(event)" />
+        {% endfor %}
+      </div>
+
+      <!-- Campo oculto real -->
+      {{ form.codigo(class="hidden", id="codigo-input") }}
+
+      <button type="submit" class="btn-custom mt-4">
+        Verificar Código
+      </button>
+
+      <div class="text-center mt-4">
+        <p class="text-sm text-gray-600">¿No recibiste el código?</p>
+        <a href="{{ url_for('auth_bp.reenviar_codigo', user_id=user_id) }}" class="link-custom">Reenviar código</a>
+      </div>
+    </form>
+  </div>
+
+  <style>
+    .btn-custom {
+        background-color: #8B5A2B;
+        color: white;
+        font-size: 1.25rem;
+        font-weight: bold;
+        padding: 10px 20px;
+        border-radius: 8px;
+        width: 100%;
+        text-align: center;
+        transition: background-color 0.3s ease-in-out, transform 0.2s ease-in-out;
+    }
+
+    .btn-custom:hover {
+        background-color: #966232;
+        transform: scale(1.03);
+    }
+
+    .btn-custom:active {
+        transform: scale(0.98);
+    }
+
+    .link-custom {
+        color: #A0522D;
+        text-decoration: underline;
+        transition: color 0.3s ease-in-out;
+    }
+
+    .link-custom:hover {
+        color: #8B5A2B;
+    }
+
+    .fa-home {
+        transition: transform 0.3s ease-in-out;
+    }
+
+    .fa-home:hover {
+        transform: scale(1.2);
+    }
+  </style>
+
+  <script>
+    function moveFocus(e) {
+      const inputs = document.querySelectorAll('.otp-input');
+      const hiddenInput = document.getElementById('codigo-input');
+      const input = e.target;
+
+      // Solo permite números
+      if (!/^[0-9]$/.test(input.value)) {
+        input.value = '';
+        return;
+      }
+
+      if (input.value.length === 1) {
+        const next = input.nextElementSibling;
+        if (next) next.focus();
+      }
+
+      hiddenInput.value = Array.from(inputs).map(i => i.value).join('');
+    }
+  </script>
+
+</body>
+</html>

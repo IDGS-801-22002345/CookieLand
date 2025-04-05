@@ -1,29 +1,26 @@
 {%macro datos(name,placeholder,type="text")%}
-<p><input name="{{name}}" type="{{type}}" placeholder="{{placeholder}}"></p>
+<p><input name="{{name}}" type="{{type}}" placeholder="{{placeholder}}" /></p>
 
-{%endmacro%}
+{%endmacro%} {%macro campoNuevo(field)%}
 
-{%macro campoNuevo(field)%}
- 
 <dd>{{field(**kwargs)|safe}}</dd>
 
 {%if field.errors%}
-<ul >
-    {% for error in field.errors %}
-        <li style="color: red;"> {{ error }}</li>
-    {% endfor %}
+<ul>
+  {% for error in field.errors %}
+  <li style="color: red">{{ error }}</li>
+  {% endfor %}
 </ul>
 {% endif %}
-
-
-
 {%endmacro%}
-{% macro mostrar_flash(exclude_modal_errors=false) %}
+
+
+    <!-- Funcion de mensajes flash -->
+{% macro mostrar_flash() %}
 {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
-        <div class="fixed top-5 right-5 z-50 space-y-4">
+        <div id="flash-container" class="fixed top-5 right-5 z-50 space-y-4"> 
             {% for category, message in messages %}
-                {% if not (exclude_modal_errors and request.args.get('modal_error')) %}
                 <div class="flex items-center p-4 mb-4 text-sm font-medium text-white rounded-lg 
                     {% if category == 'success' %} 
                         bg-green-500 
@@ -33,27 +30,36 @@
                         bg-blue-500
                     {% elif category == 'warning' %}
                         bg-yellow-500
+                    {% elif category == 'danger' %} 
+                        bg-red-500  
                     {% endif %}
                     animate__animated animate__slideInRight animate__fadeOut animate__duration-1000ms notification">
-                    
+                    {% if category == 'success' %}
+                    <i class="fas fa-check-circle text-2xl mr-3"></i>
+                    {% elif category == 'error' %}
+                        <i class="fas fa-times-circle text-2xl mr-3"></i>
+                    {% elif category == 'info' %}
+                        <i class="fas fa-info-circle text-2xl mr-3"></i>
+                    {% elif category == 'warning' %}
+                        <i class="fas fa-exclamation-triangle text-2xl mr-3"></i>
+                    {% elif category == 'danger' %} 
+                        <i class="fas fa-exclamation-circle text-2xl mr-3"></i>
+                    {% endif %}
                     <p>{{ message }}</p>
                 </div>
-                {% endif %}
             {% endfor %}
         </div>
     {% endif %}
 {% endwith %}
-
-
-  <script>
+<script>
     setTimeout(() => {
-      const flash = document.getElementById("flash-container");
-      if (flash) {
-        flash.style.opacity = "0";
-        flash.style.transition = "opacity 0.5s ease-out";
-        setTimeout(() => flash.remove(), 500);
-      }
-    }, 2500);
-  </script> 
-
+        const flash = document.getElementById("flash-container");
+        if (flash) {
+            flash.style.opacity = "0";
+            flash.style.transition = "opacity 0.5s ease-out";
+            setTimeout(() => flash.remove(), 500);
+        }
+    }, 3000);
+</script>
 {% endmacro %}
+

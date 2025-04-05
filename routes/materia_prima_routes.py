@@ -2,11 +2,15 @@ from sqlite3 import IntegrityError
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
 from forms.materia_prima_form import MateriaPrimaForm
 from models.models import MateriaPrima, InventarioMateria, db
+from utils.decoradores import *
 
 materia_prima_bp = Blueprint('materia_prima_bp', __name__, url_prefix='/')
 
 
-@materia_prima_bp.route('/materia-prima', methods=['GET', 'POST'])
+@materia_prima_bp.route('/mk_materia-prima', methods=['GET', 'POST'])
+@login_required
+@log_excepciones
+@role_required('admin')
 def index():
     create_form = MateriaPrimaForm(request.form)
     # Consulta que une materia_prima con inventario_materia
@@ -19,9 +23,11 @@ def index():
     return render_template('materia_prima/materia_prima.html', form=create_form, materia_prima=materia_prima)
 
 
-
-
-@materia_prima_bp.route("/agregar", methods=['POST'])
+@materia_prima_bp.route("/mk_agregar", methods=['POST'])
+@registrar_accion("Agrego materia prima")
+@login_required
+@log_excepciones
+@role_required('admin')
 def agregar():
     create_form = MateriaPrimaForm(request.form)
     
@@ -43,7 +49,11 @@ def agregar():
     return redirect(url_for('materia_prima_bp.index'))
 
 
-@materia_prima_bp.route('/modificar', methods=["GET", "POST"])
+@materia_prima_bp.route('/mk_modificar', methods=["GET", "POST"])
+@registrar_accion("Modifico materia prima")
+@login_required
+@log_excepciones
+@role_required('admin')
 def modificar():
     create_form = MateriaPrimaForm(request.form)
     
