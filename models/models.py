@@ -1,5 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
+import pytz
 from werkzeug.security import generate_password_hash
 import datetime
 from sqlalchemy.dialects.mysql import JSON
@@ -7,14 +8,12 @@ from sqlalchemy.dialects.mysql import JSON
 
 db = SQLAlchemy()
 
-# Tabla de Roles
 class Role(db.Model):
     __tablename__ = 'roles'
     id = db.Column(db.Integer, primary_key=True)
     role_name = db.Column(db.String(50), unique=True, nullable=False)
 
 
-# Tabla de Usuarios
 class Usuario(db.Model, UserMixin):
     __tablename__ = 'usuarios'
     id = db.Column(db.Integer, primary_key=True)
@@ -36,8 +35,43 @@ class Usuario(db.Model, UserMixin):
 
     def has_role(self, role_name):
         return self.rol and self.rol.role_name.lower() == role_name.lower()
+    
 
-# Tabla para verificar las cuentas de clientes
+class IntentosFallidos(db.Model):
+    __tablename__ = 'intentos_fallidos'
+
+    id = db.Column(db.Integer, primary_key=True)
+    correo = db.Column(db.String(100), nullable=False, unique=True)
+    intentos = db.Column(db.Integer, default=0)
+    bloqueado_hasta = db.Column(db.DateTime, nullable=True)
+    ultimo_intento = db.Column(db.DateTime, default=datetime.datetime.now(pytz.timezone("America/Mexico_City")))
+
+    def incrementar_intento(self):
+        self.intentos += 1
+        self.ultimo_intento = datetime.datetime.now(pytz.timezone("America/Mexico_City"))
+
+        if self.intentos >= 3:
+            # Bloqueo de 10 minutos
+            self.bloqueado_hasta = datetime.datetime.now(pytz.timezone("America/Mexico_City")) + datetime.timedelta(minutes=10)
+        
+        db.session.commit()
+
+    def resetear_intentos(self):
+        self.intentos = 0
+        self.bloqueado_hasta = None
+        db.session.commit()
+
+    @property
+    def esta_bloqueado(self):
+        # Asegurarse de que ambas fechas tengan la misma zona horaria (timezone-aware)
+        if self.bloqueado_hasta:
+            # Convertir la fecha de bloqueo a zona horaria local para compararla con la hora actual local
+            bloqueado_hasta_local = self.bloqueado_hasta.astimezone(pytz.timezone("America/Mexico_City"))
+            ahora = datetime.datetime.now(pytz.timezone("America/Mexico_City"))
+            return bloqueado_hasta_local > ahora
+        return False
+
+
 class CodigoVerificacion(db.Model):
     __tablename__ = 'codigos_verificacion'
     id = db.Column(db.Integer, primary_key=True)
@@ -138,6 +172,7 @@ class Produccion(db.Model):
     galleta = db.relationship('Galleta', back_populates='producciones')
     mermas = db.relationship('Merma', back_populates='produccion')
 
+
 class Merma(db.Model):
     __tablename__ = 'Merma'  
     id = db.Column(db.Integer, primary_key=True)
@@ -152,3 +187,13 @@ class Merma(db.Model):
 
     inventario_materia = db.relationship('InventarioMateria', back_populates='mermas')
     produccion = db.relationship('Produccion', back_populates='mermas')
+    
+    
+class Auditoria(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    usuario_id = db.Column(db.Integer, nullable=False)
+    accion = db.Column(db.String(255), nullable=False)
+    fecha_hora = db.Column(db.DateTime, default=datetime.datetime.now)
+    
+    def __repr__(self):
+        return f'<Auditoria {self.id} - {self.accion}>'

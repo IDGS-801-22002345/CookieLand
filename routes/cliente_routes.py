@@ -53,12 +53,15 @@ def terminosycondiciones():
 
 # Ruta de productos
 @cliente_bp.route('/productos')
+@role_required('cliente')
 @log_excepciones
 def productos():
     return render_template('cliente/productos.html')
 
 # Ruta de carrito productos
 @cliente_bp.route('/carrito_compras')
+@login_required
+@role_required('cliente')
 @log_excepciones
 def carrito_compras():
     return render_template('cliente/carrito_compras.html')

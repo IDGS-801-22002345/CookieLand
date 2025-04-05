@@ -3,7 +3,7 @@ from flask import Blueprint, Response, render_template, request, redirect, send_
 from models.models import Receta, Galleta, MateriaPrima, DetalleReceta, Produccion
 from forms.galletas_forms import GalletasForm, InsumosForm, GalletasEditForm
 from models.models import db
-
+from utils.decoradores import *
 
 galletas_bp = Blueprint('galletas_bp', __name__, url_prefix='/recetas')
 
@@ -12,6 +12,9 @@ detalles_receta=[]
 # Pagina de Recetas
 
 @galletas_bp.route("/")
+@login_required
+@log_excepciones
+@role_required('admin')
 def index():
     global detalles_receta
     detalles_receta.clear()
@@ -37,6 +40,10 @@ def form():
 
 
 @galletas_bp.route("/add_insumos", methods=["POST"])
+@registrar_accion("Agrego insumos")
+@login_required
+@log_excepciones
+@role_required('admin')
 def add_insumos():
     global detalles_receta
     insumosForm = InsumosForm(request.form)
@@ -69,6 +76,10 @@ def add_insumos():
         return redirect(url_for('galletas_bp.form'))
     
 @galletas_bp.route("/eliminar_insumo", methods=["POST"])
+@registrar_accion("Elimino insumos")
+@login_required
+@log_excepciones
+@role_required('admin')
 def eliminar_insumo():
     global detalles_receta
     insumo_id = request.form.get('insumo_id')
@@ -78,6 +89,10 @@ def eliminar_insumo():
     
 
 @galletas_bp.route("/guardar_receta", methods=["POST"])
+@registrar_accion("Guardo receta")
+@login_required
+@log_excepciones
+@role_required('admin')
 def guardar_receta():
     global detalles_receta
     print('Entro?')
@@ -140,6 +155,10 @@ def guardar_receta():
 # ------------Pagina para formulario de editar receta---------------
 
 @galletas_bp.route("/form_edit", methods=["GET", "POST"]) 
+@registrar_accion("Edito galleta")
+@login_required
+@log_excepciones
+@role_required('admin')
 def form_edit():
     global detalles_receta
     galleta_id = request.args.get('galleta_id') if request.method == 'GET' else request.form.get('galleta_id')
@@ -172,6 +191,10 @@ def form_edit():
    
 
 @galletas_bp.route("/edit_insumos", methods=["POST"])
+@registrar_accion("Edito insumos")
+@login_required
+@log_excepciones
+@role_required('admin')
 def edit_insumos():
     global detalles_receta
     insumosForm = InsumosForm(request.form)
@@ -204,6 +227,10 @@ def edit_insumos():
     return redirect(url_for('galletas_bp.index'))
 
 @galletas_bp.route("/edit_eliminar_insumo", methods=["POST"])
+@registrar_accion("Elimino insumo de la galleta")
+@login_required
+@log_excepciones
+@role_required('admin')
 def edit_eliminar_insumo():
     galleta_id = request.form.get('galleta_id') 
     global detalles_receta
@@ -214,6 +241,10 @@ def edit_eliminar_insumo():
     
     
 @galletas_bp.route("/editar_receta", methods=["POST"])
+@registrar_accion("Edito receta")
+@login_required
+@log_excepciones
+@role_required('admin')
 def editar_receta():
     global detalles_receta
     galleta_id = request.form.get('galleta_id')

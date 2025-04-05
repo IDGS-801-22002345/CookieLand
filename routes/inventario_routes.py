@@ -6,9 +6,9 @@ from utils.decoradores import *
 
 inventario_bp = Blueprint('inventario_bp', __name__, url_prefix='/')
 
-@inventario_bp.route('/inventario', methods=['GET', 'POST'])
-@log_excepciones
+@inventario_bp.route('/mk_inventario', methods=['GET', 'POST'])
 @login_required
+@log_excepciones
 @role_required('admin')
 def index():
     inventario = db.session.query(MateriaPrima).outerjoin(InventarioMateria).all()
