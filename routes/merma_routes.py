@@ -8,6 +8,9 @@ from utils.decoradores import *
 merma_bp = Blueprint('merma_bp', __name__, url_prefix='/mk_merma')
 
 @merma_bp.route("/")
+@login_required
+@log_excepciones
+@role_required('admin')
 def index():
     create_form = MermaForm(request.form)
 
@@ -21,11 +24,12 @@ def index():
 
     return render_template("merma/merma.html", form=create_form, mermas=mermas)
 
+
+@merma_bp.route("/crear", methods=['POST'])
 @registrar_accion("Agrego merma")
 @login_required
 @log_excepciones
 @role_required('admin')
-@merma_bp.route("/crear", methods=['POST'])
 def crear():
     create_form = MermaForm(request.form)
 
