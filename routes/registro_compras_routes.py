@@ -142,5 +142,3 @@ def finalizar_compra():
     
     return redirect(url_for('registro_compras_bp.compras'))
 
-
-

@@ -74,9 +74,16 @@
               {% if editar %}
                 <input type="hidden" name="galleta_id" value="{{ galleta.id }}">
               {% endif %}
+
             <div>
               {{ macro.Input(galletasForm.nombre) }}
-             
+            
+              {{ macro.campoPrecio(galletasForm.precio)}}
+              {% if editar and galleta.precio %}
+              <p class="mt-1 text-sm text-gray-500">Precio actual: <strong>${{ galleta.precio }}</strong></p>
+              <p class="mt-1 text-sm text-gray-500 pb-6">Si no desea cambiar el precio, deje el campo vacío</p>
+              
+              {% endif %}
             
               {% if editar and galleta.foto %}
               <div class="pt-2 flex flex-col justify-center items-center">
@@ -181,7 +188,4 @@
       </div>
   </div>
 </div>
-
-<script src="{{ url_for('static', filename='js/receta.js') }}"></script>
-
 {% endblock %}

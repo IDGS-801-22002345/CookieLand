@@ -1,4 +1,3 @@
-{% import "cliente/_macros.html" as macros %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -14,7 +13,10 @@
 </head>
 <body class="bg-[#D2B48C] flex items-center justify-center min-h-screen">
     
+    <!-- Mensajes flash personalizados -->
+    {% import "_macros.html" as macros %}   
     {{ macros.mostrar_flash() }}  
+    
 
 	<div class="bg-white py-12 px-12 rounded-2xl shadow-xl w-96 max-w-md mx-auto relative">
 		<a href="{{ url_for('cliente_bp.index') }}" class="absolute top-4 left-4 text-[#8B5A2B] hover:text-[#A0522D] transition-all">

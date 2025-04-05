@@ -1,0 +1,85 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<div class="flex flex-col w-full px-4 md:px-10">
+    <div class="w-full p-4 text-center bg-white border border-gray-200 rounded-lg shadow-sm">
+        <!-- Título INVENTARIO centrado -->
+        <h1 class="text-3xl font-bold text-center mb-6">Dashboard de Galletas y Ventas</h1>
+
+        <!-- Sección de Gráficas -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+            <!-- Gráfica de Ventas -->
+            <div class="bg-white p-6 rounded-lg shadow-xl">
+                <h2 class="text-xl font-semibold mb-4">Ventas Mensuales</h2>
+                <canvas id="ventasChart" class="w-full h-72"></canvas>
+            </div>
+
+            <!-- Gráfica de Galletas -->
+            <div class="bg-white p-6 rounded-lg shadow-xl">
+                <h2 class="text-xl font-semibold mb-4">Galletas Vendidas</h2>
+                <canvas id="galletasChart" class="w-full h-72"></canvas>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- Script de Chart.js -->
+<script>
+    // Datos Ficticios para Ventas Mensuales
+    var ventasData = {
+        labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio'],
+        datasets: [{
+            label: 'Ventas en USD',
+            data: [1000, 1500, 1200, 1800, 2500, 2200],
+            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+            borderColor: 'rgba(75, 192, 192, 1)',
+            borderWidth: 1
+        }]
+    };
+
+    // Gráfica de Ventas
+    var ctxVentas = document.getElementById('ventasChart').getContext('2d');
+    var ventasChart = new Chart(ctxVentas, {
+        type: 'line',  // Tipo de gráfico
+        data: ventasData,
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    // Datos Ficticios para Galletas Vendidas
+    var galletasData = {
+        labels: ['Galleta A', 'Galleta B', 'Galleta C', 'Galleta D', 'Galleta E'],
+        datasets: [{
+            label: 'Unidades Vendidas',
+            data: [200, 300, 150, 400, 500],
+            backgroundColor: 'rgba(255, 159, 64, 0.2)',
+            borderColor: 'rgba(255, 159, 64, 1)',
+            borderWidth: 1
+        }]
+    };
+
+    // Gráfica de Galletas Vendidas
+    var ctxGalletas = document.getElementById('galletasChart').getContext('2d');
+    var galletasChart = new Chart(ctxGalletas, {
+        type: 'bar',  // Tipo de gráfico
+        data: galletasData,
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+</script>
+
+{% endblock %}

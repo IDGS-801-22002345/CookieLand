@@ -12,3 +12,5 @@ credentials.json
 .env
 output.css
 **/output.css
+logs
+logs/

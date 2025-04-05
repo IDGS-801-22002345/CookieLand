@@ -20,7 +20,12 @@ def index():
     global detalles_receta
     detalles_receta.clear()
     galletasForm = GalletasForm()
-    galletas = Galleta.query.options(db.joinedload(Galleta.receta)).all()
+    galletas = Galleta.query.options(
+        db.joinedload(Galleta.receta)
+     ).order_by(
+        db.desc(Galleta.estatus), 
+        Galleta.nombre.asc()       
+     ).all()
     return render_template("recetas/recetas.html", galletas = galletas, form=galletasForm)
 
 @galletas_bp.route('/imagen/<int:galleta_id>')
@@ -32,6 +37,36 @@ def mostrar_imagen(galleta_id):
     if not galleta.foto:
         return send_from_directory('static', 'images/default-cookie.png')
     return Response(galleta.foto, mimetype='image/jpeg')  
+
+@galletas_bp.route("/estatus", methods=["POST"])
+@login_required
+@log_excepciones
+@role_required('admin')
+def estatus():
+    galleta_id = request.form.get('galleta_id')
+    
+    if not galleta_id:
+        flash('ID de galleta no proporcionado', 'error')
+        return redirect(url_for('galletas_bp.index'))
+    
+    galleta = Galleta.query.get(galleta_id)
+    
+    if not galleta:
+        flash('Galleta no encontrada', 'error')
+        return redirect(url_for('galletas_bp.index'))
+    
+    try:
+        galleta.estatus = 0 if galleta.estatus == 1 else 1
+        
+        db.session.commit()
+        estado = "activada" if galleta.estatus == 1 else "desactivada"
+        flash(f'Galleta {estado} correctamente', 'success')
+        
+    except Exception as e:
+        db.session.rollback()
+        flash('Error al actualizar el estado de la galleta', 'error')
+    
+    return redirect(url_for('galletas_bp.index'))
 
 # Pagina para formulario de agregar receta
 
@@ -47,12 +82,20 @@ def form():
 
 
 @galletas_bp.route("/add_insumos", methods=["POST"])
+@registrar_accion("Agrego insumos")
 @login_required
 @log_excepciones
 @role_required('admin')
 def add_insumos():
     global detalles_receta
     insumosForm = InsumosForm(request.form)
+
+    if  not insumosForm.validate():
+         if 'insumo' in insumosForm.errors:
+            flash('Debe seleccionar un insumo', 'error')
+         return redirect(url_for('galletas_bp.form'))
+    
+    
     if request.method == 'POST' and insumosForm.validate():
         insumo_id = insumosForm.insumo.data
         cantidad = insumosForm.cantidad.data
@@ -82,6 +125,7 @@ def add_insumos():
         return redirect(url_for('galletas_bp.form'))
     
 @galletas_bp.route("/eliminar_insumo", methods=["POST"])
+@registrar_accion("Elimino insumos")
 @login_required
 @log_excepciones
 @role_required('admin')
@@ -94,15 +138,20 @@ def eliminar_insumo():
     
 
 @galletas_bp.route("/guardar_receta", methods=["POST"])
+@registrar_accion("Guardo receta")
 @login_required
 @log_excepciones
 @role_required('admin')
 def guardar_receta():
     global detalles_receta
-    print('Entro?')
     galletasForm = GalletasForm(formdata=request.form, **request.files)
+
+    if not galletasForm.validate():
+        print(galletasForm.errors)  
+        flash('Corrija los errores en el formulario', 'warning')
     if request.method == 'POST' and galletasForm.validate():
         try:
+            
             if not detalles_receta:
                 flash('Debe agregar al menos un ingrediente', 'warning')
                 return redirect(url_for('galletas_bp.form'))
@@ -125,20 +174,17 @@ def guardar_receta():
             if galletasForm.foto.data:
                 foto_binaria = galletasForm.foto.data.read()
             
+            print(f"Precio: {galletasForm.precio.data}")
+
             nueva_galleta = Galleta(
                 nombre=galletasForm.nombre.data,
                 receta_id=nueva_receta.id,
                 foto=foto_binaria,
+                precio=galletasForm.precio.data,
+                estadoStock='Agotado',
             )
             db.session.add(nueva_galleta)
             
-            db.session.flush()  
-            nueva_produccion = Produccion(
-            galleta_id=nueva_galleta.id,
-            stock=0,
-            estadoStock='Agotado',
-            estadoProduccion='Listo',)
-            db.session.add(nueva_produccion)
         
             db.session.commit()
             detalles_receta = []
@@ -158,10 +204,11 @@ def guardar_receta():
 
 # ------------Pagina para formulario de editar receta---------------
 
-@galletas_bp.route("/form_edit", methods=["GET", "POST"]) 
+@galletas_bp.route("/form_edit", methods=["GET", "POST"])
+@registrar_accion("Edito insumo")
 @login_required
 @log_excepciones
-@role_required('admin')
+@role_required('admin') 
 def form_edit():
     global detalles_receta
     galleta_id = request.args.get('galleta_id') if request.method == 'GET' else request.form.get('galleta_id')
@@ -180,10 +227,9 @@ def form_edit():
             'cantidad': detalle.cantidad,
             'unidad': detalle.insumo.unidad
         } for detalle in galleta.receta.detalles]
-    
-    galletasForm = GalletasEditForm(nombre=galleta.nombre)
+    galletasForm = GalletasEditForm(nombre=galleta.nombre, precio=galleta.precio) 
     insumosForm = InsumosForm()
-    
+
     return render_template("recetas/formGalletas.html",
                          galletasForm=galletasForm,
                          insumosForm=insumosForm,
@@ -194,6 +240,7 @@ def form_edit():
    
 
 @galletas_bp.route("/edit_insumos", methods=["POST"])
+@registrar_accion("Edito insumos")
 @login_required
 @log_excepciones
 @role_required('admin')
@@ -229,6 +276,10 @@ def edit_insumos():
     return redirect(url_for('galletas_bp.index'))
 
 @galletas_bp.route("/edit_eliminar_insumo", methods=["POST"])
+@registrar_accion("Elimino insumo")
+@login_required
+@log_excepciones
+@role_required('admin')
 def edit_eliminar_insumo():
     galleta_id = request.form.get('galleta_id') 
     global detalles_receta
@@ -239,6 +290,7 @@ def edit_eliminar_insumo():
     
     
 @galletas_bp.route("/editar_receta", methods=["POST"])
+@registrar_accion("Edito receta")
 @login_required
 @log_excepciones
 @role_required('admin')
@@ -269,6 +321,9 @@ def editar_receta():
 
         if galletasForm.foto.data:
             galleta.foto = galletasForm.foto.data.read()
+
+        if galletasForm.precio.data:
+            galleta.precio = galletasForm.precio.data
 
         DetalleReceta.query.filter_by(receta_id=receta.id).delete()
         

@@ -16,14 +16,11 @@
   </head>
 
   <body>
-    
-    {% extends "layout.html" %} {% block content %} {% import "_macros.html" as macros %}
-  
+    {% extends "layout.html" %} {% block content %} 
     <link
       rel="stylesheet"
       href="{{ url_for('static', filename='css/output.css') }}"
     />
-    {{ macros.mostrar_flash() }}  
     <!-- Contenedor principal con margen superior -->
     <div class="flex flex-col w-full px-10">
       <!-- Botón para abrir el modal de agregar -->

@@ -18,6 +18,32 @@
 </div>
 {% endmacro %}
 
+{% macro campoPrecio(field) %}
+<div class="py-2">
+  <label for="{{ field.id }}" class="block mb-2 text-sm font-medium text-gray-900">
+    {{ field.label }}
+    <span class="text-red-500">*</span>
+  </label>
+  
+  <input
+    type="number"
+    name="{{ field.name }}"
+    id="{{ field.id }}"
+    min="1"
+    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5"
+    {% if field.flags.required %}required{% endif %}
+  >
+  
+  {% if field.errors %}
+  <ul class="mt-2">
+    {% for error in field.errors %}
+    <li class="text-sm text-red-600">{{ error }}</li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+</div>
+{% endmacro %}
+
 {% macro campoFoto(field) %}
 <div class="py-2">
   <label class="block mb-2 text-sm font-medium text-gray-900">

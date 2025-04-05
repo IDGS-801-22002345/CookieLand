@@ -1,47 +1,77 @@
 from flask import Blueprint, render_template, redirect, session, url_for, flash, request
-from flask_login import login_user, logout_user, login_required # type: ignore
+from flask_login import login_user, logout_user, login_required 
 from werkzeug.security import generate_password_hash, check_password_hash
 from forms.auth_forms import *
 from models.models import *
 from sqlalchemy.exc import IntegrityError
 from utils.decoradores import *
-from flask_mail import Message 
-from datetime import datetime, timedelta
+from flask_mail import Message # type: ignore
+import random
+from datetime import datetime, timedelta  
 import pytz
 
 auth_bp = Blueprint('auth_bp', __name__, url_prefix='/auth')
 
 
-# Login
 @auth_bp.route('/login', methods=['GET', 'POST'])
 @log_excepciones
 @anonymous_required
 def login():
     form = LoginForm()
-    if form.validate_on_submit():
-        user = Usuario.query.filter_by(correo=form.email.data).first()
-        if user and check_password_hash(user.contrasenia, form.password.data):
-            if not user.verificado:
-                enviar_codigo_verificacion(user)
-                flash('Tu cuenta aún no está verificada. Te hemos reenviado un nuevo código.', 'warning')
-                return redirect(url_for('auth_bp.verificar_codigo', user_id=user.id))
-            if user.estatus == 0:
-                flash('Tu cuenta está desactivada. Contacta al administrador.', 'warning')
-                return redirect(url_for('auth_bp.login'))
-           
-            login_user(user)
-            mexico_tz = pytz.timezone("America/Mexico_City")
-            user.last_login = datetime.now(mexico_tz)
-            db.session.commit()
-            flash('¡Inicio de sesión exitoso!', 'success')
-            if user.has_role('admin'):
-                return redirect(url_for('inventario_bp.index'))
-            elif user.has_role('cliente'):
-                return redirect(url_for('cliente_bp.index'))
-        else:
-            flash('Las credenciales son incorrectas', 'danger')
-    return render_template('auth/login.html', form=form)
 
+    if form.validate_on_submit():
+        correo = form.email.data.lower()  
+        user = Usuario.query.filter_by(correo=correo).first()
+
+        if user:
+            intentos = IntentosFallidos.query.filter_by(correo=correo).first()
+            if not intentos:
+                intentos = IntentosFallidos(correo=correo)
+                db.session.add(intentos)
+                db.session.commit()
+
+            if intentos.esta_bloqueado:
+                tiempo_restante = intentos.bloqueado_hasta - datetime.now(pytz.timezone("America/Mexico_City"))
+                minutos = int(tiempo_restante.total_seconds() // 60)
+                flash(f'Cuenta bloqueada por demasiados intentos fallidos. Intente nuevamente en {minutos} minutos.', 'danger')
+                return redirect(url_for('auth_bp.login'))  
+
+            if check_password_hash(user.contrasenia, form.password.data):
+
+                if not user.verificado:
+                    enviar_codigo_verificacion(user)
+                    flash('Tu cuenta aún no está verificada. Te hemos reenviado un nuevo código.', 'warning')
+                    return redirect(url_for('auth_bp.verificar_codigo', user_id=user.id))
+
+                if user.estatus == 0:
+                    flash('Tu cuenta está desactivada. Contacta al administrador.', 'warning')
+                    return redirect(url_for('auth_bp.login'))
+
+                intentos.resetear_intentos()
+                login_user(user)
+                user.last_login = datetime.now(pytz.timezone("America/Mexico_City"))
+                db.session.commit()
+
+                flash('¡Inicio de sesión exitoso!', 'success')
+
+                if user.has_role('admin'):
+                    # Redirecion al dashboard
+                    return redirect(url_for('personal_bp.dashboard'))
+                return redirect(url_for('cliente_bp.index'))
+
+            else:
+                intentos.incrementar_intento()
+                
+                if intentos.intentos >= 3:
+                    flash('USUARIO BLOQUEADO: Demasiados intentos fallidos. Cuenta bloqueada por 10 minutos.', 'danger')
+                else:
+                    intentos_restantes = 3 - intentos.intentos
+                    flash(f'Contraseña incorrecta. Te quedan {intentos_restantes} intento(s).', 'warning')
+
+        else:
+            flash('El correo no está registrado. Por favor, regístrate o verifica tu correo.', 'danger')
+
+    return render_template('auth/login.html', form=form)
 
 # Cerrar sesion 
 @auth_bp.route('/logout')
@@ -55,7 +85,7 @@ def logout():
 
 
 # Registrar usuario (solamente cliente)
-@auth_bp.route('/register', methods=['GET', 'POST'])
+@auth_bp.route('/mk_register', methods=['GET', 'POST'])
 @log_excepciones
 @anonymous_required
 def register_landing():
@@ -166,7 +196,7 @@ def reenviar_codigo(user_id):
 
 
 # Datos personales del cliente
-@auth_bp.route('/profile')
+@auth_bp.route('/mk_profile')
 @log_excepciones
 @role_required('cliente')
 def profile():
@@ -174,7 +204,7 @@ def profile():
 
 
 # Pedidos del cliente
-@auth_bp.route('/orders')
+@auth_bp.route('/mk_orders')
 @log_excepciones
 @role_required('cliente')
 def orders():
@@ -182,7 +212,7 @@ def orders():
 
 
 # Restablecer contraseña
-@auth_bp.route('/reset_password')
+@auth_bp.route('/mk_reset_password')
 @log_excepciones
 def resetpassword():
     return render_template('auth/resetpassword.html')

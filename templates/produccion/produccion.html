@@ -30,7 +30,7 @@
     <!-- Contenedor de la tabla con scroll -->
 
     <div class="overflow-x-auto overflow-y-auto max-h-[500px] mt-4">
-      {% if producciones %}
+      {% if galletas %}
 
       <table
         id="recetas-table"
@@ -41,27 +41,54 @@
           style="background-color: #7c5454; z-index: 10"
         >
           <tr>
+            <th scope="col" class="px-6 py-3">Imagen</th>
             <th scope="col" class="px-6 py-3">Galleta</th>
             <th scope="col" class="px-6 py-3">Cantidad</th>
             <th scope="col" class="px-6 py-3">Estatus</th>
-            <th scope="col" class="px-6 py-3">Proceso</th>
           </tr>
         </thead>
         <tbody>
-          {% for produccion in producciones %}
+          {% for galleta in galletas %}
           <tr class="bg-white border-b">
+            <td class="px-6 py-4">
+              {% if galleta.foto %}
+              <img
+                src="{{ url_for('produccion_bp.mostrar_imagen', galleta_id=galleta.id) }}"
+                class="h-20"
+                alt="{{ galleta.nombre }}"
+              />
+              {% else %}
+              <div class="text-center py-4 bg-light">
+                <i class="fas fa-cookie fa-3x text-secondary"></i>
+                <p class="mt-2">Sin imagen</p>
+              </div>
+              {% endif %}
+            </td>
             <th scope="row" class="px-6 py-4 font-medium text-gray-900">
-              {{ produccion.galleta.nombre }}
+              {{ galleta.nombre }}
             </th>
             <th scope="row" class="px-6 py-4 font-medium text-gray-900">
-              {{ produccion.stock }}
+              {{ galleta.stock }}
             </th>
             <!-- Columna Estatus -->
             <th scope="row" class="px-6 py-4 font-medium text-gray-900">
-              {{ produccion.estadoStock }}
-            </th>
-            <th scope="row" class="px-6 py-4 font-medium text-gray-900">
-              {{ produccion.estadoProduccion }}
+              {% if galleta.estadoStock == 'Completo' %}
+              <span
+                class="rounded-full bg-green-600 text-white px-2 py-1 font-medium pr-2 pb-2"
+                >{{ galleta.estadoStock }}</span
+              >
+              {% elif galleta.estadoStock == 'Bajo' %}
+              <span
+                class="rounded-full text-white px-2 py-1 font-medium pr-2 pb-2"
+                style="background-color: #e17100"
+                >{{ galleta.estadoStock }}</span
+              >
+              {% else %}
+              <span
+                class="rounded-full bg-red-600 text-white px-2 py-2 font-medium pr-2 pb-2"
+                >{{ galleta.estadoStock }}</span
+              >
+              {% endif %}
             </th>
           </tr>
           {% endfor %}
