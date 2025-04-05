@@ -2,63 +2,59 @@
 {% block title %}Contacto - Maicookies{% endblock %}
 {% block content %}
 
-    <div class="text-center mt-10">
-        <h1 class="text-4xl font-extrabold text-center text-[#5A3E1B] mb-6">Contacto</h1>
+<!-- Contenedor principal con fondo blanco y padding -->
+<div class="bg-white min-h-screen px-4 sm:px-10 py-10">
+
+    <!-- Título -->
+    <div class="text-center mb-10">
+        <h1 class="text-4xl font-extrabold text-[#5A3E1B]">Contacto</h1>
     </div>
 
+    <!-- Sección principal -->
     <section class="text-dark body-font relative">
-        <div class="container px-5 py-10 mx-auto flex sm:flex-nowrap flex-wrap">
-            <div class="lg:w-2/3 md:w-1/2 rounded-lg overflow-hidden sm:mr-10 p-10 flex items-end justify-start relative shadow-md">
+        <div class="container mx-auto flex sm:flex-nowrap flex-wrap">
+            <!-- Mapa -->
+            <div class="lg:w-2/3 md:w-1/2 rounded-lg overflow-hidden sm:mr-10 p-10 flex items-end justify-start relative shadow-md h-[550px]">
                 <iframe width="100%" height="100%" class="absolute inset-0" frameborder="0" title="Mapa" marginheight="0"
                     marginwidth="0" scrolling="no"
-                    src="https://www.google.com/maps/embed?pb=!1m17!1m12!1m3!1d3721.0041030828875!2d-101.695145!3d21.152234999999997!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m2!1m1!2zMjHCsDA5JzA4LjEiTiAxMDHCsDQxJzQyLjUiVw!5e0!3m2!1ses-419!2smx!4v1742704162946!5m2!1ses-419!2smx"></iframe>
+                    src="https://www.google.com/maps/embed?pb=!1m17!1m12!1m3!1d3721.0041030828875!2d-101.695145!3d21.152234999999997!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m2!1m1!2zMjHCsDA5JzA4LjEiTiAxMDHCsDQxJzQyLjUiVw!5e0!3m2!1ses-419!2smx!4v1742704162946!5m2!1ses-419!2smx">
+                </iframe>
             </div>
-            <div class="lg:w-1/3 md:w-1/2 bg-white flex flex-col md:ml-auto w-full md:py-8 mt-8 md:mt-0 shadow-md rounded-lg p-8 font-light text-dark">
-                <h2 class="text-gray-900 text-2xl mb-4 font-bold title-font">Envíanos un mensaje</h2>
-                <p class="leading-relaxed mb-5 text-dark">Tu opinión es muy importante para nosotros. Escríbenos y te responderemos pronto.</p>
 
-                <form action="https://fabform.io/f/{form-id}" method="post">
-                    <div class="relative mb-4">
-                        <label for="name" class="leading-7 text-sm text-dark">Nombre</label>
-                        <input type="text" id="name" name="name" required
-                            class="w-full  rounded border border-gray-300 text-base outline-none text-dark py-2 px-4 transition-colors duration-200 ease-in-out">
-                    </div>
-                    <div class="relative mb-4">
-                        <label for="email" class="leading-7 text-sm text-dark">Correo electrónico</label>
-                        <input type="email" id="email" name="email" required
-                            class="w-full  rounded border border-gray-300  text-base outline-none text-dark py-2 px-4 transition-colors duration-200 ease-in-out">
-                    </div>
-                    <div class="relative mb-4">
-                        <label for="message" class="leading-7 text-sm text-dark">Mensaje</label>
-                        <textarea id="message" name="message" required
-                            class="w-full rounded border border-gray-300 text-base outline-none text-dark py-2 px-4 resize-none transition-colors duration-200 ease-in-out"></textarea>
-                    </div>
-                    <button type="submit" class="btn-contacto">
-                        Enviar
-                    </button>                
-                </form>
+            <!-- dirección -->
+            <div class="lg:w-1/3 md:w-1/2 bg-white flex flex-col md:ml-auto w-full md:py-8 mt-8 md:mt-0 shadow-md rounded-lg p-8 font-light text-dark h-[550px]">
+                <h2 class="text-gray-900 text-2xl mb-4 font-bold title-font">Nuestra Sucursal</h2>
+                <p class="leading-relaxed text-lg mb-3">
+                    📍 <span class="font-medium">Dirección:</span><br>
+                    Av. Panorama 822,<br>
+                    Valle del Campestre,<br>
+                    37150 León de los Aldama, Gto.
+                </p>
+                <p class="text-sm text-gray-600 mt-4">
+                    Te esperamos con las mejores galletas 🍪✨
+                </p>
             </div>
         </div>
-        <div class="mt-10"></div>
     </section>
+</div>
 
-    <style>
-        .btn-contacto {
-            padding: 0.75rem 1.5rem;
-            background-color: #A0522D;
-            color: white;
-            font-size: 1.125rem;
-            font-weight: 600; 
-            border: none;
-            border-radius: 0.5rem; 
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            cursor: pointer;
-        }
-        
-        .btn-contacto:hover {
-            background-color: #EC9704; 
-        }
-        
-    </style>
+<!-- Botón personalizado -->
+<style>
+    .btn-contacto {
+        padding: 0.75rem 1.5rem;
+        background-color: #A0522D;
+        color: white;
+        font-size: 1.125rem;
+        font-weight: 600; 
+        border: none;
+        border-radius: 0.5rem; 
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        cursor: pointer;
+    }
+
+    .btn-contacto:hover {
+        background-color: #EC9704; 
+    }
+</style>
 
 {% endblock %}
