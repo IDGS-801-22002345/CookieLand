@@ -151,7 +151,8 @@ class Galleta(db.Model):
     __tablename__ = 'galletas'
     id = db.Column(db.Integer, primary_key=True)
     nombre = db.Column(db.String(255), unique=True, nullable=False)
-    foto = db.Column(db.LargeBinary(length=16777215), nullable=False)  
+    foto = db.Column(db.LargeBinary(length=16777215), nullable=False) 
+    precio = db.Column(db.Float, nullable=False) 
     receta_id = db.Column(db.Integer, db.ForeignKey('recetas.id'))
     estatus = db.Column(db.Integer, default=1)
     stock = db.Column(db.Integer, nullable=False, default=0)
