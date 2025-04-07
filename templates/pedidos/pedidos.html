@@ -3,73 +3,67 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/output.css') }}">
 
 <div class="flex flex-col w-full px-4 md:px-10">
-    <div
-      class="w-full p-4 text-center bg-white border border-gray-200 rounded-lg shadow-sm"
-    >
-    <div class="flex items-center justify-between mb-6">
-        <div>
-           
+    <div class="w-full p-4 text-center bg-white border border-gray-200 rounded-lg shadow-sm">
+        <!-- Título alineado a la izquierd -->
+        <div class="flex justify-between pb-5">
+            <div>
+                <h1 class="text-4xl font-medium text-gray-800">Pedidos</h1>
+            </div>
         </div>
-        <h1 class="text-4xl font-extrabold text-center text-[#5A3E1B] flex-1">Pedidos</h1>
-    </div>
-    <div class="bg-white text-lg shadow-md rounded-xl overflow-x-auto mt-10">
-        <table class="w-full text-left table-auto border-collapse mb-4 font-light text-dark text-lg dark:text-dark">
-            <thead class="bg-[#5A3E1B] text-white text-sm uppercase">
-                <tr>
-                    <th class="px-6 py-4"># Orden</th>
-                    <th class="px-6 py-4">Fecha Pedido</th>
-                    <th class="px-6 py-4">Fecha Recoger</th>
-                    <th class="px-6 py-4">Hora Recoger</th>
-                     
-                    <th class="px-6 py-4">Estatus</th>
-                    <th class="px-6 py-4">Más detalles</th>
-                </tr>
-            </thead>
-            <tbody class="text-gray-700 text-sm">
-                <tr class="border-b hover:bg-[#ececec]">
-                    <td class="px-6 py-4 font-semibold">#00125</td>
-                    <td class="px-6 py-4">21/03/2025</td>
-                    <td class="px-6 py-4">23/03/2025</td>
-                    <td class="px-6 py-4">11:00 AM</td>
-                    
-                    <td class="px-6 py-4 text-green-600 font-semibold">Listo para recoger</td>
-                    <td class="px-6 py-4">
-                        <a href="#" class="text-[#5A3E1B] ml-4">
-                            <i class="fas fa-cookie-bite text-2xl"></i>
-                        </a>
-                    </td>
-                </tr>
-                <tr class="border-b hover:bg-[#ececec]">
-                    <td class="px-6 py-4 font-semibold">#00124</td>
-                    <td class="px-6 py-4">20/03/2025</td>
-                    <td class="px-6 py-4">22/03/2025</td>
-                    <td class="px-6 py-4">10:30 AM</td>
-                    
-                    <td class="px-6 py-4 text-yellow-600 font-semibold">En proceso</td>
-                    <td class="px-6 py-4">
-                        <a href="#" class="text-[#5A3E1B] ml-4">
-                            <i class="fas fa-cookie-bite text-2xl"></i>
-                        </a>
-                    </td>
-                </tr>
-                <tr class="hover:bg-[#ececec]">
-                    <td class="px-6 py-4 font-semibold">#00123</td>
-                    <td class="px-6 py-4">15/03/2025</td>
-                    <td class="px-6 py-4">17/03/2025</td>
-                    <td class="px-6 py-4">01:00 PM</td>
-                    
-                    <td class="px-6 py-4 text-red-600 font-semibold">Finalizado</td>
-                    <td class="px-6 py-4">
-                        <a href="#" class="text-[#5A3E1B] ml-4">
-                            <i class="fas fa-cookie-bite text-2xl"></i>
-                        </a>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
 
-<!-- Incluye Flowbite JS -->
+        <!-- Tabla -->
+        <div class="overflow-x-auto overflow-y-auto max-h-[500px] mt-4">
+            <table class="w-full text-sm text-left text-gray-500">
+                <thead class="text-xs text-white uppercase sticky top-0" style="background-color: #7c5454 !important; z-index: 10;">
+                    <tr>
+                        <th scope="col" class="px-6 py-3"># Orden</th>
+                        <th scope="col" class="px-6 py-3">Fecha Pedido</th>
+                        <th scope="col" class="px-6 py-3">Fecha Recoger</th>
+                        <th scope="col" class="px-6 py-3">Hora Recoger</th>
+                        <th scope="col" class="px-6 py-3">Estatus</th>
+                        <th scope="col" class="px-6 py-3 text-center align-middle">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if pedidos %}
+                        {% for pedido in pedidos %}
+                        <tr class="bg-white border-b border-gray-200 hover:bg-gray-50">
+                            <td class="px-6 py-4 font-medium text-gray-900">{{ pedido.numero_orden }}</td>
+                            <td class="px-6 py-4">{{ pedido.fecha_pedido }}</td>
+                            <td class="px-6 py-4">{{ pedido.fecha_recoger }}</td>
+                            <td class="px-6 py-4">{{ pedido.hora_recoger }}</td>
+                            <td class="px-6 py-4">
+                                {% if pedido.estatus == 'Listo' %}
+                                    <span class="text-green-600 font-medium">Listo para recoger</span>
+                                {% elif pedido.estatus == 'Proceso' %}
+                                    <span class="text-yellow-600 font-medium">En proceso</span>
+                                {% else %}
+                                    <span class="text-red-600 font-medium">Finalizado</span>
+                                {% endif %}
+                            </td>
+                            <td class="px-6 py-4 text-center">
+                                <a href="#" class="text-yellow-500 hover:text-yellow-600 text-lg px-3 py-1 rounded">
+                                    <i class="fas fa-cookie-bite"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}  
+                        <tr>
+                            <td colspan="6" class="text-center py-8 bg-gray-50">
+                                <i class="fas fa-info-circle text-gray-400 text-4xl mb-3"></i>
+                                <p class="text-gray-500">No hay pedidos registrados aún</p>
+                                <p class="text-sm text-gray-400 mt-1">
+                                    Los pedidos aparecerán aquí cuando sean creados
+                                </p>
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
-
 {% endblock %}

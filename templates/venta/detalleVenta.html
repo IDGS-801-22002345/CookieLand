@@ -20,7 +20,7 @@
 
     <div class="overflow-x-auto overflow-y-auto max-h-[500px] mt-4">
       {% if ventas %}
-      <table class="w-full text-sm text-left rtl:text-right text-gray-500">
+      <table id="ventas-table" class="w-full text-sm text-left rtl:text-right text-gray-500">
         <thead
           style="background-color: #7c5454"
           class="text-xs text-white uppercase sticky top-0"
@@ -69,6 +69,46 @@
     </div>
   </div>
 </div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+      const searchInput = document.getElementById("search-input");
+      const table = document.getElementById("ventas-table");
+      
+      // Validación más robusta
+      if (!searchInput || !table) {
+          console.error("Elementos del buscador no encontrados");
+          return;
+      }
+      
+      const tbody = table.querySelector("tbody");
+      
+      // Si no hay tbody o no hay ventas, deshabilitar el buscador
+      if (!tbody || tbody.querySelector("tr") === null) {
+          searchInput.disabled = true;
+          searchInput.placeholder = "No hay datos para buscar";
+          return;
+      }
+      
+      searchInput.addEventListener("input", function () {
+          const searchText = this.value.trim().toLowerCase();
+          const rows = tbody.querySelectorAll("tr");
+          
+          rows.forEach(row => {
+              const cells = row.querySelectorAll("td");
+              let found = false;
+              
+              cells.forEach(cell => {
+                  if (cell.textContent.toLowerCase().includes(searchText)) {
+                      found = true;
+                  }
+              });
+              
+              row.style.display = found ? "" : "none";
+          });
+      });
+  });
+  </script>
 
 <!-- Incluye Flowbite JS -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>

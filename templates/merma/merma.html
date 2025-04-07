@@ -51,7 +51,7 @@
                         {{ merma.descripcion }}
                     </th>
                     <td class="px-6 py-4">{{ merma.cantidad }}</td>
-                    <td class="px-6 py-4">{{ merma.fecha }}</td>
+                    <td class="px-6 py-4">{{ merma.fecha.strftime('%d/%m/%Y %H:%M') }}</td>
                     <td class="px-6 py-4">
                         {% if merma.tipo_merma == 'insumo' and merma.inventario_materia %}
                     {{ merma.inventario_materia.materia_prima.nombre }}

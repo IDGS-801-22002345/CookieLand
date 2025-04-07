@@ -19,7 +19,7 @@
           <div class="relative">
             <input
               type="text"
-              id="buscar-galleta"
+              id="search-input"
               placeholder="Buscar galleta..."
               class="w-full p-2 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none"
             />
@@ -216,7 +216,25 @@
 </div>
 
 <script>
-  document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", function () {
+    const searchInput = document.getElementById("search-input");
+    
+    if (searchInput) {
+        searchInput.addEventListener("input", function () {
+            const searchText = this.value.toLowerCase();
+            const galletasContainer = document.querySelector('.grid.grid-cols-2.md\\:grid-cols-2.lg\\:grid-cols-3');
+            
+            if (galletasContainer) {
+                const galletasCards = galletasContainer.children;
+                
+                Array.from(galletasCards).forEach(card => {
+                    const cardText = card.textContent.toLowerCase();
+                    card.style.display = cardText.includes(searchText) ? "block" : "none";
+                });
+            }
+        });
+    }
+
     const montoRecibido = document.getElementById("monto-recibido");
     const montoCambio = document.getElementById("monto-cambio");
     const totalVenta = parseFloat("{{ total|default(0) }}");
@@ -224,32 +242,31 @@
     const btnPagar = document.getElementById("btn-pagar");
 
     function calcularCambio() {
-      const recibido = parseFloat(montoRecibido.value) || 0;
-      const cambio = recibido - totalVenta;
+        const recibido = parseFloat(montoRecibido.value) || 0;
+        const cambio = recibido - totalVenta;
 
-      if (cambio >= 0) {
-        montoCambio.textContent = "$" + cambio.toFixed(2);
-        montoCambio.classList.remove("text-red-600");
-        montoCambio.classList.add("text-green-600");
-        btnPagar.classList.remove("hidden");
-        leyendaPago.classList.add("hidden");
-
-      } else {
-        montoCambio.textContent = "-$" + Math.abs(cambio).toFixed(2);
-        montoCambio.classList.remove("text-green-600");
-        montoCambio.classList.add("text-red-600");
-        btnPagar.classList.add("hidden");
-        leyendaPago.classList.remove("hidden");
-
-      }
+        if (cambio >= 0) {
+            montoCambio.textContent = "$" + cambio.toFixed(2);
+            montoCambio.classList.remove("text-red-600");
+            montoCambio.classList.add("text-green-600");
+            btnPagar.classList.remove("hidden");
+            leyendaPago.classList.add("hidden");
+        } else {
+            montoCambio.textContent = "-$" + Math.abs(cambio).toFixed(2);
+            montoCambio.classList.remove("text-green-600");
+            montoCambio.classList.add("text-red-600");
+            btnPagar.classList.add("hidden");
+            leyendaPago.classList.remove("hidden");
+        }
     }
 
-    if (montoRecibido.value) {
-      calcularCambio();
+    if (montoRecibido) {
+        montoRecibido.addEventListener("input", calcularCambio);
+        if (montoRecibido.value) {
+            calcularCambio();
+        }
     }
-
-    montoRecibido?.addEventListener("input", calcularCambio);
-  });
+});
 </script>
 
 {% endblock %}
