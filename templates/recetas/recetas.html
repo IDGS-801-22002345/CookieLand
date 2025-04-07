@@ -1,8 +1,7 @@
-{% extends "layout.html" %} {% block content %}
+{% extends "layout.html" %} 
+{% block content %}
 <div class="flex flex-col w-full px-10">
-  <div
-    class="w-full p-4 text-center border border-gray-300 rounded-lg shadow-sm"
-  >
+  <div class="w-full p-4 text-center border border-gray-300 rounded-lg shadow-sm">
     <div class="flex justify-between pb-5">
       <div>
         <h1 class="text-4xl font-medium text-gray-800">Recetas</h1>
@@ -22,22 +21,14 @@
         id="search-input"
         class="w-full outline-none"
         placeholder="Buscar receta"
+        {% if not galletas %}disabled{% endif %}
       />
     </div>
 
-    <!-- Contenedor de la tabla con scroll -->
-
     <div class="overflow-x-auto overflow-y-auto max-h-[500px] mt-4">
       {% if galletas %}
-
-      <table
-        id="recetas-table"
-        class="w-full text-sm text-left rtl:text-right text-gray-500"
-      >
-        <thead
-          class="text-xs text-white uppercase sticky top-0"
-          style="background-color: #7c5454; z-index: 10"
-        >
+      <table id="recetas-table" class="w-full text-sm text-left rtl:text-right text-gray-500">
+        <thead class="text-xs text-white uppercase sticky top-0" style="background-color: #7c5454; z-index: 10">
           <tr>
             <th scope="col" class="px-6 py-3">Imagen</th>
             <th scope="col" class="px-6 py-3">Nombre</th>
@@ -45,7 +36,7 @@
             <th scope="col" class="px-6 py-3 text-center">Acciones</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody id="recetas-body">
           {% for galleta in galletas %}
           <tr class="bg-white border-b">
             <td class="px-6 py-4">
@@ -66,7 +57,6 @@
               {{ galleta.receta.nombre }}
             </th>
 
-            <!-- Columna Estatus -->
             <td class="px-6 py-4">
               <div class="flex items-center gap-2">
                 {% if galleta.estatus == 1 %}
@@ -79,15 +69,8 @@
 
             <td class="px-6 py-4">
               <div class="flex justify-center space-x-2">
-                <form
-                  method="POST"
-                  action="{{ url_for('galletas_bp.estatus') }}"
-                >
-                  <input
-                    type="hidden"
-                    name="galleta_id"
-                    value="{{ galleta.id }}"
-                  />
+                <form method="POST" action="{{ url_for('galletas_bp.estatus') }}">
+                  <input type="hidden" name="galleta_id" value="{{ galleta.id }}" />
                   {{ form.csrf_token }}
                   <button
                     type="submit"
@@ -96,33 +79,12 @@
                     <i class="fas fa-power-off"></i>
                   </button>
                 </form>
-                <form
-                  method="POST"
-                  action="{{ url_for('galletas_bp.form_edit') }}"
-                >
+                <form method="POST" action="{{ url_for('galletas_bp.form_edit') }}">
                   {{ form.csrf_token }}
-                  <input
-                    type="hidden"
-                    name="galleta_id"
-                    value="{{ galleta.id }}"
-                  />
-                  <button
-                    class="p-2 rounded-full bg-yellow-500 hover:bg-yellow-600 text-white focus:outline-none"
-                  >
-                    <svg
-                      class="w-5 h-5"
-                      aria-hidden="true"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        stroke="currentColor"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="m14.304 4.844 2.852 2.852M7 7H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-4.5m2.409-9.91a2.017 2.017 0 0 1 0 2.853l-6.844 6.844L8 14l.713-3.565 6.844-6.844a2.015 2.015 0 0 1 2.852 0Z"
-                      />
+                  <input type="hidden" name="galleta_id" value="{{ galleta.id }}" />
+                  <button class="p-2 rounded-full bg-yellow-500 hover:bg-yellow-600 text-white focus:outline-none">
+                    <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m14.304 4.844 2.852 2.852M7 7H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-4.5m2.409-9.91a2.017 2.017 0 0 1 0 2.853l-6.844 6.844L8 14l.713-3.565 6.844-6.844a2.015 2.015 0 0 1 2.852 0Z"/>
                     </svg>
                   </button>
                 </form>
@@ -131,13 +93,23 @@
           </tr>
           {% endfor %}
         </tbody>
+        <!-- Mensaje cuando no hay resultados de búsqueda -->
+        <tbody id="no-results" style="display: none;">
+          <tr>
+            <td colspan="4" class="text-center py-8 bg-gray-50">
+              <i class="fas fa-search-minus text-gray-400 text-4xl mb-3"></i>
+              <p class="text-gray-500">No se encontraron recetas</p>
+              <p class="text-sm text-gray-400 mt-1">Intenta con otro término de búsqueda</p>
+            </td>
+          </tr>
+        </tbody>
       </table>
       {% else %}
       <div class="text-center py-8 bg-gray-50 rounded-lg">
         <i class="fas fa-info-circle text-gray-400 text-4xl mb-3"></i>
-        <p class="text-gray-500">No hay recetas agregados aún</p>
+        <p class="text-gray-500">No hay recetas agregadas aún</p>
         <p class="text-sm text-gray-400 mt-1">
-          Agregue rectas usando el formulario
+          Agregue recetas usando el formulario
         </p>
       </div>
       {% endif %}
@@ -146,34 +118,50 @@
 </div>
 
 <script>
-
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", function() {
     const searchInput = document.getElementById("search-input");
-    const table = document.getElementById("recetas-table");
-    const tbody = table.querySelector("tbody");
-    
-    searchInput.addEventListener("input", function () {
-        const searchText = this.value.toLowerCase();
-        const rows = tbody.getElementsByTagName("tr"); 
+    const recetasTable = document.getElementById("recetas-table");
+    const recetasBody = document.getElementById("recetas-body");
+    const noResults = document.getElementById("no-results");
 
-        Array.from(rows).forEach(row => {
-            const cells = row.querySelectorAll("th, td"); 
-            let found = false;
+    if (searchInput && recetasTable) {
+        searchInput.addEventListener("input", function() {
+            const searchTerm = this.value.toLowerCase();
+            const rows = recetasBody.getElementsByTagName("tr");
+            let hasResults = false;
 
-            cells.forEach(cell => {
-                const cellText = cell.textContent.toLowerCase();
-                if (cellText.includes(searchText)) {
-                    found = true;
+            for (let row of rows) {
+                const cells = row.querySelectorAll("th, td");
+                let rowMatches = false;
+                
+                // Buscar solo en las columnas de nombre y estatus (excluyendo imagen y acciones)
+                for (let i = 1; i < cells.length - 1; i++) {
+                    if (cells[i].textContent.toLowerCase().includes(searchTerm)) {
+                        rowMatches = true;
+                        break;
+                    }
                 }
-            });
 
-            row.style.display = found ? "" : "none";
+                if (rowMatches) {
+                    row.style.display = "";
+                    hasResults = true;
+                } else {
+                    row.style.display = "none";
+                }
+            }
+
+            // Mostrar mensaje si no hay resultados
+            if (!hasResults && searchTerm.length > 0) {
+                noResults.style.display = "";
+                recetasBody.style.display = "none";
+            } else {
+                noResults.style.display = "none";
+                recetasBody.style.display = "";
+            }
         });
-    });
+    }
 });
 </script>
 
-<!-- Incluye Flowbite JS -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
-
 {% endblock %}

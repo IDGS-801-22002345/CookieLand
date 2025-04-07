@@ -20,14 +20,15 @@
                     type="search" 
                     id="search-input" 
                     class="w-full outline-none" 
-                    placeholder="Buscar en detalles de compra">
+                    placeholder="Buscar por ID, producto o proveedor"
+                    {% if not compras %}disabled{% endif %}>
             </div>
         </div>
 
         <!-- Tabla  -->
         <div class="overflow-x-auto overflow-y-auto max-h-[500px] mt-4">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            <table id="materia-prima-table" class="w-full text-sm text-left text-gray-500">
+            <table id="compras-table" class="w-full text-sm text-left text-gray-500">
                 <thead class="text-xs text-white uppercase sticky top-0" style="background-color: #7c5454 !important; z-index: 10;">
                     <tr>
                         <th class="px-6 py-3">No. Compra</th>
@@ -38,7 +39,7 @@
                         <th class="px-6 py-3 text-center align-middle">Acciones</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="compras-body">
                     {% for compra in compras %}
                     <tr class="bg-white border-b border-gray-200">
                         <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
@@ -72,6 +73,18 @@
                         </td>
                     </tr>
                     {% endfor %}
+                </tbody>
+                <!-- Mensaje cuando no hay resultados de búsqueda -->
+                <tbody id="no-results" style="display: none;">
+                    <tr>
+                        <td colspan="6" class="text-center py-8 bg-gray-50">
+                            <i class="fas fa-search-minus text-gray-400 text-4xl mb-3"></i>
+                            <p class="text-gray-500">No se encontraron compras</p>
+                            <p class="text-sm text-gray-400 mt-1">
+                                No hay coincidencias con tu búsqueda
+                            </p>
+                        </td>
+                    </tr>
                 </tbody>
             </table>
         </div>
@@ -163,6 +176,61 @@
             modal.classList.add('hidden');
         }, 200);
     }
+
+    // Función para manejar la búsqueda
+    document.addEventListener("DOMContentLoaded", function() {
+        const searchInput = document.getElementById("search-input");
+        const comprasTable = document.getElementById("compras-table");
+        const comprasBody = document.getElementById("compras-body");
+        const noResults = document.getElementById("no-results");
+
+        if (searchInput && comprasTable) {
+            searchInput.addEventListener("input", function() {
+                const searchTerm = this.value.toLowerCase();
+                const rows = comprasBody.getElementsByTagName("tr");
+                let hasResults = false;
+
+                for (let row of rows) {
+                    const cells = row.getElementsByTagName("td");
+                    let rowMatches = false;
+                    
+                    // Buscar en todas las columnas excepto acciones
+                    for (let i = 0; i < cells.length - 1; i++) {
+                        // Para la columna de productos, buscamos en cada elemento de la lista
+                        if (i === 3) { // Columna de productos
+                            const productList = cells[i].querySelectorAll("li");
+                            for (let product of productList) {
+                                if (product.textContent.toLowerCase().includes(searchTerm)) {
+                                    rowMatches = true;
+                                    break;
+                                }
+                            }
+                        } else {
+                            if (cells[i].textContent.toLowerCase().includes(searchTerm)) {
+                                rowMatches = true;
+                            }
+                        }
+                    }
+
+                    if (rowMatches) {
+                        row.style.display = "";
+                        hasResults = true;
+                    } else {
+                        row.style.display = "none";
+                    }
+                }
+
+                // Mostrar mensaje si no hay resultados
+                if (!hasResults && searchTerm.length > 0) {
+                    noResults.style.display = "";
+                    comprasBody.style.display = "none";
+                } else {
+                    noResults.style.display = "none";
+                    comprasBody.style.display = "";
+                }
+            });
+        }
+    });
 </script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>

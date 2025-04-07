@@ -1,9 +1,8 @@
-{% extends "layout.html" %} {% block content %}
+{% extends "layout.html" %} 
+{% block content %}
 
 <div class="w-full px-3">
-  <div
-    class="w-full bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden"
-  >
+  <div class="w-full bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
     <!-- Encabezado -->
     <div class="bg-yellow-900 text-white p-4">
       <h1 class="text-2xl font-bold text-center">Punto de Venta</h1>
@@ -26,16 +25,26 @@
             <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
           </div>
         </div>
-
-        <div
-          class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 overflow-y-auto py-2"
-          style="max-height: 70vh"
-        >
-          {% for galleta in galletas %} {% include
-          "component/venta/_galleta_card.html" %} {% endfor %}
+      
+        <!-- Contenedor de galletas con mensaje de no resultados -->
+        <div class="relative" style="min-height: 300px"> <!-- Añadido min-height -->
+          <div
+            class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 overflow-y-auto py-2"
+            style="max-height: 70vh"
+            id="galletas-container"
+          >
+            {% for galleta in galletas %} 
+              {% include "component/venta/_galleta_card.html" %} 
+            {% endfor %}
+          </div>
+          
+          <div id="no-results" class="hidden absolute top-16 left-0 right-0 bottom-0 flex flex-col items-center justify-center bg-white bg-opacity-90 p-4">
+            <i class="fas fa-search-minus text-gray-400 text-5xl mb-3"></i>
+            <p class="text-gray-600 font-medium text-lg mb-1">No se encontraron galletas</p>
+            <p class="text-gray-500 text-sm">Intenta con otro término de búsqueda</p>
+          </div>
         </div>
       </div>
-
       <!-- Panel de Venta -->
       <div class="bg-gray-50 p-4">
         <div class="sticky top-0">
@@ -218,22 +227,33 @@
 <script>
 document.addEventListener("DOMContentLoaded", function () {
     const searchInput = document.getElementById("search-input");
+    const galletasContainer = document.getElementById("galletas-container");
+    const noResults = document.getElementById("no-results");
     
-    if (searchInput) {
+    if (searchInput && galletasContainer) {
         searchInput.addEventListener("input", function () {
-            const searchText = this.value.toLowerCase();
-            const galletasContainer = document.querySelector('.grid.grid-cols-2.md\\:grid-cols-2.lg\\:grid-cols-3');
+            const searchText = this.value.toLowerCase().trim();
+            const galletasCards = galletasContainer.children;
+            let hasResults = false;
             
-            if (galletasContainer) {
-                const galletasCards = galletasContainer.children;
-                
-                Array.from(galletasCards).forEach(card => {
-                    const cardText = card.textContent.toLowerCase();
-                    card.style.display = cardText.includes(searchText) ? "block" : "none";
-                });
+            Array.from(galletasCards).forEach(card => {
+                const cardText = card.textContent.toLowerCase();
+                if (cardText.includes(searchText)) {
+                    card.style.display = "block";
+                    hasResults = true;
+                } else {
+                    card.style.display = "none";
+                }
+            });
+
+            if (!hasResults && searchText.length > 0) {
+                noResults.classList.remove("hidden");
+            } else {
+                noResults.classList.add("hidden");
             }
         });
     }
+
 
     const montoRecibido = document.getElementById("monto-recibido");
     const montoCambio = document.getElementById("monto-cambio");

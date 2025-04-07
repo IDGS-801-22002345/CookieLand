@@ -3,7 +3,7 @@
 
 <div class="flex flex-col w-full px-4 md:px-10">
     <div class="w-full p-4 text-center bg-white border border-gray-200 rounded-lg shadow-sm">
-        <!-- Título y botón de agregar  -->
+        <!-- Título y botón de agregar -->
         <div class="flex justify-between pb-5">
             <div>
                 <h1 class="text-4xl font-medium text-gray-800">Administración de usuarios</h1>
@@ -24,7 +24,8 @@
                     type="search" 
                     id="search-input" 
                     class="w-full outline-none" 
-                    placeholder="Buscar usuarios"/>
+                    placeholder="Buscar usuarios"
+                    {% if not usuarios %}disabled{% endif %}>
             </div>
         
             <button 
@@ -34,11 +35,11 @@
             </button>
         </div>
         
-        <!-- Tabla de usuarios  -->
+        <!-- Tabla de usuarios -->
         <div class="overflow-x-auto overflow-y-auto max-h-[500px] mt-4">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
-            <table id="proveedores-table" class="w-full text-sm text-left rtl:text-right text-gray-500">
+            <table id="usuarios-table" class="w-full text-sm text-left rtl:text-right text-gray-500">
                 <thead class="text-xs text-white uppercase sticky top-0" style="background-color: #7c5454 !important; z-index: 10;">
                     <tr>
                         <th scope="col" class="px-6 py-3">Nombre</th>
@@ -51,7 +52,7 @@
                         <th scope="col" class="px-6 py-3 text-center align-middle">Acciones</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="usuarios-body">
                     {% for usuario in usuarios %}
                     <tr class="bg-white border-b border-gray-200 relative">
                         <td class="px-6 py-4">{{ usuario.nombre }}</td>
@@ -91,396 +92,429 @@
                     </tr>
                     {% endfor %}
                 </tbody>
+                <!-- Mensaje cuando no hay resultados de búsqueda -->
+                <tbody id="no-results" style="display: none;">
+                    <tr>
+                        <td colspan="8" class="text-center py-8 bg-gray-50">
+                            <i class="fas fa-search-minus text-gray-400 text-4xl mb-3"></i>
+                            <p class="text-gray-500">No se encontraron usuarios</p>
+                            <p class="text-sm text-gray-400 mt-1">
+                                No hay coincidencias con tu búsqueda
+                            </p>
+                        </td>
+                    </tr>
+                </tbody>
             </table>
         </div>
     </div>
 </div>
 
+<!-- Modal para agregar usuarios -->
+<div id="crud-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center w-full h-full" aria-hidden="true" role="dialog">
+    <div class="relative p-4 w-full max-w-2xl max-h-screen">
+        <div class="relative bg-white rounded-lg shadow-lg">
+            <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t border-gray-300 mb-4">
+                <h3 class="text-xl font-semibold text-gray-800 text-center w-full">
+                    Agregar usuario
+                </h3>
+                <button type="button" class="text-gray-600 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center" id="close-modal-btn">
+                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+                    </svg>
+                    <span class="sr-only">Cerrar</span>
+                </button>
+            </div>
+            <form method="POST" novalidate class="p-4 md:p-6">
+                {{ form.csrf_token }}
+                <div class="grid grid-cols-2 gap-6 mb-4">
 
-	<!-- Modal para agregar usuarios -->
-	<div id="crud-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center w-full h-full" aria-hidden="true" role="dialog">
-		<div class="relative p-4 w-full max-w-2xl max-h-screen">
-			<div class="relative bg-white rounded-lg shadow-lg">
-				<div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t border-gray-300 mb-4">
-					<h3 class="text-xl font-semibold text-gray-800 text-center w-full">
-                        Agregar usuario
-                    </h3>
-					<button type="button" class="text-gray-600 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center" id="close-modal-btn">
-                        <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
-                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
-                        </svg>
-                        <span class="sr-only">Cerrar</span>
+                    <div>
+                        <label for="nombre" class="block text-sm font-medium text-gray-700 text-left">Nombre</label> {{ form.nombre(class="mt-1 p-2 w-full border border-gray-300 rounded-md", placeholder="Ingrese el nombre") }} {% for error in form.nombre.errors %}
+                        <p class="text-red-500 text-xs">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                    <div>
+                        <label for="username" class="text-sm font-medium text-gray-700 text-left">Nombre de Usuario</label> {{ form.username(class="mt-1 p-2 w-full border border-gray-300 rounded-md", placeholder="Usuario") }} {% for error in form.username.errors %}
+                        <p class="text-red-500 text-xs">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+
+                    <div>
+                        <label for="correo" class="text-sm font-medium text-gray-700 text-left">Correo Electrónico</label> {{ form.correo(class="mt-1 p-2 w-full border border-gray-300 rounded-md", placeholder="ejemplo@correo.com", type="email") }} {% for error in form.correo.errors %}
+                        <p class="text-red-500 text-xs">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                    <div>
+                        <label for="telefono" class="text-sm font-medium text-gray-700 text-left">Teléfono</label> {{ form.telefono(class="mt-1 p-2 w-full border border-gray-300 rounded-md", placeholder="Ingrese número", type="number") }} {% for error in form.telefono.errors %}
+                        <p class="text-red-500 text-xs">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+
+                    <div>
+                        <label for="rol" class="text-sm font-medium text-gray-700 text-left">Rol</label> {{ form.rol(class="mt-1 p-2 w-full border border-gray-300 rounded-md") }} {% for error in form.rol.errors %}
+                        <p class="text-red-500 text-xs">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                    <div>
+                        <label for="contrasenia" class="text-sm font-medium text-gray-700 text-left">Contraseña</label> {{ form.contrasenia(class="mt-1 p-2 w-full border border-gray-300 rounded-md", placeholder="Ingrese la contraseña", type="password") }} {% for error in form.contrasenia.errors %}
+                        <p class="text-red-500 text-xs">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                {{ form.estatus(value=1, class="hidden") }} {% for error in form.estatus.errors %}
+                <p class="text-red-500 text-xs">{{ error }}</p>
+                {% endfor %}
+
+                <!-- Botones -->
+                <div class="flex justify-center mt-6 gap-4">
+                    <button type="submit" style="background-color: #24985a !important;" class="text-white bg-green-500 hover:bg-green-600 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center">
+                        Guardar
                     </button>
-				</div>
-				<form method="POST" novalidate class="p-4 md:p-6">
-					{{ form.csrf_token }}
-					<div class="grid grid-cols-2 gap-6 mb-4">
-
-						<div>
-							<label for="nombre" class="block text-sm font-medium text-gray-700 text-left">Nombre</label> {{ form.nombre(class="mt-1 p-2 w-full border border-gray-300 rounded-md", placeholder="Ingrese el nombre") }} {% for error in form.nombre.errors %}
-							<p class="text-red-500 text-xs">{{ error }}</p>
-							{% endfor %}
-						</div>
-						<div>
-							<label for="username" class="text-sm font-medium text-gray-700 text-left">Nombre de Usuario</label> {{ form.username(class="mt-1 p-2 w-full border border-gray-300 rounded-md", placeholder="Usuario") }} {% for error in form.username.errors %}
-							<p class="text-red-500 text-xs">{{ error }}</p>
-							{% endfor %}
-						</div>
-
-						<div>
-							<label for="correo" class="text-sm font-medium text-gray-700 text-left">Correo Electrónico</label> {{ form.correo(class="mt-1 p-2 w-full border border-gray-300 rounded-md", placeholder="ejemplo@correo.com", type="email") }} {% for error in form.correo.errors %}
-							<p class="text-red-500 text-xs">{{ error }}</p>
-							{% endfor %}
-						</div>
-						<div>
-							<label for="telefono" class="text-sm font-medium text-gray-700 text-left">Teléfono</label> {{ form.telefono(class="mt-1 p-2 w-full border border-gray-300 rounded-md", placeholder="Ingrese número", type="number") }} {% for error in form.telefono.errors %}
-							<p class="text-red-500 text-xs">{{ error }}</p>
-							{% endfor %}
-						</div>
-
-						<div>
-							<label for="rol" class="text-sm font-medium text-gray-700 text-left">Rol</label> {{ form.rol(class="mt-1 p-2 w-full border border-gray-300 rounded-md") }} {% for error in form.rol.errors %}
-							<p class="text-red-500 text-xs">{{ error }}</p>
-							{% endfor %}
-						</div>
-						<div>
-							<label for="contrasenia" class="text-sm font-medium text-gray-700 text-left">Contraseña</label> {{ form.contrasenia(class="mt-1 p-2 w-full border border-gray-300 rounded-md", placeholder="Ingrese la contraseña", type="password") }} {% for error in form.contrasenia.errors %}
-							<p class="text-red-500 text-xs">{{ error }}</p>
-							{% endfor %}
-						</div>
-					</div>
-
-					{{ form.estatus(value=1, class="hidden") }} {% for error in form.estatus.errors %}
-					<p class="text-red-500 text-xs">{{ error }}</p>
-					{% endfor %}
-
-					<!-- Botones -->
-					<div class="flex justify-center mt-6 gap-4">
-						<button type="submit" style="background-color: #24985a !important;" class="text-white bg-green-500 hover:bg-green-600 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center">
-                            Guardar
-                        </button>
-						<button type="button" id="cancel-btn" style="background-color:#c90704 !important;" class="text-white bg-red-500 hover:bg-red-600 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm w-1/2 sm:w-auto px-5 py-2.5 text-center ml-2">
-                            Cancelar
-                        </button>
-					</div>
-				</form>
-			</div>
-		</div>
-	</div>
-
-	<!-- Modal para editar usuarios -->
-	<div id="modal-edicion" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center w-full h-full" aria-hidden="true" role="dialog">
-		<div class="relative p-4 w-full max-w-2xl max-h-screen">
-			<div class="relative bg-white rounded-lg shadow-lg">
-				<div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t border-gray-300 mb-4">
-					<h3 class="text-xl font-semibold text-gray-800 text-center w-full">
-						Editar usuario
-					</h3>
-					<button type="button" class="text-gray-600 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center" id="cerrar-modal-edicion">
-						<svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
-							<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
-						</svg>
-						<span class="sr-only">Cerrar</span>
-					</button>
-				</div>
-				<form action="{{ url_for('personal_bp.modificar_usuario') }}" method="POST" id="form-editar" novalidate class="p-4 md:p-6">
-					{{ form.csrf_token }}
-					<input type="hidden" name="id" id="edit-id" value="{{ form.id.data }}">
-					<div class="grid grid-cols-2 gap-6 mb-4">
-						<div>
-							<label for="edit-nombre" class="block text-sm font-medium text-gray-700 text-left">Nombre</label> {{ form.nombre(class="mt-1 p-2 w-full border border-gray-300 rounded-md", id="edit-nombre", placeholder="Ingrese el nombre") }}
-						</div>
-						<div>
-							<label for="edit-username" class="text-sm font-medium text-gray-700 text-left">Nombre de Usuario</label> {{ form.username(class="mt-1 p-2 w-full border border-gray-300 rounded-md", id="edit-username", placeholder="Usuario") }}
-						</div>
-						<div>
-							<label for="edit-correo" class="text-sm font-medium text-gray-700 text-left">Correo Electrónico</label> {{ form.correo(class="mt-1 p-2 w-full border border-gray-300 rounded-md", id="edit-correo", placeholder="ejemplo@correo.com", type="email") }}
-						</div>
-						<div>
-							<label for="edit-telefono" class="text-sm font-medium text-gray-700 text-left">Teléfono</label> {{ form.telefono(class="mt-1 p-2 w-full border border-gray-300 rounded-md", id="edit-telefono", placeholder="Ingrese número", type="number") }}
-						</div>
-						<div>
-							<label for="edit-rol" class="text-sm font-medium text-gray-700 text-left">Rol</label> {{ form.rol(class="mt-1 p-2 w-full border border-gray-300 rounded-md", id="edit-rol") }}
-						</div>
-						<div>
-							<label for="edit-contrasenia" class="text-sm font-medium text-gray-700 text-left">Contraseña (opcional)</label> {{ form.contrasenia(class="mt-1 p-2 w-full border border-gray-300 rounded-md", id="edit-contrasenia", placeholder="Ingrese la contraseña", type="password") }}
-						</div>
-					</div>
-					<div class="flex justify-center mt-6 gap-4">
-						<button type="submit" style="background-color: #24985a !important;" class="text-white bg-green-500 hover:bg-green-600 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center">
-							Guardar Cambios
-						</button>
-						<button type="button" id="cancelar-editar"  onclick="cerrarModalEditar()" style="background-color:#c90704 !important;" class="text-white bg-red-500 hover:bg-red-600 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm w-1/2 sm:w-auto px-5 py-2.5 text-center ml-2">
-							Cancelar
-						</button>
-					</div>
-				</form>
-			</div>
-		</div>
-	</div>
-
-	
-	<!-- Modal de confirmación de actualización -->
-	<div id="actualizar-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60">
-		<div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8 animate-fade-in relative">
-
-			<div class="flex justify-center mb-4">
-				<div class="bg-yellow-100 text-yellow-400 rounded-full p-4 shadow-md">
-					<svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round"
-                  d="M13 16h-1v-4h-1m1-4h.01M12 18a6 6 0 100-12 6 6 0 000 12z"/>
-          </svg>
-				</div>
-			</div>
-
-			<h2 class="text-2xl font-bold text-gray-800 text-center mb-2">Confirmar actualización</h2>
-			<p class="text-gray-600 text-sm text-center mb-6">Estas a punto de modificar la información de este usuario.</p>
-
-			<div class="flex justify-center gap-4">
-				<button type="button" id="cancelar-actualizacion" class="px-5 py-2 rounded-md bg-gray-200 text-gray-700 hover:bg-gray-300 transition font-medium">
-          Cancelar
-        </button>
-				<button type="button" id="confirmar-actualizacion" class="px-5 py-2 rounded-md bg-green-600 text-white hover:bg-green-700 transition font-medium shadow-sm">
-          Confirmar
-        </button>
-			</div>
-
-			<button id="cerrar-actualizar-modal" type="button" class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 text-lg">
-        &times;
-      </button>
-		</div>
-	</div>
-	<style>
-		.animate-fade-in {
-					animation: fadeIn 0.25s ease-out;
-				}
-				
-				@keyframes fadeIn {
-					from {
-					opacity: 0;
-					transform: scale(0.95);
-					}
-				
-					to {
-					opacity: 1;
-					transform: scale(1);
-					}
-				}	
-		
-	</style>
-
-
-	<!-- Modal de eliminación -->
-	<div id="eliminar-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60">
-		<div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8 animate-fade-in relative">
-
-			<div class="flex justify-center mb-4">
-				<div class="bg-red-100 text-red-600 rounded-full p-4 shadow-md">
-					<svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round"
-                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.054 0 1.643-1.14 1.057-2.054L13.057 4.946a1.25 1.25 0 00-2.114 0L3.025 16.946C2.44 17.86 3.028 19 4.083 19z"/>
-          </svg>
-				</div>
-			</div>
-
-			<h2 class="text-2xl font-bold text-gray-800 text-center mb-2">¿Eliminar usuario?</h2>
-			<p class="text-gray-600 text-sm text-center mb-6">Esta acción es permanente y no se puede deshacer.</p>
-
-			<form id="form-eliminar-usuario" method="POST" class="flex justify-center gap-4">
-				<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-				<button type="button" id="cancelar-eliminar" class="px-5 py-2 rounded-md bg-gray-200 text-gray-700 hover:bg-gray-300 transition font-medium">
-                Cancelar
-                </button>
-				<button type="submit" class="px-5 py-2 rounded-md bg-red-600 text-white hover:bg-red-700 transition font-medium shadow-sm">
-                Eliminar
-                </button>
-			</form>
-			<button id="cerrar-eliminar" type="button" onclick="cerrarModalEliminar()" class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 text-2xl">
-				&times;
-			</button>
-		</div>
-	</div>
-	<style>
-		.animate-fade-in {
-					animation: fadeIn 0.25s ease-out;
-				}
-				
-				@keyframes fadeIn {
-					from { opacity: 0; transform: scale(0.95); }
-					to   { opacity: 1; transform: scale(1); }
-				}				
-		
-	</style>
+                    <button type="button" id="cancel-btn" style="background-color:#c90704 !important;" class="text-white bg-red-500 hover:bg-red-600 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm w-1/2 sm:w-auto px-5 py-2.5 text-center ml-2">
+                        Cancelar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 
-<!-- Flowbite JS -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
+<!-- Modal para editar usuarios -->
+<div id="modal-edicion" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center w-full h-full" aria-hidden="true" role="dialog">
+    <div class="relative p-4 w-full max-w-2xl max-h-screen">
+        <div class="relative bg-white rounded-lg shadow-lg">
+            <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t border-gray-300 mb-4">
+                <h3 class="text-xl font-semibold text-gray-800 text-center w-full">
+                    Editar usuario
+                </h3>
+                <button type="button" class="text-gray-600 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center" id="cerrar-modal-edicion">
+                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+                    </svg>
+                    <span class="sr-only">Cerrar</span>
+                </button>
+            </div>
+            <form action="{{ url_for('personal_bp.modificar_usuario') }}" method="POST" id="form-editar" novalidate class="p-4 md:p-6">
+                {{ form.csrf_token }}
+                <input type="hidden" name="id" id="edit-id" value="{{ form.id.data }}">
+                <div class="grid grid-cols-2 gap-6 mb-4">
+                    <div>
+                        <label for="edit-nombre" class="block text-sm font-medium text-gray-700 text-left">Nombre</label> {{ form.nombre(class="mt-1 p-2 w-full border border-gray-300 rounded-md", id="edit-nombre", placeholder="Ingrese el nombre") }}
+                    </div>
+                    <div>
+                        <label for="edit-username" class="text-sm font-medium text-gray-700 text-left">Nombre de Usuario</label> {{ form.username(class="mt-1 p-2 w-full border border-gray-300 rounded-md", id="edit-username", placeholder="Usuario") }}
+                    </div>
+                    <div>
+                        <label for="edit-correo" class="text-sm font-medium text-gray-700 text-left">Correo Electrónico</label> {{ form.correo(class="mt-1 p-2 w-full border border-gray-300 rounded-md", id="edit-correo", placeholder="ejemplo@correo.com", type="email") }}
+                    </div>
+                    <div>
+                        <label for="edit-telefono" class="text-sm font-medium text-gray-700 text-left">Teléfono</label> {{ form.telefono(class="mt-1 p-2 w-full border border-gray-300 rounded-md", id="edit-telefono", placeholder="Ingrese número", type="number") }}
+                    </div>
+                    <div>
+                        <label for="edit-rol" class="text-sm font-medium text-gray-700 text-left">Rol</label> {{ form.rol(class="mt-1 p-2 w-full border border-gray-300 rounded-md", id="edit-rol") }}
+                    </div>
+                    <div>
+                        <label for="edit-contrasenia" class="text-sm font-medium text-gray-700 text-left">Contraseña (opcional)</label> {{ form.contrasenia(class="mt-1 p-2 w-full border border-gray-300 rounded-md", id="edit-contrasenia", placeholder="Ingrese la contraseña", type="password") }}
+                    </div>
+                </div>
+                <div class="flex justify-center mt-6 gap-4">
+                    <button type="submit" style="background-color: #24985a !important;" class="text-white bg-green-500 hover:bg-green-600 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center">
+                        Guardar Cambios
+                    </button>
+                    <button type="button" id="cancelar-editar"  onclick="cerrarModalEditar()" style="background-color:#c90704 !important;" class="text-white bg-red-500 hover:bg-red-600 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm w-1/2 sm:w-auto px-5 py-2.5 text-center ml-2">
+                        Cancelar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de confirmación de actualización -->
+<div id="actualizar-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8 animate-fade-in relative">
+
+        <div class="flex justify-center mb-4">
+            <div class="bg-yellow-100 text-yellow-400 rounded-full p-4 shadow-md">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                          d="M13 16h-1v-4h-1m1-4h.01M12 18a6 6 0 100-12 6 6 0 000 12z"/>
+                </svg>
+            </div>
+        </div>
+
+        <h2 class="text-2xl font-bold text-gray-800 text-center mb-2">Confirmar actualización</h2>
+        <p class="text-gray-600 text-sm text-center mb-6">Estas a punto de modificar la información de este usuario.</p>
+
+        <div class="flex justify-center gap-4">
+            <button type="button" id="cancelar-actualizacion" class="px-5 py-2 rounded-md bg-gray-200 text-gray-700 hover:bg-gray-300 transition font-medium">
+                Cancelar
+            </button>
+            <button type="button" id="confirmar-actualizacion" class="px-5 py-2 rounded-md bg-green-600 text-white hover:bg-green-700 transition font-medium shadow-sm">
+                Confirmar
+            </button>
+        </div>
+
+        <button id="cerrar-actualizar-modal" type="button" class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 text-lg">
+            &times;
+        </button>
+    </div>
+</div>
+
+<!-- Modal de eliminación -->
+<div id="eliminar-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8 animate-fade-in relative">
+
+        <div class="flex justify-center mb-4">
+            <div class="bg-red-100 text-red-600 rounded-full p-4 shadow-md">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                          d="M12 9v2m0 4h.01m-6.938 4h13.856c1.054 0 1.643-1.14 1.057-2.054L13.057 4.946a1.25 1.25 0 00-2.114 0L3.025 16.946C2.44 17.86 3.028 19 4.083 19z"/>
+                </svg>
+            </div>
+        </div>
+
+        <h2 class="text-2xl font-bold text-gray-800 text-center mb-2">¿Eliminar usuario?</h2>
+        <p class="text-gray-600 text-sm text-center mb-6">Esta acción es permanente y no se puede deshacer.</p>
+
+        <form id="form-eliminar-usuario" method="POST" class="flex justify-center gap-4">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="button" id="cancelar-eliminar" class="px-5 py-2 rounded-md bg-gray-200 text-gray-700 hover:bg-gray-300 transition font-medium">
+                Cancelar
+            </button>
+            <button type="submit" class="px-5 py-2 rounded-md bg-red-600 text-white hover:bg-red-700 transition font-medium shadow-sm">
+                Eliminar
+            </button>
+        </form>
+        <button id="cerrar-eliminar" type="button" onclick="cerrarModalEliminar()" class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 text-2xl">
+            &times;
+        </button>
+    </div>
+</div>
+
+<style>
+    .animate-fade-in {
+        animation: fadeIn 0.25s ease-out;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: scale(0.95); }
+        to   { opacity: 1; transform: scale(1); }
+    }                
+</style>
 
 <script>
-	// Modal de agregar
-			document.getElementById('open-modal-btn').addEventListener('click', () => {
-			  document.getElementById('crud-modal').classList.remove('hidden');
-			});
-			
-			document.getElementById('close-modal-btn').addEventListener('click', () => {
-			  document.getElementById('crud-modal').classList.add('hidden');
-			});
-			
-			document.getElementById('cancel-btn').addEventListener('click', () => {
-			  document.getElementById('crud-modal').classList.add('hidden');
-			});
-			
-			document.addEventListener('DOMContentLoaded', () => {
-				const botonesEditar = document.querySelectorAll('.btn-modificar');
-				const modalEditar = document.getElementById('modal-edicion');
-				const cerrarBtn = document.getElementById('cerrar-modal-edicion');
-				const formEditar = document.getElementById('form-editar');
-			
-				// Abrir modal con datos
-				botonesEditar.forEach(btn => {
-				  btn.addEventListener('click', () => {
-					document.getElementById('edit-id').value = btn.dataset.id;
-					document.getElementById('edit-nombre').value = btn.dataset.nombre;
-					document.getElementById('edit-username').value = btn.dataset.username;
-					document.getElementById('edit-correo').value = btn.dataset.correo;
-					document.getElementById('edit-telefono').value = btn.dataset.telefono;
-					document.getElementById('edit-rol').value = btn.dataset.rol;
-					document.getElementById('edit-contrasenia').value = "";
-			
-					modalEditar.classList.remove('hidden');
-					modalEditar.classList.add('flex');
-					modalEditar.style.display = 'flex';
-				  });
-				});
-			
-				// Botón de cerrar
-				cerrarBtn.addEventListener('click', cerrarModalEditar);
-			
-				// Cerrar al hacer clic fuera del modal
-				window.addEventListener('click', (e) => {
-				  if (e.target === modalEditar) cerrarModalEditar();
-				});
-			
-				// Modal de confirmación de actualización
-				const modalConfirmar = document.getElementById('actualizar-modal');
-				const confirmarBtn = document.getElementById('confirmar-actualizacion');
-				const cancelarBtn = document.getElementById('cancelar-actualizacion');
-				const cerrarX = document.getElementById('cerrar-actualizar-modal');
-				let formSubmitEvent = null;
-			
-				formEditar.addEventListener('submit', (e) => {
-				  e.preventDefault();
-				  formSubmitEvent = e;
-				  modalConfirmar.classList.remove('hidden');
-				  modalConfirmar.style.display = 'flex';
-				});
-			
-				confirmarBtn.addEventListener('click', () => {
-				  modalConfirmar.classList.add('hidden');
-				  modalConfirmar.style.display = 'none';
-				  if (formSubmitEvent) formEditar.submit();
-				});
-			
-				cancelarBtn.addEventListener('click', () => {
-				  modalConfirmar.classList.add('hidden');
-				  modalConfirmar.style.display = 'none';
-				});
-			
-				cerrarX.addEventListener('click', () => {
-				  modalConfirmar.classList.add('hidden');
-				  modalConfirmar.style.display = 'none';
-				});
-			
-				window.addEventListener('click', (e) => {
-				  if (e.target === modalConfirmar) {
-					modalConfirmar.classList.add('hidden');
-					modalConfirmar.style.display = 'none';
-				  }
-				});
-			  });
-			
-			// Modal de eliminación
-			document.addEventListener('DOMContentLoaded', () => {
-			  const modalEliminar = document.getElementById('eliminar-modal');
-			  const formEliminar = document.getElementById('form-eliminar-usuario');
-			  const cancelEliminar = document.getElementById('cancelar-eliminar');
-			
-			  document.querySelectorAll('.btn-eliminar').forEach(button => {
-				button.addEventListener('click', () => {
-				  const userId = button.getAttribute('data-id');
-				  formEliminar.setAttribute('action', `/eliminar_usuario/${userId}`);
-				  modalEliminar.classList.remove('hidden');
-				  modalEliminar.style.display = 'flex';
-				});
-			  });
-			
-			  cancelEliminar.addEventListener('click', () => {
-				modalEliminar.classList.add('hidden');
-				modalEliminar.style.display = 'none';
-				formEliminar.removeAttribute('action');
-			  });
-			
-			  window.addEventListener('click', (e) => {
-				if (e.target === modalEliminar) {
-				  modalEliminar.classList.add('hidden');
-				  modalEliminar.style.display = 'none';
-				  formEliminar.removeAttribute('action');
-				}
-			  });
-			});
-			
-			function cerrarModalEliminar() {
-			  const modal = document.getElementById('eliminar-modal');
-			  const form = document.getElementById('form-eliminar-usuario');
-			  modal.classList.add('hidden');
-			  modal.style.display = 'none';
-			  form.removeAttribute('action');
-			}	
+// Modal de agregar
+document.getElementById('open-modal-btn').addEventListener('click', () => {
+    document.getElementById('crud-modal').classList.remove('hidden');
+});
 
-			document.addEventListener("DOMContentLoaded", function () {
-				const btnFiltrar = document.getElementById("btn-filtrar-clientes");
-				const searchInput = document.getElementById("search-input");
-				let soloClientes = false;
-			
-				// Función que aplica tanto el filtro como la búsqueda
-				function filtrarFilas() {
-					const filtroTexto = searchInput.value.toLowerCase();
-			
-					document.querySelectorAll("tbody tr").forEach(fila => {
-						const celdas = fila.querySelectorAll("td");
-						const rol = celdas[5]?.textContent?.trim().toLowerCase();
-			
-						let coincideBusqueda = Array.from(celdas).some(td =>
-							td.textContent.toLowerCase().includes(filtroTexto)
-						);
-			
-						let coincideCliente = !soloClientes || rol === "cliente";
-			
-						fila.style.display = (coincideBusqueda && coincideCliente) ? "" : "none";
-					});
-				}
-			
-				// Evento para alternar filtro de clientes
-				btnFiltrar.addEventListener("click", function () {
-					soloClientes = !soloClientes;
-					btnFiltrar.textContent = soloClientes ? "Mostrar todos" : "Mostrar solo clientes";
-					filtrarFilas();
-				});
-			
-				// Evento para búsqueda
-				searchInput.addEventListener("input", filtrarFilas);
-			});
+document.getElementById('close-modal-btn').addEventListener('click', () => {
+    document.getElementById('crud-modal').classList.add('hidden');
+});
 
-			function cerrarModalEditar() {
-				const modal = document.getElementById('modal-edicion');
-				const form = document.getElementById('form-editar');
-	
-				if (modal && form) {
-					modal.classList.add('hidden');
-					modal.classList.remove('flex');
-					modal.style.display = 'none';
-					form.reset(); 
-				}
-			}	
+document.getElementById('cancel-btn').addEventListener('click', () => {
+    document.getElementById('crud-modal').classList.add('hidden');
+});
+
+// Modal de edición
+document.addEventListener('DOMContentLoaded', () => {
+    const botonesEditar = document.querySelectorAll('.btn-modificar');
+    const modalEditar = document.getElementById('modal-edicion');
+    const cerrarBtn = document.getElementById('cerrar-modal-edicion');
+    const formEditar = document.getElementById('form-editar');
+
+    // Abrir modal con datos
+    botonesEditar.forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.getElementById('edit-id').value = btn.dataset.id;
+            document.getElementById('edit-nombre').value = btn.dataset.nombre;
+            document.getElementById('edit-username').value = btn.dataset.username;
+            document.getElementById('edit-correo').value = btn.dataset.correo;
+            document.getElementById('edit-telefono').value = btn.dataset.telefono;
+            document.getElementById('edit-rol').value = btn.dataset.rol;
+            document.getElementById('edit-contrasenia').value = "";
+
+            modalEditar.classList.remove('hidden');
+            modalEditar.classList.add('flex');
+            modalEditar.style.display = 'flex';
+        });
+    });
+
+    // Botón de cerrar
+    cerrarBtn.addEventListener('click', cerrarModalEditar);
+
+    // Cerrar al hacer clic fuera del modal
+    window.addEventListener('click', (e) => {
+        if (e.target === modalEditar) cerrarModalEditar();
+    });
+
+    // Modal de confirmación de actualización
+    const modalConfirmar = document.getElementById('actualizar-modal');
+    const confirmarBtn = document.getElementById('confirmar-actualizacion');
+    const cancelarBtn = document.getElementById('cancelar-actualizacion');
+    const cerrarX = document.getElementById('cerrar-actualizar-modal');
+    let formSubmitEvent = null;
+
+    formEditar.addEventListener('submit', (e) => {
+        e.preventDefault();
+        formSubmitEvent = e;
+        modalConfirmar.classList.remove('hidden');
+        modalConfirmar.style.display = 'flex';
+    });
+
+    confirmarBtn.addEventListener('click', () => {
+        modalConfirmar.classList.add('hidden');
+        modalConfirmar.style.display = 'none';
+        if (formSubmitEvent) formEditar.submit();
+    });
+
+    cancelarBtn.addEventListener('click', () => {
+        modalConfirmar.classList.add('hidden');
+        modalConfirmar.style.display = 'none';
+    });
+
+    cerrarX.addEventListener('click', () => {
+        modalConfirmar.classList.add('hidden');
+        modalConfirmar.style.display = 'none';
+    });
+
+    window.addEventListener('click', (e) => {
+        if (e.target === modalConfirmar) {
+            modalConfirmar.classList.add('hidden');
+            modalConfirmar.style.display = 'none';
+        }
+    });
+});
+
+// Modal de eliminación
+document.addEventListener('DOMContentLoaded', () => {
+    const modalEliminar = document.getElementById('eliminar-modal');
+    const formEliminar = document.getElementById('form-eliminar-usuario');
+    const cancelEliminar = document.getElementById('cancelar-eliminar');
+
+    document.querySelectorAll('.btn-eliminar').forEach(button => {
+        button.addEventListener('click', () => {
+            const userId = button.getAttribute('data-id');
+            formEliminar.setAttribute('action', `/eliminar_usuario/${userId}`);
+            modalEliminar.classList.remove('hidden');
+            modalEliminar.style.display = 'flex';
+        });
+    });
+
+    cancelEliminar.addEventListener('click', () => {
+        modalEliminar.classList.add('hidden');
+        modalEliminar.style.display = 'none';
+        formEliminar.removeAttribute('action');
+    });
+
+    window.addEventListener('click', (e) => {
+        if (e.target === modalEliminar) {
+            modalEliminar.classList.add('hidden');
+            modalEliminar.style.display = 'none';
+            formEliminar.removeAttribute('action');
+        }
+    });
+});
+
+// Función para cerrar modal de eliminación
+function cerrarModalEliminar() {
+    const modal = document.getElementById('eliminar-modal');
+    const form = document.getElementById('form-eliminar-usuario');
+    modal.classList.add('hidden');
+    modal.style.display = 'none';
+    form.removeAttribute('action');
+}
+
+// Función para cerrar modal de edición
+function cerrarModalEditar() {
+    const modal = document.getElementById('modal-edicion');
+    const form = document.getElementById('form-editar');
+
+    if (modal && form) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+        modal.style.display = 'none';
+        form.reset(); 
+    }
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+    const searchInput = document.getElementById("search-input");
+    const usuariosTable = document.getElementById("usuarios-table");
+    const usuariosBody = document.getElementById("usuarios-body");
+    const noResults = document.getElementById("no-results");
+    const btnFiltrar = document.getElementById("btn-filtrar-clientes");
+    let soloClientes = false;
+
+    if (searchInput && usuariosTable) {
+        searchInput.addEventListener("input", function() {
+            const searchTerm = this.value.toLowerCase();
+            const rows = usuariosBody.getElementsByTagName("tr");
+            let hasResults = false;
+            let hasClientes = false;
+
+            for (let row of rows) {
+                const cells = row.getElementsByTagName("td");
+                let rowMatches = false;
+                let isCliente = false;
+                
+                // Buscar en todas las columnas excepto acciones
+                for (let i = 0; i < cells.length - 1; i++) {
+                    if (cells[i].textContent.toLowerCase().includes(searchTerm)) {
+                        rowMatches = true;
+                    }
+                }
+
+                // Verificar si es cliente (columna Rol)
+                if (cells[5]?.textContent?.trim().toLowerCase() === "cliente") {
+                    isCliente = true;
+                }
+
+                // Aplicar ambos filtros (búsqueda y tipo de usuario)
+                const shouldShow = rowMatches && (!soloClientes || isCliente);
+                
+                if (shouldShow) {
+                    row.style.display = "";
+                    hasResults = true;
+                    if (isCliente) hasClientes = true;
+                } else {
+                    row.style.display = "none";
+                }
+            }
+
+            // Manejar el mensaje de no resultados
+            if (!hasResults && searchTerm.length > 0) {
+                noResults.style.display = "";
+                usuariosBody.style.display = "none";
+            } else {
+                noResults.style.display = "none";
+                usuariosBody.style.display = "";
+            }
+
+            // Actualizar estado del botón de filtro
+            if (soloClientes && !hasClientes && searchTerm.length === 0) {
+                noResults.style.display = "";
+                usuariosBody.style.display = "none";
+                noResults.querySelector("p").textContent = "No hay clientes registrados";
+            }
+        });
+
+        // Filtro de clientes
+        btnFiltrar.addEventListener("click", function() {
+            soloClientes = !soloClientes;
+            btnFiltrar.textContent = soloClientes ? "Mostrar todos" : "Clientes";
+            
+            // Disparar el evento de búsqueda para aplicar ambos filtros
+            const event = new Event("input");
+            searchInput.dispatchEvent(event);
+        });
+    }
+});
 </script>
+
+<!-- Incluye Flowbite JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
+
 {% endblock %}

@@ -52,17 +52,14 @@
           </tr>
           {% endfor %}
         </tbody>
-        <!-- Mensaje cuando no hay resultados -->
-        <tbody id="no-results" style="display: none;">
-          <tr>
-            <td colspan="6" class="text-center py-8 bg-gray-50">
-              <i class="fas fa-search-minus text-gray-400 text-4xl mb-3"></i>
-              <p class="text-gray-500">No se encontraron ventas</p>
-              <p class="text-sm text-gray-400 mt-1">Intenta con otros términos de búsqueda</p>
-            </td>
-          </tr>
-        </tbody>
       </table>
+      
+      <div id="no-results" class="hidden text-center py-8 bg-gray-50 rounded-lg">
+        <i class="fas fa-search-minus text-gray-400 text-4xl mb-3"></i>
+        <p class="text-gray-500">No se encontraron ventas</p>
+        <p class="text-sm text-gray-400 mt-1">Intenta con otros términos de búsqueda</p>
+      </div>
+      
       {% else %}
       <div class="text-center py-8 bg-gray-50 rounded-lg">
         <i class="fas fa-info-circle text-gray-400 text-4xl mb-3"></i>
@@ -80,11 +77,10 @@
 <script>
 document.addEventListener("DOMContentLoaded", function() {
     const searchInput = document.getElementById("search-input");
-    const ventasTable = document.getElementById("ventas-table");
     const ventasBody = document.getElementById("ventas-body");
     const noResults = document.getElementById("no-results");
-
-    if (searchInput && ventasTable) {
+    
+    if (searchInput && ventasBody) {
         searchInput.addEventListener("input", function() {
             const searchTerm = this.value.trim().toLowerCase();
             const rows = ventasBody.getElementsByTagName("tr");
@@ -94,7 +90,6 @@ document.addEventListener("DOMContentLoaded", function() {
                 const cells = row.getElementsByTagName("td");
                 let rowMatches = false;
                 
-                // Buscar solo en las columnas relevantes (excluyendo acciones)
                 for (let i = 0; i < cells.length - 1; i++) {
                     if (cells[i].textContent.toLowerCase().includes(searchTerm)) {
                         rowMatches = true;
@@ -110,13 +105,10 @@ document.addEventListener("DOMContentLoaded", function() {
                 }
             }
 
-            // Mostrar mensaje si no hay resultados
             if (!hasResults && searchTerm.length > 0) {
-                noResults.style.display = "";
-                ventasBody.style.display = "none";
+                noResults.classList.remove("hidden");
             } else {
-                noResults.style.display = "none";
-                ventasBody.style.display = "";
+                noResults.classList.add("hidden");
             }
         });
     }

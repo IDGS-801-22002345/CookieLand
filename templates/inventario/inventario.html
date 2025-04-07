@@ -29,7 +29,7 @@
                         <th scope="col" class="px-6 py-3 text-center">Unidad de Medida</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="table-body">
                     {% for materia in inventario %}
                     <tr class="bg-white border-b hover:bg-gray-50">
                         <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
@@ -52,20 +52,36 @@
                     {% endfor %}
                 </tbody>
             </table>
+            <div id="no-results" class="hidden text-center py-8 bg-gray-50 rounded-lg">
+                <i class="fas fa-search-minus text-gray-400 text-4xl mb-3"></i>
+                <p class="text-gray-500">No se encontraron insumos</p>
+                <p class="text-sm text-gray-400 mt-1">Intenta con otros términos de búsqueda</p>
+            </div>
+            <div id="no-data" class="hidden text-center py-8 bg-gray-50 rounded-lg">
+                <i class="fas fa-box-open text-gray-400 text-4xl mb-3"></i>
+                <p class="text-gray-500">No hay insumos en el inventario</p>
+                <p class="text-sm text-gray-400 mt-1">Agrega insumos para comenzar</p>
+            </div>
         </div>
     </div>
 </div>
 
-<!-- Script de búsqueda  -->
 <script>
 document.addEventListener("DOMContentLoaded", function () {
     const searchInput = document.getElementById("search-input");
-    const table = document.getElementById("inventario-table");
-    const tbody = table.querySelector("tbody");
+    const tableBody = document.getElementById("table-body");
+    const noResults = document.getElementById("no-results");
+    const noData = document.getElementById("no-data");
+    const rows = tableBody.getElementsByTagName("tr");
+    
+    if (rows.length === 0) {
+        noData.classList.remove("hidden");
+        tableBody.classList.add("hidden");
+    }
     
     searchInput.addEventListener("input", function () {
         const searchText = this.value.toLowerCase();
-        const rows = tbody.getElementsByTagName("tr");
+        let foundCount = 0;
 
         Array.from(rows).forEach(row => {
             const cells = row.querySelectorAll("th, td");
@@ -78,8 +94,34 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
             });
 
-            row.style.display = found ? "" : "none";
+            if (found) {
+                row.style.display = "";
+                foundCount++;
+            } else {
+                row.style.display = "none";
+            }
         });
+
+        if (searchText === "") {
+            noResults.classList.add("hidden");
+            if (rows.length === 0) {
+                noData.classList.remove("hidden");
+                tableBody.classList.add("hidden");
+            } else {
+                noData.classList.add("hidden");
+                tableBody.classList.remove("hidden");
+            }
+        } else {
+            if (foundCount === 0) {
+                noResults.classList.remove("hidden");
+                tableBody.classList.add("hidden");
+                noData.classList.add("hidden");
+            } else {
+                noResults.classList.add("hidden");
+                tableBody.classList.remove("hidden");
+                noData.classList.add("hidden");
+            }
+        }
     });
 });
 </script>
