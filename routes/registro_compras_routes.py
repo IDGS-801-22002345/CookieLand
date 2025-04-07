@@ -137,7 +137,6 @@ def finalizar_compra():
                 inventario = InventarioMateria(
                     material_id=materia_prima.id,
                     cantidad=cantidad_convertida,
-                    cantidad_minima=0,
                     estado_stock="Disponible"
                 )
                 db.session.add(inventario)

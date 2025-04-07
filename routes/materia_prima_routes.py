@@ -38,15 +38,42 @@ def agregar():
                 nombre=create_form.nombre.data,
                 unidad=create_form.unidad.data
             )
+            
+            # Agregar la materia prima primero
             db.session.add(nueva_materia)
+            db.session.commit()  # Commit para obtener el id generado automáticamente
+            
+            # Establecer la cantidad mínima dependiendo de la unidad
+            if nueva_materia.unidad in ['gramos', 'g']:
+                cantidad_minima = 1000
+            elif nueva_materia.unidad in ['mililitros', 'ml']:
+                cantidad_minima = 1000
+            elif nueva_materia.unidad in ['piezas', 'pz']:
+                cantidad_minima = 30
+            else:
+                cantidad_minima = 0  # Si no es ninguna de las anteriores, se puede manejar de forma predeterminada
+            
+            # Crear el inventario con la cantidad mínima
+            nuevo_inventario = InventarioMateria(
+                cantidad=0,
+                cantidad_minima=cantidad_minima,
+                estado_stock='Sin Stock',
+                material_id=nueva_materia.id  # Ahora se asigna el ID generado
+            )
+            
+            # Agregar el inventario
+            db.session.add(nuevo_inventario)
             db.session.commit()
+
             flash("Materia Prima agregada con éxito", "success")
         
         except IntegrityError:
-            db.session.rollback()  # Deshacer cambios en la base de datos
+            db.session.rollback() 
             flash("Error: El insumo ya existe. Por favor, elige otro.", "danger")
     
     return redirect(url_for('materia_prima_bp.index'))
+
+
 
 
 @materia_prima_bp.route('/mk_modificar', methods=["GET", "POST"])
