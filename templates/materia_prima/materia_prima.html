@@ -1,88 +1,89 @@
-{% extends "layout.html" %} {% block content %}
-
-<link
-  rel="stylesheet"
-  href="{{ url_for('static', filename='css/output.css') }}"
-/>
+{% extends "layout.html" %}
+{% block content %}
+{% import "_macros.html" as macros %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/output.css') }}">
 <script src="{{ url_for('static', filename='js/materia_prima.js') }}"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
 
-<!-- Contenedor principal con margen superior -->
-<div class="flex flex-col w-full px-10">
-  <!-- Título INVENTARIO centrado -->
-  <h1 class="text-3xl font-bold text-center mb-4">MATERIA PRIMA</h1>
-  <!-- Botón para abrir el modal de agregar -->
-  <div
-    class="pl-28 p-4 text-center bg-white border border-gray-300 rounded-lg shadow-sm sm:p-8 dark:bg-gray-800 dark:border-gray-700"
-  >
-    <div class="flex justify-end">
-      <button
-        data-modal-target="crud-modal"
-        data-modal-toggle="crud-modal"
-        class="flex items-center gap-2 text-white focus:outline-none focus:ring-4 focus:ring-[#4F4747] bg-green-500 hover:bg-green-500 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-1 transition-colors duration-200 ease-in-out"
-      >
-        <i class="fa-solid fa-circle-plus"></i>
-        Agregar
-      </button>
-    </div>
-    <div class="flex items-center border border-gray-300 rounded-md w-96 p-2">
-      <i class="fas fa-search text-gray-500 px-2"></i>
-      <input
-        type="search"
-        id="search-input"
-        class="w-full outline-none"
-        placeholder="Buscar materia prima"
-      />
-    </div>
+<!-- Contenedor principal -->
+<div class="flex flex-col w-full px-4 md:px-10">
+    <div class="w-full p-4 text-center bg-white border border-gray-200 rounded-lg shadow-sm">
+        <!-- Título y botón de agregar  -->
+        <div class="flex justify-between pb-5">
+            <div>
+                <h1 class="text-4xl font-medium text-gray-800">Materia Prima</h1>
+            </div>
+            <button
+                data-modal-target="crud-modal"
+                data-modal-toggle="crud-modal"
+                class="flex items-center gap-2 text-white focus:outline-none focus:ring-4 focus:ring-[#4F4747] bg-green-500 hover:bg-green-500 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-1 transition-colors duration-200 ease-in-out">
+                <i class="fa-solid fa-circle-plus"></i>
+                Agregar
+            </button>
+        </div>
 
-    <!-- Contenedor de la tabla con scroll -->
-    <div class="overflow-x-auto overflow-y-auto max-h-[500px] mt-4">
-      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+        <!-- Barra de búsqueda  -->
+        <div class="flex items-center border border-gray-300 rounded-md w-96 p-2 mb-4">
+            <i class="fas fa-search text-gray-500 px-2"></i>
+            <input
+                type="search"
+                id="search-input"
+                class="w-full outline-none"
+                placeholder="Buscar materia prima">
+        </div>
 
-      <table
-        id="materia-prima-table"
-        class="w-full text-sm text-left rtl:text-right text-gray-500"
-      >
-        <thead
-          class="text-xs text-white uppercase sticky top-0"
-          style="background-color: #7c5454 !important; z-index: 10"
-        >
-          <tr>
-            <th scope="col" class="px-6 py-3">Producto</th>
-            <th scope="col" class="px-6 py-3">Unidad de Medida</th>
-            <th scope="col" class="px-6 py-3 text-center align-middle">
-              Acciones
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for materia in materia_prima %}
-          <tr class="bg-white border-b border-gray-200 relative">
-            <td
-              class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
-            >
-              {{ materia.nombre }}
-            </td>
-            <td class="px-6 py-4">{{ materia.unidad }}</td>
-            <td class="px-6 py-4 flex justify-center items-center space-x-4">
-              <a
-                href="javascript:void(0)"
-                data-modal-target="modificar-modal"
-                data-modal-toggle="modificar-modal"
-                class="btn-modificar p-2 rounded-full bg-yellow-500 hover:bg-yellow-600 text-white focus:outline-none"
-                data-id="{{ materia.id }}"
-                data-nombre="{{ materia.nombre }}"
-                data-unidad="{{ materia.unidad }}"
-              >
-                <i class="fa-solid fa-pen-to-square"></i>
-              </a>
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+        <!-- Tabla de materia prima  -->
+        <div class="overflow-x-auto overflow-y-auto max-h-[500px] mt-4">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <table id="materia-prima-table" class="w-full text-sm text-left rtl:text-right text-gray-500">
+                <thead class="text-xs text-white uppercase sticky top-0" style="background-color: #7c5454 !important; z-index: 10">
+                    <tr>
+                        <th scope="col" class="px-6 py-3">Producto</th>
+                        <th scope="col" class="px-6 py-3">Unidad de Medida</th>
+                        <th scope="col" class="px-6 py-3 text-center align-middle">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="table-body">
+                    {% for materia in materia_prima %}
+                    <tr class="bg-white border-b border-gray-200 relative">
+                        <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
+                            {{ materia.nombre }}
+                        </td>
+                        <td class="px-6 py-4">{{ materia.unidad }}</td>
+                        <td class="px-6 py-4 flex justify-center items-center space-x-4">
+                            <a
+                                href="javascript:void(0)"
+                                data-modal-target="modificar-modal"
+                                data-modal-toggle="modificar-modal"
+                                class="btn-modificar p-2 rounded-full bg-yellow-500 hover:bg-yellow-600 text-white focus:outline-none"
+                                data-id="{{ materia.id }}"
+                                data-nombre="{{ materia.nombre }}"
+                                data-unidad="{{ materia.unidad }}"
+                            >
+                                <i class="fa-solid fa-pen-to-square"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            
+            <!-- Mensaje cuando no hay resultados -->
+            <div id="no-results" class="hidden text-center py-8 bg-gray-50 rounded-lg">
+                <i class="fas fa-search-minus text-gray-400 text-4xl mb-3"></i>
+                <p class="text-gray-500">No se encontraron materiales</p>
+                <p class="text-sm text-gray-400 mt-1">Intenta con otros términos de búsqueda</p>
+            </div>
+            
+            <!-- Mensaje cuando no hay datos -->
+            <div id="no-data" class="hidden text-center py-8 bg-gray-50 rounded-lg">
+                <i class="fas fa-box-open text-gray-400 text-4xl mb-3"></i>
+                <p class="text-gray-500">No hay materiales registrados</p>
+                <p class="text-sm text-gray-400 mt-1">Agrega materiales para comenzar</p>
+            </div>
+        </div>
     </div>
-  </div>
 </div>
 
 <!-- Fondo oscuro semitransparente -->
@@ -288,30 +289,93 @@
     </div>
   </div>
 </div>
-<script>
-  document.querySelectorAll('form[action*="modificar"]').forEach((form) => {
-    form.addEventListener("submit", function (e) {
-      e.preventDefault();
 
-      // Verificar si el formulario tiene errores de validación
-      if (form.checkValidity()) {
-        Swal.fire({
-          title: "¿Guardar cambios?",
-          text: "¿Estás seguro de que deseas actualizar los datos de este insumo?",
-          icon: "question",
-          showCancelButton: true,
-          confirmButtonColor: "#3085d6",
-          cancelButtonColor: "#d33",
-          confirmButtonText: "Sí, guardar",
-          cancelButtonText: "Cancelar",
-        }).then((result) => {
-          if (result.isConfirmed) {
-            form.submit();
-          }
+<script>
+ document.addEventListener("DOMContentLoaded", function () {
+    const searchInput = document.getElementById("search-input");
+    const tableBody = document.getElementById("table-body");
+    const noResults = document.getElementById("no-results");
+    const noData = document.getElementById("no-data");
+    const rows = tableBody.getElementsByTagName("tr");
+    const table = document.getElementById("materia-prima-table");
+    
+    // Mostrar mensaje si no hay datos inicialmente
+    if (rows.length === 0) {
+        noData.classList.remove("hidden");
+        tableBody.classList.add("hidden"); // Solo ocultamos el cuerpo
+    }
+    
+    searchInput.addEventListener("input", function () {
+        const searchText = this.value.toLowerCase();
+        let foundCount = 0;
+
+        Array.from(rows).forEach(row => {
+            const cells = row.querySelectorAll("td, th");
+            let found = false;
+
+            cells.forEach(cell => {
+                const cellText = cell.textContent.toLowerCase();
+                if (cellText.includes(searchText)) {
+                    found = true;
+                }
+            });
+
+            if (found) {
+                row.style.display = "";
+                foundCount++;
+            } else {
+                row.style.display = "none";
+            }
         });
-      } else {
-        form.reportValidity(); // Muestra los errores de validación nativos del navegador
-      }
+
+        // Mostrar u ocultar mensajes según los resultados
+        if (searchText === "") {
+            noResults.classList.add("hidden");
+            if (rows.length === 0) {
+                noData.classList.remove("hidden");
+                tableBody.classList.add("hidden");
+            } else {
+                noData.classList.add("hidden");
+                tableBody.classList.remove("hidden");
+            }
+        } else {
+            if (foundCount === 0) {
+                noResults.classList.remove("hidden");
+                tableBody.classList.add("hidden");
+                noData.classList.add("hidden");
+            } else {
+                noResults.classList.add("hidden");
+                tableBody.classList.remove("hidden");
+                noData.classList.add("hidden");
+            }
+        }
+    });
+
+    // SweetAlert para modificar
+    document.querySelectorAll('form[action*="modificar"]').forEach((form) => {
+        form.addEventListener("submit", function (e) {
+            e.preventDefault();
+
+            // Verificar si el formulario tiene errores de validación
+            if (form.checkValidity()) {
+                Swal.fire({
+                    title: "¿Guardar cambios?",
+                    text: "¿Estás seguro de que deseas actualizar los datos de este material?",
+                    icon: "question",
+                    showCancelButton: true,
+                    confirmButtonColor: "#3085d6",
+                    cancelButtonColor: "#d33",
+                    confirmButtonText: "Sí, guardar",
+                    cancelButtonText: "Cancelar",
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
+            } else {
+                form.reportValidity(); // Muestra los errores de validación nativos del navegador
+            }
+        });
     });
   });
 </script>
@@ -321,8 +385,5 @@
   rel="stylesheet"
 />
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<!-- Incluye Flowbite JS -->
-<script src="{{ url_for('static', filename='js/materia_prima.js') }}"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
 
 {% endblock %}
