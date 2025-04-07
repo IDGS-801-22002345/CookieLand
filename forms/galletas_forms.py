@@ -2,7 +2,7 @@ from wtforms import StringField,FileField, SelectField, IntegerField, FloatField
 from flask_wtf.file import FileAllowed, FileRequired, FileSize
 from wtforms import validators
 from flask_wtf import FlaskForm
-from wtforms.validators import DataRequired
+from wtforms.validators import DataRequired, Optional, NumberRange
 
 
 class GalletasForm(FlaskForm):
@@ -22,8 +22,9 @@ class GalletasForm(FlaskForm):
     
 class GalletasEditForm(FlaskForm):
     nombre = StringField('Nombre', validators=[DataRequired()])
-    precio = FloatField('Precio de la galleta', [
-        validators.NumberRange(min=0.01, message='El precio debe ser mayor a 0')
+    precio = FloatField('Precio de la galleta', validators=[
+        Optional(),  
+        NumberRange(min=0.01, message='El precio debe ser mayor a 0')
     ])
     foto = FileField('Nueva imagen de galleta', validators=[
         FileAllowed(['jpg', 'jpeg', 'png'], 'Solo se permiten imágenes (JPG, PNG)')
