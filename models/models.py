@@ -240,3 +240,23 @@ class CarritoTemporal(db.Model):
 
     galleta = db.relationship('Galleta', backref='carritos_temporales')
     usuario = db.relationship('Usuario', backref='carritos_temporales')
+
+class Venta(db.Model):
+    __tablename__ = 'ventas'
+    id = db.Column(db.Integer, primary_key=True)
+    fechaCreacion = db.Column(db.DateTime, default=datetime.datetime.now, nullable=False)
+    total = db.Column(db.Float, nullable=False)
+    usuario_id = db.Column(db.Integer, db.ForeignKey('usuarios.id'), nullable=True)
+    usuario = db.relationship('Usuario')
+    detalles = db.relationship('DetalleVenta', back_populates='venta')
+
+class DetalleVenta(db.Model):
+    __tablename__ = 'detalle_ventas'
+    id = db.Column(db.Integer, primary_key=True)
+    venta_id = db.Column(db.Integer, db.ForeignKey('ventas.id'), nullable=False)
+    galleta_id = db.Column(db.Integer, db.ForeignKey('galletas.id'), nullable=False)
+    cantidad = db.Column(db.Integer, nullable=False)
+    precio_unitario = db.Column(db.Float, nullable=False)
+    
+    venta = db.relationship('Venta', back_populates='detalles')
+    galleta = db.relationship('Galleta')

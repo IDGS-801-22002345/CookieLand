@@ -1,0 +1,292 @@
+{% extends "layout.html" %} 
+{% block content %}
+
+<div class="w-full px-3">
+  <div class="w-full bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+    <!-- Encabezado -->
+    <div class="bg-yellow-900 text-white p-4">
+      <h1 class="text-2xl font-bold text-center">Punto de Venta</h1>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-0">
+      <!-- Sección de Galletas -->
+      <div class="col-span-2 p-4 border-r border-gray-200">
+        <div class="mb-4">
+          <h2 class="text-xl font-semibold text-gray-800 mb-2">
+            Galletas Disponibles
+          </h2>
+          <div class="relative">
+            <input
+              type="text"
+              id="search-input"
+              placeholder="Buscar galleta..."
+              class="w-full p-2 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:outline-none"
+            />
+            <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+          </div>
+        </div>
+      
+        <!-- Contenedor de galletas con mensaje de no resultados -->
+        <div class="relative" style="min-height: 300px"> <!-- Añadido min-height -->
+          <div
+            class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 overflow-y-auto py-2"
+            style="max-height: 70vh"
+            id="galletas-container"
+          >
+            {% for galleta in galletas %} 
+              {% include "component/venta/_galleta_card.html" %} 
+            {% endfor %}
+          </div>
+          
+          <div id="no-results" class="hidden absolute top-16 left-0 right-0 bottom-0 flex flex-col items-center justify-center bg-white bg-opacity-90 p-4">
+            <i class="fas fa-search-minus text-gray-400 text-5xl mb-3"></i>
+            <p class="text-gray-600 font-medium text-lg mb-1">No se encontraron galletas</p>
+            <p class="text-gray-500 text-sm">Intenta con otro término de búsqueda</p>
+          </div>
+        </div>
+      </div>
+      <!-- Panel de Venta -->
+      <div class="bg-gray-50 p-4">
+        <div class="sticky top-0">
+          <h2
+            class="text-xl font-semibold text-gray-800 mb-4 flex items-center"
+          >
+            <i class="fas fa-receipt mr-2"></i> Detalle de Venta
+          </h2>
+
+          <!-- Resumen de Venta -->
+          <div
+            class="bg-white rounded-lg border border-gray-200 p-4 mb-4 shadow-sm"
+          >
+            <div class="flex justify-between mb-3">
+              <span class="font-medium">Galletas:</span>
+              <span id="total-items" class="font-semibold">
+                {{ productos  }}
+              </span>
+            </div>
+            <div class="flex justify-between text-lg mb-4">
+              <span class="font-medium">Total:</span>
+              <span id="total-venta" class="font-bold"
+                >${{ "%.2f"|format(total) if total else "0.00" }} MXN</span
+              >
+            </div>
+
+            <div class="border-t pt-3">
+              <div class="mb-3">
+                <label
+                  for="monto-recibido"
+                  class="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  Monto Recibido
+                </label>
+                <input
+                  type="number"
+                  id="monto-recibido"
+                  class="w-full p-2 border rounded-lg text-right font-medium text-lg"
+                  min="0"
+                  step="0.01"
+                  placeholder="0.00"
+                />
+              </div>
+
+              <div
+                class="flex justify-between items-center bg-amber-50 p-3 rounded-lg"
+              >
+                <span class="font-medium text-gray-700">Cambio:</span>
+                <span id="monto-cambio" class="text-xl font-bold text-green-600"
+                  >$0.00</span
+                >
+              </div>
+
+              <div id="leyenda-pago" class=" bg-blue-50 p-2 rounded text-center text-sm text-blue-700 border border-blue-100">
+                <i class="fas fa-info-circle mr-1"></i> Ingrese el monto recibido para habilitar el pago
+              </div>
+            </div>
+            </div>
+          </div>
+
+          <!-- Tabla de Detalle -->
+          <div class="overflow-auto mb-4" style="max-height: 40vh">
+            <table class="min-w-full bg-white border border-gray-200">
+              <thead class="bg-gray-100 sticky top-0">
+                <tr>
+                  <th
+                    class="py-2 px-3 text-left text-xs font-medium text-gray-700 uppercase"
+                  >
+                    Producto
+                  </th>
+                  <th
+                    class="py-2 px-3 text-center text-xs font-medium text-gray-700 uppercase"
+                  >
+                    Cant.
+                  </th>
+                  <th
+                    class="py-2 px-3 text-right text-xs font-medium text-gray-700 uppercase"
+                  >
+                    Precio
+                  </th>
+                  <th
+                    class="py-2 px-3 text-right text-xs font-medium text-gray-700 uppercase"
+                  >
+                    Subtotal
+                  </th>
+                  <th
+                    class="py-2 px-3 text-right text-xs font-medium text-gray-700 uppercase"
+                  ></th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-200">
+                {% if detalles_venta %} {% for item in detalles_venta %}
+                <tr>
+                  <td class="py-2 px-3 text-left">{{ item.galleta }}</td>
+                  <td class="py-2 px-3 text-center">{{ item.cantidad }}</td>
+                  <td class="py-2 px-3 text-right">
+                    ${{ "%.2f"|format(item.precio) }}
+                  </td>
+                  <td class="py-2 px-3 text-right">
+                    ${{ "%.2f"|format(item.subtotal) }}
+                  </td>
+                  <td class="py-2 px-3 text-right">
+                    <form
+                      method="POST"
+                      action="{{ url_for('ventas_bp.eliminar_galleta') }}"
+                    >
+                      <input
+                        type="hidden"
+                        name="csrf_token"
+                        value="{{ csrf_token() }}"
+                      />
+                      <input
+                        type="hidden"
+                        name="galleta_id"
+                        value="{{ item.id }}"
+                      />
+                      <button
+                        type="submit"
+                        class="text-red-500 hover:text-red-700 transition-colors"
+                      >
+                        <i class="fas fa-trash-alt"></i>
+                      </button>
+                    </form>
+                  </td>
+                </tr>
+                {% endfor %} {% else %}
+                <tr>
+                  <td colspan="5" class="py-4 text-center text-gray-500">
+                    No hay galletas agregadas
+                  </td>
+                </tr>
+                {% endif %}
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Botones de Acción -->
+          <div class="space-y-3">
+            <form
+              method="POST"
+              action="{{ url_for('ventas_bp.limpiar_venta') }}"
+            >
+              <input
+                type="hidden"
+                name="csrf_token"
+                value="{{ csrf_token() }}"
+              />
+              <button
+                type="submit"
+                class="w-full py-2 px-4 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
+              >
+                <i class="fas fa-trash-alt mr-2"></i> Limpiar Todo
+              </button>
+            </form>
+
+            <form
+            method="POST"
+            action="{{ url_for('ventas_bp.realizar_venta') }}"
+          >
+            <input
+              type="hidden"
+              name="csrf_token"
+              value="{{ csrf_token() }}"
+            />
+            <button
+            id="btn-pagar"
+            class="w-full py-3 px-4 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold hidden"
+          >
+            <i class="fas fa-cash-register mr-2"></i> Procesar Pago
+          </button>
+          </form>
+       
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const searchInput = document.getElementById("search-input");
+    const galletasContainer = document.getElementById("galletas-container");
+    const noResults = document.getElementById("no-results");
+    
+    if (searchInput && galletasContainer) {
+        searchInput.addEventListener("input", function () {
+            const searchText = this.value.toLowerCase().trim();
+            const galletasCards = galletasContainer.children;
+            let hasResults = false;
+            
+            Array.from(galletasCards).forEach(card => {
+                const cardText = card.textContent.toLowerCase();
+                if (cardText.includes(searchText)) {
+                    card.style.display = "block";
+                    hasResults = true;
+                } else {
+                    card.style.display = "none";
+                }
+            });
+
+            if (!hasResults && searchText.length > 0) {
+                noResults.classList.remove("hidden");
+            } else {
+                noResults.classList.add("hidden");
+            }
+        });
+    }
+
+
+    const montoRecibido = document.getElementById("monto-recibido");
+    const montoCambio = document.getElementById("monto-cambio");
+    const totalVenta = parseFloat("{{ total|default(0) }}");
+    const leyendaPago = document.getElementById("leyenda-pago");
+    const btnPagar = document.getElementById("btn-pagar");
+
+    function calcularCambio() {
+        const recibido = parseFloat(montoRecibido.value) || 0;
+        const cambio = recibido - totalVenta;
+
+        if (cambio >= 0) {
+            montoCambio.textContent = "$" + cambio.toFixed(2);
+            montoCambio.classList.remove("text-red-600");
+            montoCambio.classList.add("text-green-600");
+            btnPagar.classList.remove("hidden");
+            leyendaPago.classList.add("hidden");
+        } else {
+            montoCambio.textContent = "-$" + Math.abs(cambio).toFixed(2);
+            montoCambio.classList.remove("text-green-600");
+            montoCambio.classList.add("text-red-600");
+            btnPagar.classList.add("hidden");
+            leyendaPago.classList.remove("hidden");
+        }
+    }
+
+    if (montoRecibido) {
+        montoRecibido.addEventListener("input", calcularCambio);
+        if (montoRecibido.value) {
+            calcularCambio();
+        }
+    }
+});
+</script>
+
+{% endblock %}
