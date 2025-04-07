@@ -1,8 +1,7 @@
-{% extends "layout.html" %} {% block content %}
+{% extends "layout.html" %} 
+{% block content %}
 <div class="flex flex-col w-full px-10">
-  <div
-    class="w-full p-4 text-center border border-gray-300 rounded-lg shadow-sm"
-  >
+  <div class="w-full p-4 text-center border border-gray-300 rounded-lg shadow-sm">
     <div class="flex justify-between pb-5">
       <div>
         <h1 class="text-4xl font-medium text-gray-800">Ventas</h1>
@@ -15,16 +14,14 @@
         id="search-input"
         class="w-full outline-none"
         placeholder="Buscar venta"
+        {% if not ventas %}disabled{% endif %}
       />
     </div>
 
     <div class="overflow-x-auto overflow-y-auto max-h-[500px] mt-4">
       {% if ventas %}
       <table id="ventas-table" class="w-full text-sm text-left rtl:text-right text-gray-500">
-        <thead
-          style="background-color: #7c5454"
-          class="text-xs text-white uppercase sticky top-0"
-        >
+        <thead style="background-color: #7c5454" class="text-xs text-white uppercase sticky top-0">
           <tr>
             <th scope="col" class="px-6 py-3">Venta</th>
             <th scope="col" class="px-6 py-3">Fecha</th>
@@ -34,30 +31,36 @@
             <th scope="col" class="px-6 py-3">Acciones</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody id="ventas-body">
           {% for venta in ventas %}
           <tr class="bg-white border-b hover:bg-gray-50">
             <td class="px-6 py-4 font-medium text-gray-900">#{{ venta.id }}</td>
-            <td class="px-6 py-4">
-              {{ venta.fechaCreacion.strftime('%d/%m/%Y %H:%M') }}
-            </td>
-            <td class="px-6 py-4">
-              {{ venta.usuario.nombre if venta.usuario else 'Anónimo' }}
-            </td>
-            <td class="px-6 py-4 font-bold">
-              ${{ "%.2f"|format(venta.total) }}
-            </td>
+            <td class="px-6 py-4">{{ venta.fechaCreacion.strftime('%d/%m/%Y %H:%M') }}</td>
+            <td class="px-6 py-4">{{ venta.usuario.nombre if venta.usuario else 'Anónimo' }}</td>
+            <td class="px-6 py-4 font-bold">${{ "%.2f"|format(venta.total) }}</td>
             <td class="px-6 py-4">{{ venta.detalles|length }}</td>
             <td class="px-6 py-4">
-              <button
-                ¿
-                class="text-white p-2 rounded-full text-center bg-yellow-800 hover:bg-yellow-900"
-              >
-                <i class="fas fa-eye mr-1"></i>
-              </button>
+              <form method="POST" action="{{ url_for('ventasDetalles_bp.abrir_modal') }}">
+                {{ form.csrf_token }}
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                <input type="hidden" name="venta_id" value="{{ venta.id }}" />
+                <button class="text-white py-2 px-3 rounded-full text-center bg-yellow-800 hover:bg-yellow-900">
+                  <i class="fas fa-eye"></i>
+                </button>
+              </form>
             </td>
           </tr>
           {% endfor %}
+        </tbody>
+        <!-- Mensaje cuando no hay resultados -->
+        <tbody id="no-results" style="display: none;">
+          <tr>
+            <td colspan="6" class="text-center py-8 bg-gray-50">
+              <i class="fas fa-search-minus text-gray-400 text-4xl mb-3"></i>
+              <p class="text-gray-500">No se encontraron ventas</p>
+              <p class="text-sm text-gray-400 mt-1">Intenta con otros términos de búsqueda</p>
+            </td>
+          </tr>
         </tbody>
       </table>
       {% else %}
@@ -70,47 +73,55 @@
   </div>
 </div>
 
+{% if modal %} 
+  {% include "component/venta/_modalDetalleVenta.html" %} 
+{% endif %}
+
 <script>
-  document.addEventListener("DOMContentLoaded", function () {
-      const searchInput = document.getElementById("search-input");
-      const table = document.getElementById("ventas-table");
-      
-      // Validación más robusta
-      if (!searchInput || !table) {
-          console.error("Elementos del buscador no encontrados");
-          return;
-      }
-      
-      const tbody = table.querySelector("tbody");
-      
-      // Si no hay tbody o no hay ventas, deshabilitar el buscador
-      if (!tbody || tbody.querySelector("tr") === null) {
-          searchInput.disabled = true;
-          searchInput.placeholder = "No hay datos para buscar";
-          return;
-      }
-      
-      searchInput.addEventListener("input", function () {
-          const searchText = this.value.trim().toLowerCase();
-          const rows = tbody.querySelectorAll("tr");
-          
-          rows.forEach(row => {
-              const cells = row.querySelectorAll("td");
-              let found = false;
-              
-              cells.forEach(cell => {
-                  if (cell.textContent.toLowerCase().includes(searchText)) {
-                      found = true;
-                  }
-              });
-              
-              row.style.display = found ? "" : "none";
-          });
-      });
-  });
-  </script>
+document.addEventListener("DOMContentLoaded", function() {
+    const searchInput = document.getElementById("search-input");
+    const ventasTable = document.getElementById("ventas-table");
+    const ventasBody = document.getElementById("ventas-body");
+    const noResults = document.getElementById("no-results");
 
-<!-- Incluye Flowbite JS -->
+    if (searchInput && ventasTable) {
+        searchInput.addEventListener("input", function() {
+            const searchTerm = this.value.trim().toLowerCase();
+            const rows = ventasBody.getElementsByTagName("tr");
+            let hasResults = false;
+
+            for (let row of rows) {
+                const cells = row.getElementsByTagName("td");
+                let rowMatches = false;
+                
+                // Buscar solo en las columnas relevantes (excluyendo acciones)
+                for (let i = 0; i < cells.length - 1; i++) {
+                    if (cells[i].textContent.toLowerCase().includes(searchTerm)) {
+                        rowMatches = true;
+                        break;
+                    }
+                }
+
+                if (rowMatches) {
+                    row.style.display = "";
+                    hasResults = true;
+                } else {
+                    row.style.display = "none";
+                }
+            }
+
+            // Mostrar mensaje si no hay resultados
+            if (!hasResults && searchTerm.length > 0) {
+                noResults.style.display = "";
+                ventasBody.style.display = "none";
+            } else {
+                noResults.style.display = "none";
+                ventasBody.style.display = "";
+            }
+        });
+    }
+});
+</script>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
-
 {% endblock %}
