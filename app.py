@@ -17,6 +17,7 @@ from routes.detalle_compras import detalle_compras_bp
 from routes.registro_compras_routes import registro_compras_bp
 from routes.inventario_routes import inventario_bp
 from routes.galletas_routes import galletas_bp
+from routes.dashboard_joel_routes import dashboard_bp
 from routes.materia_prima_routes import materia_prima_bp
 from routes.merma_routes import merma_bp
 from routes.personal_routes import personal_bp
@@ -79,6 +80,7 @@ def create_app():
     app.register_blueprint(galletas_bp)
     app.register_blueprint(ventas_bp)
     app.register_blueprint(ventasDetalles_bp)
+    app.register_blueprint(dashboard_bp)
 
 
     app.jinja_env.filters['b64encode'] = lambda x: base64.b64encode(x).decode('utf-8') if x else None

@@ -4,12 +4,12 @@
 
     <!-- Hero -->
     <div class="relative">
-        <img class="h-auto max-w-full w-full" src="{{ url_for('static', filename='img/img1.jpg') }}" alt="image description">
+        <img class="h-auto max-w-full w-full" src="{{ url_for('static', filename='img/fondo.jpg') }}" alt="image description">
         <div class="absolute inset-0 flex flex-col items-center justify-center bg-black/40 text-white text-center">
             <h1 class="text-4xl md:text-6xl font-extrabold tracking-wide mb-6">
             El primer bocado te enamora, el segundo te hace adicto
             </h1>
-            <a href="" class="px-6 py-3 bg-[#A0522D] text-white text-lg font-semibold rounded-lg shadow-lg hover:bg-[#EC9704] transition-all">
+            <a href="{{ url_for('cliente_bp.productos') }}" class="px-6 py-3 bg-[#A0522D] text-white text-lg font-semibold rounded-lg shadow-lg hover:bg-[#EC9704] transition-all">
             Pide en Línea
             </a>
         </div>
@@ -23,7 +23,7 @@
                 <p class="mb-4">Nos apasiona crear <strong>las galletas más deliciosas</strong> y únicas que jamás hayas probado. Utilizamos ingredientes de la más alta calidad y recetas tradicionales combinadas con un toque moderno para ofrecerte una experiencia inigualable. Nuestro compromiso con la excelencia y la satisfacción del cliente nos distingue como los mejores.</p>
             </div>
             <div class="grid grid-cols-2 gap-4 mt-2">
-                <img class="w-full rounded-lg h-96 object-cover col-span-2" src="{{ url_for('static', filename='img/img21.jpg') }}" alt="preparando-galletas">
+                <img class="w-full rounded-lg h-96 object-cover col-span-2" src="{{ url_for('static', filename='img/variasgalletas.jpg') }}" alt="preparando-galletas">
             </div>
         </div>
     </section>
