@@ -1,0 +1,40 @@
+<div
+  id="detallesModal"
+  class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center"
+>
+  <div
+    class="bg-white rounded-lg p-6 w-11/12 max-w-4xl max-h-[80vh] overflow-auto"
+  >
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="text-xl font-bold">
+        Detalles de Venta #<span id="ventaId"></span>
+      </h3>
+      <button onclick="cerrarModal()" class="text-gray-500 hover:text-gray-700">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <div class="mb-4">
+      <p><strong>Fecha:</strong> <span id="ventaFecha"></span></p>
+      <p><strong>Total:</strong> $<span id="ventaTotal"></span></p>
+      <p><strong>Atendió:</strong> <span id="ventaUsuario"></span></p>
+    </div>
+
+    <table class="w-full text-sm text-left text-gray-500">
+      <thead
+        style="background-color: #7c5454"
+        class="text-xs text-white uppercase"
+      >
+        <tr>
+          <th scope="col" class="px-6 py-3">Producto</th>
+          <th scope="col" class="px-6 py-3">Cantidad</th>
+          <th scope="col" class="px-6 py-3">Precio Unitario</th>
+          <th scope="col" class="px-6 py-3">Subtotal</th>
+        </tr>
+      </thead>
+      <tbody id="detallesBody">
+        <!-- Aquí se llenarán los detalles con JavaScript -->
+      </tbody>
+    </table>
+  </div>
+</div>
