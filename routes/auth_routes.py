@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, redirect, session, url_for, flash, request
-from flask_login import login_user, logout_user, login_required 
+from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from forms.auth_forms import *
 from models.models import *
@@ -49,13 +49,43 @@ def login():
 
                 intentos.resetear_intentos()
                 login_user(user)
+                # Limpiar carrito anterior
+                session.pop('carrito', None)
+
+                # Restaurar carrito del usuario desde CarritoTemporal
+                temporal = CarritoTemporal.query.filter_by(usuario_id=user.id).all()
+                session['carrito'] = []
+
+                for item in temporal:
+                    galleta = Galleta.query.get(item.galleta_id)
+                    if galleta:
+                        presentacion = item.presentacion
+                        cantidad = item.cantidad
+
+                        if presentacion == 'caja':
+                            piezas = cantidad * 30
+                            precio = galleta.precio * 30
+                        elif presentacion == 'kilo':
+                            piezas = cantidad * 24
+                            precio = galleta.precio * 24
+                        else:
+                            piezas = cantidad
+                            precio = galleta.precio
+
+                        session['carrito'].append({
+                            'galleta_id': galleta.id,
+                            'nombre': galleta.nombre,
+                            'precio': precio,
+                            'presentacion': presentacion,
+                            'cantidad': cantidad,
+                            'piezas': piezas
+                        })
                 user.last_login = datetime.now(pytz.timezone("America/Mexico_City"))
                 db.session.commit()
 
                 flash('¡Inicio de sesión exitoso!', 'success')
 
                 if user.has_role('admin'):
-                    # Redirecion al dashboard
                     return redirect(url_for('personal_bp.dashboard'))
                 return redirect(url_for('cliente_bp.index'))
 
@@ -70,6 +100,7 @@ def login():
 
         else:
             flash('El correo no está registrado. Por favor, regístrate o verifica tu correo.', 'danger')
+    session.pop('carrito', None)
 
     return render_template('auth/login.html', form=form)
 
@@ -79,6 +110,7 @@ def login():
 @login_required
 def logout():
     logout_user()
+    session.pop('carrito', None)  # Limpia el carrito al cerrar sesión
     session.clear()
     flash("Sesión cerrada correctamente.", "info")
     return redirect(url_for('auth_bp.login'))
@@ -208,7 +240,9 @@ def profile():
 @log_excepciones
 @role_required('cliente')
 def orders():
-    return render_template('auth/orders.html')
+    pedidos = Pedido.query.filter_by(usuario_id=current_user.id).order_by(Pedido.fecha_pedido.desc()).all()
+    return render_template('auth/orders.html', pedidos=pedidos)
+
 
 
 # Restablecer contraseña

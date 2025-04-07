@@ -8,16 +8,14 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
 
 
 </head>
-<body class="bg-[#e1d9ce] text-gray-900 flex-col min-h-screen">
-
-    {% import "_macros.html" as macros %}   
-    {{ macros.mostrar_flash() }}  
+<body class="bg-[#e1d9ce] text-gray-900 flex-col min-h-screen">  
 
     <!-- Nav -->
-    <nav class="bg-gradient-to-b from-black/50 bg-white top-0 left-0 w-full z-50 py-6">
+    <nav class="bg-gradient-to-b from-black/50 bg-white top-0 left-0 w-full z-50 py-6 fixed">
         <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto px-6">
             <a href="/" class="flex items-center space-x-3">
                 <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo Maicookies" class="w-12 h-12">
@@ -31,7 +29,11 @@
                     </button>
                     <a href="{{ url_for('cliente_bp.carrito_compras') }}" class="relative text-black text-2xl focus:outline-none">
                         <i class="fas fa-shopping-cart"></i>
-                        <span class="absolute top-(-2) right-(-2) left-5 bg-red-500 text-white text-xs font-bold rounded-full px-2">3</span>
+                        {% if session.get('carrito') %}
+                        <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full px-2">
+                            {{ session['carrito']|length }}
+                        </span>
+                        {% endif %}
                     </a>
                 </div> 
                 <!-- Botón del menú móvil -->
@@ -43,77 +45,79 @@
                 </button>
                  
                
-            <!-- Dropdown menu -->
-            <div class="z-50 hidden my-4 w-72 rounded-2xl shadow-xl bg-white dark:bg-gray-800 text-sm text-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-600" id="user-dropdown">
-                {% if current_user.is_authenticated %}
-                <div class="px-6 py-4 border-b border-gray-300 dark:border-gray-600">
-                    <span class="block text-base font-semibold text-gray-900 dark:text-white">{{ current_user.username }}</span>
-                    <span class="block text-base text-gray-600 truncate dark:text-gray-400">{{ current_user.correo }}</span>
+                <div class="z-50 hidden my-4 w-72 rounded-2xl shadow-xl bg-white dark:bg-gray-800 text-sm text-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-600" id="user-dropdown">
+                    {% if current_user.is_authenticated %}
+                    <div class="px-6 py-4 border-b border-gray-300 dark:border-gray-600">
+                        <span class="block text-base font-semibold text-gray-900 dark:text-white">{{ current_user.username }}</span>
+                        <span class="block text-base text-gray-600 truncate dark:text-gray-400">{{ current_user.correo }}</span>
+                    </div>
+                    <ul class="py-3 mx-4 space-y-1">
+                        <li>
+                            <a href="{{ url_for('auth_bp.profile') }}"
+                               class="block w-full px-6 py-3 text-base text-gray-900 dark:text-gray-100 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-xl transition duration-300 cursor-pointer">
+                                <span class="font-medium">Mi perfil</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ url_for('auth_bp.orders') }}"
+                               class="block w-full px-6 py-3 text-base text-gray-900 dark:text-gray-100 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-xl transition duration-300 cursor-pointer">
+                                <span class="font-medium">Pedidos</span>
+                            </a>
+                        </li>
+                        <li>
+                            <button type="button"
+                                    onclick="document.getElementById('modal-logout').classList.remove('hidden')"
+                                    class="block w-full text-left px-6 py-3 text-base text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-800 rounded-xl transition duration-300 cursor-pointer">
+                                <span class="font-medium">Cerrar sesión</span>
+                            </button>
+                        </li>
+                    </ul>
+                    {% else %}
+                        <ul class="py-2 px-2 text-center space-y-1">
+                            <li>
+                                <a href="{{ url_for('auth_bp.login') }}"
+                                   class="block w-full px-3 py-2 text-sm text-gray-900 dark:text-gray-100 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-md transition duration-200 cursor-pointer">
+                                    Iniciar sesión
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ url_for('auth_bp.register_landing') }}"
+                                   class="block w-full px-3 py-2 text-sm text-gray-900 dark:text-gray-100 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-md transition duration-200 cursor-pointer">
+                                    Registrarse
+                                </a>
+                            </li>
+                        </ul>                    
+                    {% endif %}
                 </div>
-                <ul class="py-3 mx-4">  
-                    <li>
-                        <a href="{{ url_for('auth_bp.profile') }}"
-                            class="block px-6 py-3 text-base text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition duration-300">
-                            <span class="font-medium">Mi perfil</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ url_for('auth_bp.orders') }}"
-                            class="block px-6 py-3 text-base text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition duration-300">
-                            <span class="font-medium">Pedidos</span>
-                        </a>
-                    </li>
-                    <li>
-                        <button type="button" onclick="document.getElementById('modal-logout').classList.remove('hidden')"
-                            class="block w-full text-left px-6 py-3 text-base text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-800 rounded-xl transition duration-300">
-                            <span class="font-medium">Cerrar sesión</span>
-                        </button>
-                    </li>
-                </ul>
-                {% else %}
-                <ul class="py-3 mx-4 text-center">
-                    <li>
-                        <a href="{{ url_for('auth_bp.login') }}"
-                            class="block px-4 py-2 text-sm text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition duration-300">
-                            <span class="font-medium">Iniciar sesión</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ url_for('auth_bp.register_landing') }}"
-                            class="block px-4 py-2 text-sm text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition duration-300"></a>
-                            <span class="font-medium">Registrarse</span>
-                        </a>
-                    </li>
-                </ul>
-                {% endif %}
-            </div>
+                
+            
             
             </div>
             <div id="mobile-menu" class="items-center justify-between hidden w-full md:flex md:w-auto md:order-1 tracking-wide">
                 <ul class="flex flex-col font-semibold tracking-normal text-[17px] p-4 md:p-0 mt-4 rounded-lg bg-transparent md:space-x-8 rtl:space-x-reverse md:flex-row md:mt-0">
                     <li>
                         <a href="{{ url_for('cliente_bp.index')}}" class="block py-3 px-4 text-dark md:p-0">
-                            Inicio {% if request.endpoint == 'cliente_bp.index' %}🍪{% endif %}
+                            Inicio
                         </a>
                     </li>
                     <li>
                         <a href="{{ url_for('cliente_bp.nosotros')}}" class="block py-3 px-4 text-dark md:p-0">
-                            Nosotros {% if request.endpoint == 'cliente_bp.nosotros' %}🍪{% endif %}
+                            Nosotros
                         </a>
                     </li>
                     <li>
                         <a href="{{ url_for('cliente_bp.productos')}}" class="block py-3 px-4 text-dark md:p-0">
-                            Pide en Línea {% if request.endpoint == 'cliente_bp.productos' %}🍪{% endif %}
+                            Pide en Línea
                         </a>
                     </li>
                     <li>
                         <a href="{{ url_for('cliente_bp.geleria')}}" class="block py-3 px-4 text-dark md:p-0">
-                            Galería {% if request.endpoint == 'cliente_bp.geleria' %}🍪{% endif %}
+                            Galería
                         </a>
                     </li>
                     <li>
                         <a href="{{ url_for('cliente_bp.contacto') }}" class="block py-3 px-4 text-dark md:p-0">
-                            Contacto {% if request.endpoint == 'cliente_bp.contacto' %}🍪{% endif %}
+                            Contacto
                         </a>
                     </li>
                 </ul>
@@ -195,7 +199,7 @@
 
 
     <!-- Footer -->
-    <footer class="bg-[#D2B48C] text-dark bottom-0 left-0">
+    <footer class="bg-white text-dark bottom-0 left-0">
         <div class="mx-auto w-full max-w-screen-xl">
             <div class="grid grid-cols-2 gap-8 px-4 py-6 lg:py-8 md:grid-cols-4">
                 <div>
@@ -251,7 +255,7 @@
                     </ul>
                 </div>
             </div>
-            <div class="px-4 py-6 bg-[#D2B48C] text-center">
+            <div class="px-4 py-6  text-center">
                 <span class="text-sm text-dark-200">© 2025 <a href="#" class="hover:underline">Maicookies™</a>. Todos los derechos reservados.</span>
             </div>
         </div>

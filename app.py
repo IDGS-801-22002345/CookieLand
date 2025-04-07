@@ -1,8 +1,8 @@
 import os
-from flask import Flask, current_app, render_template, request, redirect, session, url_for
+from flask import Flask, current_app, flash, render_template, request, redirect, session, url_for
 from flask_wtf.csrf import CSRFProtect
 import base64
-from flask_login import LoginManager 
+from flask_login import LoginManager, current_user 
 from config import *
 from models.models import *
 from flask_mail import Mail
@@ -107,6 +107,20 @@ def create_app():
     app.logger.addHandler(file_handler)
     app.logger.setLevel(logging.INFO)
     
+    @app.before_request
+    def cargar_carrito_temporal():
+        if current_user.is_authenticated and 'carrito' not in session:
+            carrito = {}
+            items = CarritoTemporal.query.filter_by(usuario_id=current_user.id).all()
+            for item in items:
+                carrito[str(item.galleta_id)] = {'cantidad': item.cantidad}
+            session['carrito'] = carrito  
+    
+    @app.route('/limpiar-carrito')
+    def limpiar_carrito():
+        session.pop('carrito', None)
+        flash("Carrito limpiado.", "info")
+        return redirect(url_for('cliente_bp.productos'))  
     
     return app
 

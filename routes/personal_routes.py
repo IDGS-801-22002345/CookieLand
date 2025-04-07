@@ -1,10 +1,12 @@
-from flask import render_template, redirect, url_for, flash, request
+from flask import render_template, redirect, render_template_string, url_for, flash, request
 from flask_login import login_required
 from werkzeug.security import generate_password_hash
 from forms.personal_forms import RegistroUsuarioForm
 from models.models import *
 from flask import Blueprint
 from utils.decoradores import *
+from sqlalchemy.orm import joinedload
+
 
 personal_bp = Blueprint('personal_bp', __name__, url_prefix='/')
 
@@ -102,22 +104,23 @@ def modificar_usuario():
     return render_template("personal/usuarios.html", form=form, usuarios=usuarios, modificar_modal=True)
 
 
-# Ruta para eliminar un usuario
-@personal_bp.route('/eliminar_usuario/<int:usuario_id>', methods=['POST'])
+# Ruta para activar/desactivar un usuario
+@personal_bp.route('/toggle_usuario_estatus/<int:usuario_id>', methods=['POST'])
 @log_excepciones
 @login_required
 @role_required('admin')
-@registrar_accion("Eliminó un usuario")
-def eliminar_usuario(usuario_id):
+@registrar_accion("Cambió estatus de un usuario")
+def toggle_usuario_estatus(usuario_id):
     usuario = Usuario.query.get_or_404(usuario_id)
 
     try:
-        usuario.estatus = 0
+        usuario.estatus = 0 if usuario.estatus == 1 else 1
         db.session.commit()
-        flash(f"Usuario '{usuario.username}' desactivado correctamente.", "success")
+        estado = "activado" if usuario.estatus == 1 else "desactivado"
+        flash(f"Usuario '{usuario.username}' {estado} correctamente.", "success")
     except Exception as e:
         db.session.rollback()
-        flash(f"No se pudo desactivar el usuario: {e}", "danger")
+        flash(f"No se pudo cambiar el estatus del usuario: {e}", "danger")
 
     return redirect(url_for('personal_bp.usuarios'))
 
@@ -147,10 +150,13 @@ def dashboard():
     return render_template('dashboard/dashboard.html')
 
 
-# Ruta para el pedidos
+# Ruta para mirar pedidos (clinte)
 @personal_bp.route('/mk_pedidos')  
 @log_excepciones
 @login_required
 @role_required('admin')
 def pedidos():
-    return render_template('pedidos/pedidos.html')
+    pedidos = Pedido.query.options(
+        joinedload(Pedido.detalles).joinedload(DetallePedido.galleta)
+    ).order_by(Pedido.fecha_pedido.desc()).all()
+    return render_template('pedidos/pedidos.html', pedidos=pedidos)

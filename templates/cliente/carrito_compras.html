@@ -2,7 +2,12 @@
 {% block title %}Carrito de compras - Maicookies{% endblock %}
 
 {% block content %}
-<div class="max-w-screen-xl mx-auto px-4 py-12">
+
+{% import "_macros.html" as macros %}
+{{ macros.mostrar_flash() }}
+
+
+<div class="max-w-screen-xl min-h-[80vh] mx-auto px-4 py-12 mt-24">
   <h1 class="text-4xl font-extrabold text-center text-[#5A3E1B] mb-12">Tu carrito de compras</h1>
 
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -11,66 +16,124 @@
       <div class="grid grid-cols-12 font-semibold text-[#5A3E1B] border-b border-[#CDAA7D] pb-2 mb-4">
         <span class="col-span-2"></span>
         <span class="col-span-3">Producto</span>
-        <span class="text-center col-span-2">P. Unitario</span>
-        <span class="text-center col-span-3">Cantidad</span>
-        <span class="text-right col-span-2">Total</span>
+        <span class="col-span-2 text-center">P. Unitario</span>
+        <span class="col-span-2 text-center">Cantidad</span>
+        <span class="col-span-1 text-center">Acción</span>
+        <span class="col-span-2 text-right">Total</span>
       </div>
-      <!-- Producto -->
+  
+      {% for item in carrito %}
       <div class="grid grid-cols-12 items-center border-b border-gray-200 py-4">
+        <!-- Imagen -->
         <div class="col-span-2">
-          <img src="{{ url_for('static', filename='img/img14.jpg') }}" alt="Galleta" class="w-20 h-20 object-cover rounded-lg border">
+          <img src="{{ url_for('cliente_bp.mostrar_imagen', galleta_id=item['galleta_id']) }}" alt="Galleta"
+               class="w-20 h-20 object-cover rounded-lg border">
         </div>
-        <h3 class="col-span-3 text-[#5A3E1B] font-medium">Galleta de Chocolate</h3>
-        <p class="col-span-2 text-center text-[#5A3E1B] font-medium">$25.00</p>
-        <div class="col-span-3 flex justify-center items-center">
-          <button type="button" class="text-[#5A3E1B] px-2 text-xl font-bold" onclick="actualizarCantidad(-1)">−</button>
-          <input type="number" id="cantidad" min="1" max="999" value="3" class="w-14 text-center border border-[#CDAA7D] rounded-lg mx-2">
-          <button type="button" class="text-[#5A3E1B] px-2 text-xl font-bold" onclick="actualizarCantidad(1)">+</button>
+  
+        <!-- Nombre -->
+        <div class="col-span-3 text-[#5A3E1B] font-medium">
+          <h3>{{ item['nombre'] }}</h3>
+          <p class="text-xs text-gray-500 capitalize">Presentación: {{ item['presentacion'] }}</p>
         </div>
-        <p class="col-span-2 text-right text-[#8B5A2B] font-semibold">$<span id="precioTotal">75.00</span></p>
+  
+        <!-- Precio Unitario -->
+        <p class="col-span-2 text-center text-[#5A3E1B] font-medium">${{ "%.2f"|format(item['precio']) }}</p>
+  
+        <!-- Formulario para cambiar cantidad -->
+        <div class="col-span-2 flex justify-center">
+          <form method="POST" action="{{ url_for('cliente_bp.cambiar_cantidad') }}" class="flex items-center gap-2">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="galleta_id" value="{{ item['galleta_id'] }}">
+            <input type="hidden" name="presentacion" value="{{ item['presentacion'] }}">
+            <input type="number"
+                   name="cantidad"
+                   min="1"
+                   max="200"
+                   value="{{ item['cantidad'] }}"
+                   class="w-16 text-center border border-[#CDAA7D] rounded-lg text-[#5A3E1B] font-medium text-sm"
+                   onchange="this.form.submit()">
+          </form>
+        </div>
+  
+        <!-- Botón Eliminar -->
+        <div class="col-span-1 text-center">
+          <form method="POST" action="{{ url_for('cliente_bp.eliminar_galleta') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="galleta_id" value="{{ item['galleta_id'] }}">
+            <input type="hidden" name="presentacion" value="{{ item['presentacion'] }}">
+            <button type="submit" title="Eliminar"
+                    class="p-2 bg-red-100 hover:bg-red-200 text-red-600 rounded-lg transition duration-200">
+              <i class="fas fa-trash-alt"></i>
+            </button>
+          </form>
+        </div>
+  
+        <!-- Total -->
+        <p class="col-span-2 text-right text-[#8B5A2B] font-semibold">
+          ${{ "%.2f"|format(item['precio'] * item['cantidad']) }}
+        </p>
       </div>
+      {% else %}
+      <div class="text-center text-[#5A3E1B] mt-6 text-sm font-medium col-span-12">
+        <i class="fas fa-info-circle mr-1"></i> No tienes productos en tu carrito aún.
+      </div>
+      {% endfor %}
     </div>
+  
+  
+    
 
     <!-- Detalles del pedido -->
     <div class="bg-white rounded-2xl shadow-xl border border-[#CDAA7D] p-6 h-fit self-start sticky top-24">
       <h2 class="text-2xl font-bold text-[#5A3E1B] mb-6">Detalles del pedido</h2>
 
-      <div class="mb-4">
-        <label for="fecha" class="block text-sm font-medium text-[#5A3E1B] mb-1">Fecha de recolección</label>
-        <input type="date" id="fecha" name="fecha" class="w-full p-3 border border-[#CDAA7D] rounded-lg focus:ring-2 focus:ring-[#A0522D] focus:outline-none">
-      </div>
+      <form action="{{ url_for('cliente_bp.confirmar_pedido') }}" method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
-      <div class="mb-4">
-        <label for="hora" class="block text-sm font-medium text-[#5A3E1B] mb-1">Hora de recolección</label>
-        <select id="hora" name="hora" class="w-full p-3 border border-[#CDAA7D] rounded-lg focus:ring-2 focus:ring-[#A0522D] focus:outline-none">
-          <option value="">Selecciona una hora</option>
-          <option>10:00 AM</option>
-          <option>12:00 PM</option>
-          <option>2:00 PM</option>
-          <option>4:00 PM</option>
-          <option>6:00 PM</option>
-        </select>
-      </div>
+        <div class="mb-4">
+          <label for="fecha" class="block text-sm font-medium text-[#5A3E1B] mb-1">Fecha de recolección</label>
+          <input type="date" id="fecha" name="fecha" required
+                 class="w-full p-3 border border-[#CDAA7D] rounded-lg focus:ring-2 focus:ring-[#A0522D] focus:outline-none">
+        </div>
 
-      <!-- Totales del pedido -->
-      <div class="mb-4 border-t border-gray-200 pt-4">
-        <div class="flex justify-between text-sm text-gray-600">
-          <span>Subtotal:</span>
-          <span>$<span id="subtotal">75.00</span></span>
+        <div class="mb-4">
+          <label for="hora" class="block text-sm font-medium text-[#5A3E1B] mb-1">Hora de recolección</label>
+          <select id="hora" name="hora" required
+                  class="w-full p-3 border border-[#CDAA7D] rounded-lg focus:ring-2 focus:ring-[#A0522D] focus:outline-none">
+            <option value="">Selecciona una hora</option>
+            <option value="10:00 AM">10:00 AM</option>
+            <option value="12:00 PM">12:00 PM</option>
+            <option value="2:00 PM">2:00 PM</option>
+            <option value="4:00 PM">4:00 PM</option>
+            <option value="6:00 PM">6:00 PM</option>
+          </select>
         </div>
-        <div class="flex justify-between text-sm text-gray-600">
-          <span>Envio:</span>
-          <span>Tienda</span>
-        </div>
-        <div class="flex justify-between font-bold text-lg text-[#5A3E1B] mt-5">
-          <span>Total:</span>
-          <span>$<span id="total">75.00</span></span>
-        </div>
-      </div>
 
-      <button type="submit" class="btn-custom w-full">
-        Confirmar pedido
-      </button>
+        {% set subtotal = namespace(valor=0) %}
+        {% for item in carrito %}
+          {% set subtotal.valor = subtotal.valor + (item['precio'] * item['cantidad']) %}
+        {% endfor %}
+
+        <div class="mb-4 border-t border-gray-200 pt-4">
+          <div class="flex justify-between text-sm text-gray-600">
+            <span>Subtotal:</span>
+            <span>${{ '%.2f' % subtotal.valor }}</span>
+          </div>
+          <div class="flex justify-between text-sm text-gray-600">
+            <span>Envío:</span>
+            <span>Tienda</span>
+          </div>
+          <div class="flex justify-between font-bold text-lg text-[#5A3E1B] mt-5">
+            <span>Total:</span>
+            <span>${{ '%.2f' % subtotal.valor }}</span>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-custom w-full">Confirmar pedido</button>
+        <p class="text-sm text-gray-500 mt-4 text-center">
+          <i class="fas fa-info-circle mr-1"></i> Todos los pedidos realizados son con al menos dos días de anticipación.
+        </p>
+      </form>
     </div>
   </div>
 </div>
@@ -97,37 +160,39 @@
 </style>
 
 <script>
+  function validarCantidad(input) {
+    input.value = input.value.replace(/\D/g, ''); 
+    if (input.value === '' || parseInt(input.value) < 1) {
+      input.value = 1;
+    } else if (parseInt(input.value) > 200) {
+      input.value = 200;
+    }
+  }
+
+  document.querySelectorAll('input[name="cantidad"]').forEach(input => {
+    input.addEventListener('keypress', function (e) {
+      if (!/[0-9]/.test(e.key)) {
+        e.preventDefault();
+      }
+    });
+  });
+
   document.addEventListener('DOMContentLoaded', () => {
     const fechaInput = document.getElementById('fecha');
     const today = new Date();
+    today.setDate(today.getDate() + 2); 
     const yyyy = today.getFullYear();
     const mm = String(today.getMonth() + 1).padStart(2, '0');
     const dd = String(today.getDate()).padStart(2, '0');
-    const minDate = `${yyyy}-${mm}-${dd}`;
-    fechaInput.setAttribute('min', minDate);
+    fechaInput.min = `${yyyy}-${mm}-${dd}`;
 
     const maxDateObj = new Date();
     maxDateObj.setDate(maxDateObj.getDate() + 40);
     const maxY = maxDateObj.getFullYear();
     const maxM = String(maxDateObj.getMonth() + 1).padStart(2, '0');
     const maxD = String(maxDateObj.getDate()).padStart(2, '0');
-    const maxDate = `${maxY}-${maxM}-${maxD}`;
-    fechaInput.setAttribute('max', maxDate);
+    fechaInput.max = `${maxY}-${maxM}-${maxD}`;
   });
 
-  function actualizarCantidad(cambio) {
-    const cantidadInput = document.getElementById('cantidad');
-    let cantidad = parseInt(cantidadInput.value) + cambio;
-    if (cantidad < 1) cantidad = 1;
-    if (cantidad > 999) cantidad = 999;
-    cantidadInput.value = cantidad;
-
-    const precioUnitario = 25.00;
-    const subtotal = (cantidad * precioUnitario).toFixed(2);
-
-    document.getElementById('precioTotal').innerText = subtotal;
-    document.getElementById('subtotal').innerText = subtotal;
-    document.getElementById('total').innerText = subtotal;
-  }
 </script>
 {% endblock %}
