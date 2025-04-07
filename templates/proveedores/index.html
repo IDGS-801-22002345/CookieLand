@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Registro de Proveedores</title>
+    <title>Proveedores</title>
     <link
       href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
       rel="stylesheet"
@@ -22,101 +22,88 @@
       href="{{ url_for('static', filename='css/output.css') }}"
     />
     <!-- Contenedor principal con margen superior -->
-    <div class="flex flex-col w-full px-10">
-      <!-- Botón para abrir el modal de agregar -->
-      <div
-        class="pl-28 p-4 text-center bg-white border border-gray-300 rounded-lg shadow-sm sm:p-8 dark:bg-gray-800 dark:border-gray-700"
-      >
-      <h1 class="text-3xl font-bold text-center mb-4">Administración de proveedores</h1>
-
-        <div class="flex justify-end">
-          <button
-            data-modal-target="crud-modal"
-            data-modal-toggle="crud-modal"
-            class="flex items-center gap-2 text-white focus:outline-none bg-green-500 hover:bg-green-500 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-1dark:bg-green-600 dark:hover:bg-[#3b82f6]"
-          >
-            <i class="fas fa-truck"></i>
-            Agregar
-          </button>
+    <div class="flex flex-col w-full px-4 md:px-10">
+        <div class="w-full p-4 text-center bg-white border border-gray-200 rounded-lg shadow-sm">
+            <!-- Título y botón de agregar  -->
+            <div class="flex justify-between pb-5">
+                <div>
+                    <h1 class="text-4xl font-medium text-gray-800">Proveedores</h1>
+                </div>
+                <button 
+                    data-modal-target="crud-modal" 
+                    data-modal-toggle="crud-modal"
+                    class="flex items-center gap-2 text-white bg-green-500 hover:bg-green-500 focus:outline-none focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-1 transition-colors duration-200 ease-in-out">
+                    <i class="fas fa-truck"></i> 
+                    Agregar
+                </button>
+            </div>
+    
+            <!-- Barra de búsqueda  -->
+            <div class="flex items-center space-x-4 mb-4">
+                <div class="flex items-center border border-gray-300 rounded-md w-96 p-2">
+                    <i class="fas fa-search text-gray-500 px-2"></i>
+                    <input 
+                        type="search" 
+                        id="search-input" 
+                        class="w-full outline-none" 
+                        placeholder="Buscar proveedores"/>
+                </div>
+            </div>
+            
+            <!-- Tabla de proveedores  -->
+            <div class="overflow-x-auto overflow-y-auto max-h-[500px] mt-4">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    
+                <table id="proveedores-table" class="w-full text-sm text-left rtl:text-right text-gray-500">
+                    <thead class="text-xs text-white uppercase sticky top-0" style="background-color: #7c5454 !important; z-index: 10;">
+                        <tr>
+                            <th scope="col" class="px-6 py-3">Nombre</th>
+                            <th scope="col" class="px-6 py-3">Teléfono</th>
+                            <th scope="col" class="px-6 py-3">Email</th>
+                            <th scope="col" class="px-6 py-3">Estatus</th>
+                            <th scope="col" class="px-6 py-3 text-center align-middle">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for prov in proveedores %}
+                        <tr class="bg-white border-b border-gray-200 relative">
+                            <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">{{ prov.nombre }}</td>
+                            <td class="px-6 py-4">{{ prov.telefono }}</td>
+                            <td class="px-6 py-4">{{ prov.email }}</td>
+                            <td class="px-6 py-4 text-start">
+                                <div class="flex items-center">
+                                    <span class="inline-block w-4 h-4 rounded-full me-2 
+                                        {% if prov.estatus == 1 %} bg-green-500 {% else %} bg-red-500 {% endif %}">
+                                    </span>
+                                    {% if prov.estatus == 1 %} Activo {% else %} Inactivo {% endif %}
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 text-center flex justify-center items-center space-x-4">
+                                <form method="POST" action="{{ url_for('provedor_bp.cambiar_estatus') }}" class="cambiar-estatus-form">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <input type="hidden" name="id" value="{{ prov.id }}">
+                                    <input type="hidden" name="estatus" value="{{ 1 if prov.estatus == 0 else 0 }}">
+                                    <button type="submit" class="p-2 text-white rounded-full focus:outline-none {% if prov.estatus == 1 %} bg-green-500 hover:bg-green-600 {% else %} bg-red-500 hover:bg-red-600 {% endif %}">
+                                        <i class="fas fa-power-off"></i>
+                                    </button>
+                                </form>
+                                <a href="javascript:void(0)" 
+                                    data-modal-target="modificar-modal" 
+                                    data-modal-toggle="modificar-modal"
+                                    class="p-2 rounded-full bg-yellow-500 hover:bg-yellow-600 text-white focus:outline-none"
+                                    data-id="{{ prov.id }}"
+                                    data-nombre="{{ prov.nombre }}"
+                                    data-telefono="{{ prov.telefono }}"
+                                    data-email="{{ prov.email }}">
+                                    <i class="fa-solid fa-pen-to-square"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
-        <div
-          class="flex items-center border border-gray-300 rounded-md w-96 p-2"
-        >
-          <i class="fas fa-search text-gray-500 px-2"></i>
-          <input
-            type="search"
-            id="search-input"
-            class="w-full outline-none"
-            placeholder="Buscar proveedor"
-          />
-        </div>
-
-        <!-- Contenedor de la tabla con scroll -->
-        <div class="overflow-x-auto overflow-y-auto max-h-[500px] mt-4">
-          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-
-          <table
-            id="proveedores-table"
-            class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400"
-          >
-            <thead
-              class="text-xs text-white uppercase sticky top-0 dark:bg-gray-700 dark:text-gray-400"
-              style="background-color: #7c5454 !important; z-index: 10"
-            >
-              <tr>
-                <th scope="col" class="px-6 py-3">Nombre</th>
-                <th scope="col" class="px-6 py-3">Teléfono</th>
-                <th scope="col" class="px-6 py-3">Email</th>
-                <th scope="col" class="px-6 py-3 w-32">Estatus</th>
-                <th scope="col" class="px-6 py-3 text-center align-middle">
-                  Acciones
-                </th>
-                <!-- Centrado -->
-              </tr>
-            </thead>
-            <tbody>
-              {% for prov in proveedores %}
-              <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200 relative">
-               
-                <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">       {{ prov.nombre }}</td>
-                <td class="px-6 py-4">{{ prov.telefono }}</td>
-                <td class="px-6 py-4">{{ prov.email }}</td>
-                <td class="px-6 py-4">
-                    <div class="flex items-center">
-                        {% if prov.estatus == 1 %}
-                        <div class="h-2.5 w-2.5 rounded-full bg-green-500 me-2"></div> Activo
-                        {% else %}
-                        <div class="h-2.5 w-2.5 rounded-full bg-red-500 me-2"></div> Inactivo
-                        {% endif %}
-                    </div>
-                </td>
-                <td class="px-6 py-4 flex justify-center items-center space-x-4">
-                    <!-- Formulario sin el ID en la URL -->
-                    <form method="POST" action="{{ url_for('provedor_bp.cambiar_estatus') }}" class="cambiar-estatus-form">
-                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                        <input type="hidden" name="id" value="{{ prov.id }}">
-                        <input type="hidden" name="estatus" value="{{ 1 if prov.estatus == 0 else 0 }}">
-                        <button type="submit" class="p-2 text-white rounded-full focus:outline-none {% if prov.estatus == 1 %} bg-green-500 hover:bg-green-600 {% else %} bg-red-500 hover:bg-red-600 {% endif %}">
-                            <i class="fas fa-power-off"></i>
-                        </button>
-                    </form>
-                    <a href="javascript:void(0)" 
-                    data-modal-target="modificar-modal" 
-                    data-modal-toggle="modificar-modal"
-                    class="btn-modificar p-2 rounded-full bg-yellow-500 hover:bg-yellow-600 text-white focus:outline-none"
-                    data-id="{{ prov.id }}"
-                    data-nombre="{{ prov.nombre }}"
-                    data-telefono="{{ prov.telefono }}"
-                    data-email="{{ prov.email }}">
-                    <i class="fa-solid fa-pen-to-square"></i>
-                 </a>
-                </td>
-            </tr>
-            {% endfor %}
-            </tbody>
-          </table>
-        </div>
-      </div>
     </div>
 
    <!-- Fondo oscuro semitransparente -->

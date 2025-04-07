@@ -145,6 +145,34 @@
   </div>
 </div>
 
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+    const searchInput = document.getElementById("search-input");
+    const table = document.getElementById("recetas-table");
+    const tbody = table.querySelector("tbody");
+    
+    searchInput.addEventListener("input", function () {
+        const searchText = this.value.toLowerCase();
+        const rows = tbody.getElementsByTagName("tr"); 
+
+        Array.from(rows).forEach(row => {
+            const cells = row.querySelectorAll("th, td"); 
+            let found = false;
+
+            cells.forEach(cell => {
+                const cellText = cell.textContent.toLowerCase();
+                if (cellText.includes(searchText)) {
+                    found = true;
+                }
+            });
+
+            row.style.display = found ? "" : "none";
+        });
+    });
+});
+</script>
+
 <!-- Incluye Flowbite JS -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
 

@@ -5,65 +5,75 @@
 
 <div class="flex flex-col w-full px-4 md:px-10">
     <div class="w-full p-4 text-center bg-white border border-gray-200 rounded-lg shadow-sm">
-        <div class="flex flex-col self-start mt-10 w-[1200px]">
-            <h1 class="text-3xl font-bold text-center align-middle mb-4">DETALLE COMPRA DE INSUMOS</h1>
-            <!-- Buscador -->
-            <div class="ml-28 w-full p-4 text-center bg-white border border-gray-300 rounded-lg shadow-sm sm:p-8">
-                <div class="flex items-center border border-gray-300 rounded-md w-96 p-2">
-                    <i class="fas fa-search text-gray-500 px-2"></i>
-                    <input type="search" id="search-input" class="w-full outline-none" placeholder="Buscar en detalles de compra">
-                </div>
-
-                <!-- Tabla -->
-                <div class="overflow-x-auto overflow-y-auto max-h-[500px] mt-4">
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                    <table id="materia-prima-table" class="w-full text-sm text-left text-gray-500">
-                        <thead class="text-xs text-white uppercase sticky top-0" style="background-color: #7c5454 !important; z-index: 10;">
-                            <tr>
-                                <th class="px-6 py-3">No. Compra</th>
-                                <th class="px-6 py-3">Fecha</th>
-                                <th class="px-6 py-3">Total</th>
-                                <th class="px-6 py-3">Productos</th>
-                                <th class="px-6 py-3">Proveedor</th>
-                                <th class="px-6 py-3 text-center align-middle">Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for compra in compras %}
-                            <tr class="bg-white border-b border-gray-200">
-                                <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                                    {{ compra.id }}
-                                </th>
-                                <td class="px-6 py-4">{{ compra.create_date.strftime('%d-%m-%Y %H:%M') }}</td>
-                                <td class="px-6 py-4">${{ compra.total }}</td>
-                                <td class="px-6 py-4">
-                                    <ul class="space-y-2">
-                                        {% for producto in compra.materias_primas %}
-                                            <li class="flex items-center text-sm text-gray-500">
-                                                <i class="fas fa-box mr-2"></i> <!-- Caja de producto -->
-                                                {{ producto.nombre }}
-                                            </li>
-                                        {% endfor %}
-                                    </ul>
-                                </td>
-                                <td class="px-6 py-4">
-                                    {% if compra.materias_primas and compra.materias_primas[0].proveedor %}
-                                        {{ compra.materias_primas[0].proveedor }}
-                                    {% else %}
-                                        N/A
-                                    {% endif %}
-                                </td>
-                                <td class="px-6 py-4 text-center align-middle">
-                                    <button onclick="openModal('modal-{{ compra.id }}')" class="text-gray-500 hover:text-gray-900">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
+        <!-- Título  -->
+        <div class="flex justify-between pb-5">
+            <div>
+                <h1 class="text-4xl font-medium text-gray-800">Detalle Compra Insumos</h1>
             </div>
+        </div>
+
+        <!-- Buscador  -->
+        <div class="flex items-center space-x-4 mb-4">
+            <div class="flex items-center border border-gray-300 rounded-md w-96 p-2">
+                <i class="fas fa-search text-gray-500 px-2"></i>
+                <input 
+                    type="search" 
+                    id="search-input" 
+                    class="w-full outline-none" 
+                    placeholder="Buscar en detalles de compra">
+            </div>
+        </div>
+
+        <!-- Tabla  -->
+        <div class="overflow-x-auto overflow-y-auto max-h-[500px] mt-4">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <table id="materia-prima-table" class="w-full text-sm text-left text-gray-500">
+                <thead class="text-xs text-white uppercase sticky top-0" style="background-color: #7c5454 !important; z-index: 10;">
+                    <tr>
+                        <th class="px-6 py-3">No. Compra</th>
+                        <th class="px-6 py-3">Fecha</th>
+                        <th class="px-6 py-3">Total</th>
+                        <th class="px-6 py-3">Productos</th>
+                        <th class="px-6 py-3">Proveedor</th>
+                        <th class="px-6 py-3 text-center align-middle">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for compra in compras %}
+                    <tr class="bg-white border-b border-gray-200">
+                        <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
+                            {{ compra.id }}
+                        </th>
+                        <td class="px-6 py-4">{{ compra.create_date.strftime('%d-%m-%Y %H:%M') }}</td>
+                        <td class="px-6 py-4">${{ compra.total }}</td>
+                        <td class="px-6 py-4">
+                            <ul class="space-y-2">
+                                {% for producto in compra.materias_primas %}
+                                    <li class="flex items-center text-sm text-gray-500">
+                                        <i class="fas fa-box mr-2"></i>
+                                        {{ producto.nombre }}
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </td>
+                        <td class="px-6 py-4">
+                            {% if compra.materias_primas and compra.materias_primas[0].proveedor %}
+                                {{ compra.materias_primas[0].proveedor }}
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4 text-center align-middle">
+                            <button 
+                                onclick="openModal('modal-{{ compra.id }}')" 
+                                class="text-gray-500 hover:text-gray-900 text-lg px-3 py-1 rounded">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
     </div>
 </div>

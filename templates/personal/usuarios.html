@@ -1,73 +1,100 @@
-{% extends "layout.html" %} {% block content %}
+{% extends "layout.html" %}
+{% block content %}
 
-<div class="flex flex-col w-full px-10">
-	<div class="pl-28 p-4 text-center bg-white border border-gray-300 rounded-lg shadow-sm sm:p-8 dark:bg-gray-800 dark:border-gray-700">
-		<h1 class="text-3xl font-bold text-center mb-4">Administración de usuarios</h1>
-
-		<div class="flex justify-end">
-			<button id="open-modal-btn" class="flex items-center gap-2 text-white bg-green-500 hover:bg-green-500 focus:outline-none focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-1 transition-colors duration-200 ease-in-out">
-                <i class="fas fa-user-plus"></i> Agregar
+<div class="flex flex-col w-full px-4 md:px-10">
+    <div class="w-full p-4 text-center bg-white border border-gray-200 rounded-lg shadow-sm">
+        <!-- Título y botón de agregar  -->
+        <div class="flex justify-between pb-5">
+            <div>
+                <h1 class="text-4xl font-medium text-gray-800">Administración de usuarios</h1>
+            </div>
+            <button 
+                id="open-modal-btn" 
+                class="flex items-center gap-2 text-white bg-green-500 hover:bg-green-500 focus:outline-none focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-1 transition-colors duration-200 ease-in-out">
+                <i class="fas fa-user-plus"></i> 
+                Agregar
             </button>
-		</div>
+        </div>
 
-		<div class="flex items-center space-x-4 mt-4 mb-4">
-			<div class="flex items-center border border-gray-300 rounded-md w-96 p-2">
-				<i class="fas fa-search text-gray-500 px-2"></i>
-				<input type="search" id="search-input" class="w-full outline-none" placeholder="Buscar usuarios"/>
-			</div>
-		
-			<button id="btn-filtrar-clientes" class="text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2">
-				Clientes
-			</button>
-		</div>
-		
-		
-		<div class="overflow-x-auto overflow-y-auto max-h-[500px] mt-4">
-			<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <!-- Barra de búsqueda y filtros -->
+        <div class="flex items-center space-x-4 mb-4">
+            <div class="flex items-center border border-gray-300 rounded-md w-96 p-2">
+                <i class="fas fa-search text-gray-500 px-2"></i>
+                <input 
+                    type="search" 
+                    id="search-input" 
+                    class="w-full outline-none" 
+                    placeholder="Buscar usuarios"/>
+            </div>
+        
+            <button 
+                id="btn-filtrar-clientes" 
+                class="text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2">
+                Clientes
+            </button>
+        </div>
+        
+        <!-- Tabla de usuarios  -->
+        <div class="overflow-x-auto overflow-y-auto max-h-[500px] mt-4">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
-			<table id="proveedores-table" class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-				<thead class="text-xs text-white uppercase sticky top-0 dark:bg-gray-700 dark:text-gray-400" style="background-color: #7c5454 !important; z-index: 10;">
-					<tr>
-						<th scope="col" class="px-6 py-3">Nombre</th>
-						<th scope="col" class="px-6 py-3">Teléfono</th>
-						<th scope="col" class="px-6 py-3">Correo</th>
-						<th scope="col" class="px-6 py-3">Username</th>
-						<th scope="col" class="px-6 py-3">Estatus</th>
-						<th scope="col" class="px-6 py-3">Rol</th>
-						<th scope="col" class="px-6 py-3">R. Sesión</th>
-						<th scope="col" class="px-6 py-3 text-center align-middle">Acciones</th>
-					</tr>
-				</thead>
-				<tbody>
-					{% for usuario in usuarios %}
-					<tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200 relative">
-						<td class="px-6 py-4">{{ usuario.nombre }}</td>
-						<td class="px-6 py-4">{{ usuario.telefono }}</td>
-						<td class="px-6 py-4">{{ usuario.correo }}</td>
-						<td class="px-6 py-4">{{ usuario.username }}</td>
-						<td class="px-6 py-4 text-start">
-							<span class="inline-block w-4 h-4 rounded-full 
-								{% if usuario.estatus == 1 %} bg-green-500 {% else %} bg-red-500 {% endif %}">
-							</span>
-						</td>
-						<td class="px-6 py-4">{{ usuario.rol.role_name }}</td>
-						<td class="px-6 py-4">{{ usuario.last_login }}</td>
+            <table id="proveedores-table" class="w-full text-sm text-left rtl:text-right text-gray-500">
+                <thead class="text-xs text-white uppercase sticky top-0" style="background-color: #7c5454 !important; z-index: 10;">
+                    <tr>
+                        <th scope="col" class="px-6 py-3">Nombre</th>
+                        <th scope="col" class="px-6 py-3">Teléfono</th>
+                        <th scope="col" class="px-6 py-3">Correo</th>
+                        <th scope="col" class="px-6 py-3">Username</th>
+                        <th scope="col" class="px-6 py-3">Estatus</th>
+                        <th scope="col" class="px-6 py-3">Rol</th>
+                        <th scope="col" class="px-6 py-3">R. Sesión</th>
+                        <th scope="col" class="px-6 py-3 text-center align-middle">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for usuario in usuarios %}
+                    <tr class="bg-white border-b border-gray-200 relative">
+                        <td class="px-6 py-4">{{ usuario.nombre }}</td>
+                        <td class="px-6 py-4">{{ usuario.telefono }}</td>
+                        <td class="px-6 py-4">{{ usuario.correo }}</td>
+                        <td class="px-6 py-4">{{ usuario.username }}</td>
+                        <td class="px-6 py-4 text-start">
+                            <span class="inline-block w-4 h-4 rounded-full 
+                                {% if usuario.estatus == 1 %} bg-green-500 {% else %} bg-red-500 {% endif %}">
+                            </span>
+                        </td>
+                        <td class="px-6 py-4">{{ usuario.rol.role_name }}</td>
+                        <td class="px-6 py-4">{{ usuario.last_login }}</td>
 
-						<td class="px-6 py-4 text-center flex justify-center items-center space-x-4">
-							<a href="javascript:void(0)" class="btn-modificar text-yellow-500  hover:text-yellow-600 text-lg px-3 py-1 rounded" data-modal-target="modificar-modal" data-modal-toggle="modificar-modal" data-id="{{ usuario.id }}" data-nombre="{{ usuario.nombre }}" data-username="{{ usuario.username }}" data-correo="{{ usuario.correo }}" data-telefono="{{ usuario.telefono }}" data-rol="{{ usuario.rol.role_name }}" data-estatus="{{ usuario.estatus }}">
-								<i class="fas fa-edit"></i>
-							</a>
+                        <td class="px-6 py-4 text-center flex justify-center items-center space-x-4">
+                            <a 
+                                href="javascript:void(0)" 
+                                class="btn-modificar text-yellow-500 hover:text-yellow-600 text-lg px-3 py-1 rounded" 
+                                data-modal-target="modificar-modal" 
+                                data-modal-toggle="modificar-modal" 
+                                data-id="{{ usuario.id }}" 
+                                data-nombre="{{ usuario.nombre }}" 
+                                data-username="{{ usuario.username }}" 
+                                data-correo="{{ usuario.correo }}" 
+                                data-telefono="{{ usuario.telefono }}" 
+                                data-rol="{{ usuario.rol.role_name }}" 
+                                data-estatus="{{ usuario.estatus }}">
+                                <i class="fas fa-edit"></i>
+                            </a>
 
-							<button class="btn-eliminar text-red-500 hover:text-red-700 text-lg" data-id="{{ usuario.id }}">
+                            <button 
+                                class="btn-eliminar text-red-500 hover:text-red-700 text-lg" 
+                                data-id="{{ usuario.id }}">
                                 <i class="fas fa-trash-alt"></i>
                             </button>
-						</td>
-					</tr>
-					{% endfor %}
-				</tbody>
-			</table>
-		</div>
-	</div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 
 
 	<!-- Modal para agregar usuarios -->
