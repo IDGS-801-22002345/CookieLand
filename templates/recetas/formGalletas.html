@@ -9,11 +9,9 @@
       <div>
         {% if editar %}
         <h1 class="text-2xl font-bold text-gray-800">Editar Receta</h1>
-
         {% else %}
         <h1 class="text-2xl font-bold text-gray-800">Crear Nueva Receta</h1>
-
-            {% endif %}
+        {% endif %}
       </div>
       <a
         href="/recetas"
@@ -27,17 +25,19 @@
       </a>
     </div>
 
-  
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div class="bg-white rounded-lg border border-gray-200 p-6">
-
-          <form method="POST" action="{{ url_for('galletas_bp.edit_insumos' if editar else 'galletas_bp.add_insumos') }}">
-            {{ insumosForm.csrf_token }}
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            {% if editar %}
-              <input type="hidden" name="galleta_id" value="{{ galleta.id }}">
-            {% endif %}
-      
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <!-- Primer columna -->
+      <div class="bg-white rounded-lg border border-gray-200 p-6">
+        <!-- Formulario de insumos -->
+        <form
+          method="POST"
+          action="{{ url_for('galletas_bp.edit_insumos' if editar else 'galletas_bp.add_insumos') }}"
+        >
+          {{ insumosForm.csrf_token }}
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+          {% if editar %}
+          <input type="hidden" name="galleta_id" value="{{ galleta.id }}" />
+          {% endif %}
 
           <div class="flex flex-col gap-8">
             <div class="border border-gray-200 rounded-lg p-5 bg-gray-50">
@@ -47,93 +47,106 @@
               </h2>
 
               <div class="space-y-4">
-                {{ macro.campoSelect(insumosForm.insumo) }}
-                {{ macro.Input(insumosForm.cantidad) }}
-              </form>
+                {{ macro.campoSelect(insumosForm.insumo) }} {{
+                macro.Input(insumosForm.cantidad) }}
+              </div>
 
-                <div class="pt-2">
-                  <button
-                    type=" button"
-                    name="action"
-                    value="agregarIngrediente"
-                    class="w-full text-white bg-green-500 hover:bg-green-700 font-medium rounded-lg text-sm px-5 py-2.5 text-center transition-colors"
-                  >
-                    <i class="fa-solid fa-plus mr-2"></i> Agregar Ingrediente
-                  </button>
-
-                  <p class="mt-1 text-sm text-gray-500">Ingrese primero los ingredientes de la receta</p>
-
-                </div>
+              <div class="pt-2">
+                <button
+                  type="submit"
+                  name="action"
+                  value="agregarIngrediente"
+                  class="w-full text-white bg-green-500 hover:bg-green-700 font-medium rounded-lg text-sm px-5 py-2.5 text-center transition-colors"
+                >
+                  <i class="fa-solid fa-plus mr-2"></i> Agregar Ingrediente
+                </button>
+                <p class="mt-1 text-sm text-gray-500">
+                  Ingrese primero los ingredientes de la receta
+                </p>
               </div>
             </div>
-       <form method="POST" 
-            action="{{ url_for('galletas_bp.editar_receta' if editar else 'galletas_bp.guardar_receta') }}"
-             enctype="multipart/form-data">
-            {{ galletasForm.csrf_token }}
-              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-              {% if editar %}
-                <input type="hidden" name="galleta_id" value="{{ galleta.id }}">
-              {% endif %}
+          </div>
+        </form>
 
-            <div>
-              {{ macro.Input(galletasForm.nombre) }}
-            
-              {{ macro.campoPrecio(galletasForm.precio)}}
-              {% if editar and galleta.precio %}
-              <p class="mt-1 text-sm text-gray-500">Precio actual: <strong>${{ galleta.precio }}</strong></p>
-              <p class="mt-1 text-sm text-gray-500 pb-6">Si no desea cambiar el precio, deje el campo vacío</p>
-              
-              {% endif %}
-            
-              {% if editar and galleta.foto %}
-              <div class="pt-2 flex flex-col justify-center items-center">
-                <img src="{{ url_for('galletas_bp.mostrar_imagen', galleta_id=galleta.id) }}" 
-                     class="w-40 object-cover rounded">
-                     <div class="text-center mt-2">
-                      <p class="text-sm font-medium text-gray-700">Imagen actual de la galleta</p>
-                      
-                      <p class="text-xs text-gray-500 mt-1">Sube una nueva imagen solo si deseas reemplazar la actual</p>
-                  </div>
+        <form
+          method="POST"
+          action="{{ url_for('galletas_bp.editar_receta' if editar else 'galletas_bp.guardar_receta') }}"
+          enctype="multipart/form-data"
+        >
+          {{ galletasForm.csrf_token }}
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+          {% if editar %}
+          <input type="hidden" name="galleta_id" value="{{ galleta.id }}" />
+          {% endif %}
+
+          <div class="mt-6">
+            {{ macro.Input(galletasForm.nombre) }} {{
+            macro.campoPrecio(galletasForm.precio)}} {% if editar and
+            galleta.precio %}
+            <p class="mt-1 text-sm text-gray-500">
+              Precio actual: <strong>${{ galleta.precio }}</strong>
+            </p>
+            <p class="mt-1 text-sm text-gray-500 pb-6">
+              Si no desea cambiar el precio, deje el campo vacío
+            </p>
+            {% endif %} {% if editar and galleta.foto %}
+            <div class="pt-2 flex flex-col justify-center items-center">
+              <img
+                src="{{ url_for('galletas_bp.mostrar_imagen', galleta_id=galleta.id) }}"
+                class="w-40 object-cover rounded"
+              />
+              <div class="text-center mt-2">
+                <p class="text-sm font-medium text-gray-700">
+                  Imagen actual de la galleta
+                </p>
+                <p class="text-xs text-gray-500 mt-1">
+                  Sube una nueva imagen solo si deseas reemplazar la actual
+                </p>
               </div>
-            {% endif %}
-            {{ macro.campoFoto(galletasForm.foto) }}
             </div>
-            <div class="bg-gray-50 px-4 py-3 text-center border-t border-gray-200">
-              {% if editar %}
-              <button
+            {% endif %} {{ macro.campoFoto(galletasForm.foto) }}
+          </div>
+
+          <div
+            class="bg-gray-50 px-4 py-3 text-center border-t border-gray-200 mt-6"
+          >
+            {% if editar %}
+            <button
               type="submit"
               class="inline-flex items-center text-white bg-green-500 hover:bg-green-700 font-medium rounded-lg text-sm px-5 py-2.5 text-center transition-colors"
             >
               <i class="fas fa-cookie mr-2"></i> Editar Receta
-            </button>      
-              {% else %}
-              <button
+            </button>
+            {% else %}
+            <button
               type="submit"
               class="inline-flex items-center text-white bg-green-500 hover:bg-green-700 font-medium rounded-lg text-sm px-5 py-2.5 text-center transition-colors"
             >
               <i class="fas fa-cookie mr-2"></i> Guardar Receta
-            </button>      
-                  {% endif %}
-           
-            </div>
-          </form>
+            </button>
+            {% endif %}
           </div>
+        </form>
+      </div>
+
+      <!-- Segunda columna -->
+      <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
+        <div class="text-white p-4" style="background-color: #7b3f0f">
+          <h2 class="text-xl font-semibold">
+            <i class="fas fa-clipboard-list mr-2"></i>
+            Ingredientes de la Receta
+          </h2>
         </div>
 
-        <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
-          <div class="text-white p-4" style="background-color: #7b3f0f">
-            <h2 class="text-xl font-semibold">
-              <i class="fas fa-clipboard-list mr-2"></i>
-              Ingredientes de la Receta
-            </h2>
-          </div>
-
-          <div class="p-4">
-            <div id="lista-ingredientes">
+        <div class="p-4">
+          <div id="lista-ingredientes">
             {% if detalles_receta %}
             <div class="overflow-x-auto">
-              <table class="w-full text-sm text-left text-gray-600" >
-                <thead class="text-xs  text-white" style="background-color: #44250b">
+              <table class="w-full text-sm text-left text-gray-600">
+                <thead
+                  class="text-xs text-white"
+                  style="background-color: #44250b"
+                >
                   <tr>
                     <th scope="col" class="px-6 py-3 text-center">
                       Ingrediente
@@ -143,26 +156,45 @@
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200" id="tbody-ingredientes">
-                    {% for detalle in detalles_receta %}
-                    <tr class="hover:bg-gray-50" id="ingrediente-{{ detalle.id }}">
-                        <td class="px-6 py-4 text-center font-medium">
+                  {% for detalle in detalles_receta %}
+                  <tr
+                    class="hover:bg-gray-50"
+                    id="ingrediente-{{ detalle.id }}"
+                  >
+                    <td class="px-6 py-4 text-center font-medium">
                       {{ detalle.insumo }}
                     </td>
                     <td class="px-6 py-4 text-center">
                       {{ detalle.cantidad }} {{ detalle.unidad }}
                     </td>
                     <td class="px-6 py-4 text-center">
-                      <form method="POST" action="{{ url_for('galletas_bp.edit_eliminar_insumo' if editar else 'galletas_bp.eliminar_insumo') }}">
+                      <form
+                        method="POST"
+                        action="{{ url_for('galletas_bp.edit_eliminar_insumo' if editar else 'galletas_bp.eliminar_insumo') }}"
+                      >
                         {{ galletasForm.csrf_token }}
-                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                        <input type="hidden" name="insumo_id" value="{{ detalle.id }}">
+                        <input
+                          type="hidden"
+                          name="csrf_token"
+                          value="{{ csrf_token() }}"
+                        />
+                        <input
+                          type="hidden"
+                          name="insumo_id"
+                          value="{{ detalle.id }}"
+                        />
                         {% if editar %}
-                          <input type="hidden" name="galleta_id" value="{{ galleta.id }}">
+                        <input
+                          type="hidden"
+                          name="galleta_id"
+                          value="{{ galleta.id }}"
+                        />
                         {% endif %}
-                      <button
-                      type="submit"
-                      class="text-red-500 hover:text-red-700 transition-colors" >
-                           <i class="fas fa-trash-alt"></i>
+                        <button
+                          type="submit"
+                          class="text-red-500 hover:text-red-700 transition-colors"
+                        >
+                          <i class="fas fa-trash-alt"></i>
                         </button>
                       </form>
                     </td>
@@ -171,8 +203,6 @@
                 </tbody>
               </table>
             </div>
-        </div>
-
             {% else %}
             <div class="text-center py-8 bg-gray-50 rounded-lg">
               <i class="fas fa-info-circle text-gray-400 text-4xl mb-3"></i>
@@ -183,9 +213,9 @@
             </div>
             {% endif %}
           </div>
-
         </div>
       </div>
+    </div>
   </div>
 </div>
 {% endblock %}

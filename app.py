@@ -23,6 +23,8 @@ from routes.merma_routes import merma_bp
 from routes.personal_routes import personal_bp
 from routes.produccion_routes import produccion_bp
 from routes.proveedor_routes import provedor_bp
+from routes.venta_routes import ventas_bp
+from routes.ventaDetalle_routes import ventasDetalles_bp
 
 
 app = Flask(__name__)
@@ -76,6 +78,8 @@ def create_app():
     app.register_blueprint(detalle_compras_bp)
     app.register_blueprint(merma_bp)
     app.register_blueprint(galletas_bp)
+    app.register_blueprint(ventas_bp)
+    app.register_blueprint(ventasDetalles_bp)
     app.register_blueprint(dashboard_bp)
 
 

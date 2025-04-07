@@ -1,0 +1,49 @@
+{% macro Input(field) %}
+  <label for="{{ field.id }}" 
+  style="color: #5a3e1b"
+  class="text-sm font-medium">
+  {{ field.label }}
+    <span class="text-red-500">*</span>
+  </label>
+  {{ field(class="w-20 p-2 border rounded-lg text-center  font-medium") }}
+  {% if field.errors %}
+  <ul class="mt-2">
+    {% for error in field.errors %}
+    <li class="text-sm text-red-600">{{ error }}</li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+{% endmacro %}
+
+
+{% macro campoSelect(field) %}
+ <label
+ for="{{ field.id }}"
+ style="color: #5a3e1b"
+ class="block mt-4 mb-2 text-sm font-medium"
+ >{{ field.label }}
+ <span class="text-red-500">*</span>
+</label>
+  <select
+    name="{{ field.name }}"
+    id="{{ field.id }}"
+    class="w-full p-2 border rounded-lg text-sm "
+    {% if field.required %}required{% endif %}
+  >
+  <option value="" disabled {% if not field.data %}selected{% endif %}>Selecciona una opción</option>
+  {% for value, label in field.choices %}
+      <option value="{{ value }}" {% if field.data == value %}selected{% endif %}>
+        {{ label }}
+      </option>
+    {% endfor %}
+  </select>
+  
+  {% if field.errors %}
+  <ul class="mt-2">
+    {% for error in field.errors %}
+    <li class="text-sm text-red-600">{{ error }}</li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+</div>
+{% endmacro %}
