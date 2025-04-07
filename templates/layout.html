@@ -19,18 +19,11 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
     />
-    <link
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
-      rel="stylesheet"
-    />
   </head>
 
-  <body>
-
+  <body class="relative">
     <!-- Mensajes flash personalizados -->
-    {% import "_macros.html" as macros %}   
-    {{ macros.mostrar_flash() }}  
-
+    {% import "_macros.html" as macros %} {{ macros.mostrar_flash() }}
 
     <nav
       class="fixed top-0 left-0 right-0 bg-white shadow-md z-30 md:left-64 transition-all duration-300"
@@ -39,7 +32,9 @@
         <div class="flex justify-end space-x-4">
           <div class="flex items-center space-x-2 cursor-pointer">
             <i class="fa fa-user" aria-hidden="true"></i>
-            <span class="text-gray-700 hidden md:inline">{{ current_user.nombre }}</span>
+            <span class="text-gray-700 hidden md:inline"
+              >{{ current_user.nombre }}</span
+            >
           </div>
         </div>
       </div>
@@ -48,7 +43,7 @@
     <!-- Barra lateral -->
     <div
       id="sidebar"
-      class="bg-white h-screen w-64 fixed -left-64 md:left-0 top-0 border-r z-20 transition-all duration-300"
+      class="bg-white h-screen w-64 fixed -left-64 md:left-0 top-0 border-r z-20 transition-all duration-300 flex flex-col"
     >
       <!-- Contenedor del logo -->
       <div class="flex justify-center items-center p-4">
@@ -59,105 +54,122 @@
         />
       </div>
 
-      <!-- Items del menú -->
-      <div class="p-2 space-y-2 overflow-y-auto">
-        <!-- Dashboard -->
-        <a
-          href="{{ url_for('dashboard_bp.index') }}"
-          class="w-full px-3 py-3 flex items-center space-x-4 justify-start text-gray-500 hover:bg-blue-200 hover:text-blue-600 rounded-lg group transition-colors"
-        >
-          <i class="fas fa-users"></i>
-          <span class="font-medium">Dashboard</span>
-        </a>
-
-        <!-- Usuarios -->
-        <a
-          href="{{ url_for('personal_bp.usuarios') }}"
-          class="w-full px-3 py-3 flex items-center space-x-4 justify-start text-gray-500 hover:bg-blue-200 hover:text-blue-600 rounded-lg group transition-colors"
-        >
-          <i class="fas fa-users"></i>
-          <span class="font-medium">Usuarios</span>
-        </a>
-
-        <!-- Proveedores -->
-        <a
-          href="{{ url_for('provedor_bp.index') }}"
-          class="w-full px-3 py-3 flex items-center space-x-4 justify-start text-gray-500 hover:bg-blue-200 hover:text-blue-600 rounded-lg group transition-colors"
-        >
-          <i class="fas fa-truck"></i>
-          <span class="font-medium">Proveedores</span>
-        </a>
-
-        <!-- Ventas -->
-        <!-- <a
-          class="w-full px-3 py-3 flex items-center space-x-4 justify-start text-gray-500 hover:bg-blue-200 hover:text-blue-600 rounded-lg group transition-colors"
-        >
-          <i class="fas fa-shopping-cart"></i>
-          <span class="font-medium">Ventas</span>
-        </a> -->
-
-        <!-- Compras -->
-        <a
-        href="{{ url_for('registro_compras_bp.compras') }}"
-        class="w-full px-3 py-3 flex items-center space-x-4 justify-start text-gray-500 hover:bg-blue-200 hover:text-blue-600 rounded-lg group transition-colors"
-        >
-          <i class="fas fa-shopping-bag"></i>
-          <span class="font-medium">Compras</span>
-        </button>
-
-        <!-- Recetas -->
-        <a
-          href="{{ url_for('galletas_bp.index') }}"
-          class="w-full px-3 py-3 flex items-center space-x-4 justify-start text-gray-500 hover:bg-blue-200 hover:text-blue-600 rounded-lg group transition-colors"
-        >
-          <i class="fas fa-utensils"></i>
-          <span class="font-medium">Recetas</span>
-        </a>
-
-        <!-- Produccion -->
-        <a
-          href="{{ url_for('produccion_bp.index') }}"
-          class="w-full px-3 py-3 flex items-center space-x-4 justify-start text-gray-500 hover:bg-blue-200 hover:text-blue-600 rounded-lg group transition-colors"
-        >
-          <i class="fa-solid fa-cookie-bite"></i>
-          <span class="font-medium">Produccion</span>
-        </a>
- <!-- Materia Prima -->
- <a
- href="{{ url_for('materia_prima_bp.index') }}"
- class="w-full px-3 py-3 flex items-center space-x-4 justify-start text-gray-500 hover:bg-blue-200 hover:text-blue-600 rounded-lg group transition-colors"
->
- <i class="fas fa-boxes"></i>
- <span class="font-medium">Materia Prima</span>
-</a>
-        <!-- Inventario Insumos -->
-        <a
-          href="{{ url_for('inventario_bp.index') }}"
-          class="w-full px-3 py-3 flex items-center space-x-4 justify-start text-gray-500 hover:bg-blue-200 hover:text-blue-600 rounded-lg group transition-colors"
-        >
-          <i class="fas fa-warehouse"></i>
-          <span class="font-medium">Inventario Insumos</span>
-            </a>
-
-        <!-- Detalle de compras  -->
-            <a
-          href="{{ url_for('detalle_compras_bp.index') }}"
-          class="w-full px-3 py-3 flex items-center space-x-4 justify-start text-gray-500 hover:bg-blue-200 hover:text-blue-600 rounded-lg group transition-colors"
-        >
-          <i class="fas fa-receipt"></i>
-          <span class="font-medium">Detalles Compras</span>
+      <!-- Contenedor de módulos con scroll -->
+      <div class="flex-1 overflow-y-auto">
+        <!-- Items del menú -->
+        <div class="p-2 space-y-2">
+          <!-- Dashboard -->
+          <a
+            href="{{ url_for('dashboard_bp.index') }}"
+            class="w-full px-3 py-3 flex items-center space-x-4 justify-start text-gray-500 hover:bg-blue-200 hover:text-blue-600 rounded-lg group transition-colors"
+          >
+            <i class="fas fa-users"></i>
+            <span class="font-medium">Dashboard</span>
           </a>
-        <!-- Pedidos -->
-        <a
+
+          <!-- Usuarios -->
+          <a
+            href="{{ url_for('personal_bp.usuarios') }}"
+            class="w-full px-3 py-3 flex items-center space-x-4 justify-start text-gray-500 hover:bg-blue-200 hover:text-blue-600 rounded-lg group transition-colors"
+          >
+            <i class="fas fa-users"></i>
+            <span class="font-medium">Usuarios</span>
+          </a>
+
+          <!-- Proveedores -->
+          <a
+            href="{{ url_for('provedor_bp.index') }}"
+            class="w-full px-3 py-3 flex items-center space-x-4 justify-start text-gray-500 hover:bg-blue-200 hover:text-blue-600 rounded-lg group transition-colors"
+          >
+            <i class="fas fa-truck"></i>
+            <span class="font-medium">Proveedores</span>
+          </a>
+
+          <!-- Ventas -->
+          <a
+            href="{{ url_for('ventas_bp.index') }}"
+            class="w-full px-3 py-3 flex items-center space-x-4 justify-start text-gray-500 hover:bg-blue-200 hover:text-blue-600 rounded-lg group transition-colors"
+          >
+            <i class="fas fa-shopping-cart"></i>
+            <span class="font-medium">Ventas</span>
+          </a>
+
+          <!-- Compras -->
+          <a
+            href="{{ url_for('registro_compras_bp.compras') }}"
+            class="w-full px-3 py-3 flex items-center space-x-4 justify-start text-gray-500 hover:bg-blue-200 hover:text-blue-600 rounded-lg group transition-colors"
+          >
+            <i class="fas fa-shopping-bag"></i>
+            <span class="font-medium">Compras</span>
+          </a>
+
+          <!-- Recetas -->
+          <a
+            href="{{ url_for('galletas_bp.index') }}"
+            class="w-full px-3 py-3 flex items-center space-x-4 justify-start text-gray-500 hover:bg-blue-200 hover:text-blue-600 rounded-lg group transition-colors"
+          >
+            <i class="fas fa-utensils"></i>
+            <span class="font-medium">Recetas</span>
+          </a>
+
+          <!-- Produccion -->
+          <a
+            href="{{ url_for('produccion_bp.index') }}"
+            class="w-full px-3 py-3 flex items-center space-x-4 justify-start text-gray-500 hover:bg-blue-200 hover:text-blue-600 rounded-lg group transition-colors"
+          >
+            <i class="fa-solid fa-cookie-bite"></i>
+            <span class="font-medium">Produccion</span>
+          </a>
+
+          <!-- Materia Prima -->
+          <a
+            href="{{ url_for('materia_prima_bp.index') }}"
+            class="w-full px-3 py-3 flex items-center space-x-4 justify-start text-gray-500 hover:bg-blue-200 hover:text-blue-600 rounded-lg group transition-colors"
+          >
+            <i class="fas fa-boxes"></i>
+            <span class="font-medium">Materia Prima</span>
+          </a>
+
+          <!-- Inventario Insumos -->
+          <a
+            href="{{ url_for('inventario_bp.index') }}"
+            class="w-full px-3 py-3 flex items-center space-x-4 justify-start text-gray-500 hover:bg-blue-200 hover:text-blue-600 rounded-lg group transition-colors"
+          >
+            <i class="fas fa-warehouse"></i>
+            <span class="font-medium">Inventario Insumos</span>
+          </a>
+
+          <!-- Detalle de compras  -->
+          <a
+            href="{{ url_for('detalle_compras_bp.index') }}"
+            class="w-full px-3 py-3 flex items-center space-x-4 justify-start text-gray-500 hover:bg-blue-200 hover:text-blue-600 rounded-lg group transition-colors"
+          >
+            <i class="fas fa-receipt"></i>
+            <span class="font-medium">Detalles Compras</span>
+          </a>
+
+          <!-- Detalle de ventas  -->
+          <a
+            href="{{ url_for('ventasDetalles_bp.index') }}"
+            class="w-full px-3 py-3 flex items-center space-x-4 justify-start text-gray-500 hover:bg-blue-200 hover:text-blue-600 rounded-lg group transition-colors"
+          >
+            <i class="fas fa-receipt"></i>
+            <span class="font-medium">Detalles Ventas</span>
+          </a>
+
+          <!-- Pedidos -->
+          <a
             href="{{ url_for('personal_bp.pedidos') }}"
             class="w-full px-3 py-3 flex items-center space-x-4 justify-start text-gray-500 hover:bg-blue-200 hover:text-blue-600 rounded-lg group transition-colors"
-            >
-        <i class="fas fa-clipboard-list"></i>
-        <span class="font-medium">Pedidos</span>
-            </a>
+          >
+            <i class="fas fa-clipboard-list"></i>
+            <span class="font-medium">Pedidos</span>
+          </a>
+        </div>
       </div>
-      <!-- Cerrar sesión (parte inferior) -->
-      <div class="absolute bottom-0 w-full p-4 border-t">
+
+      <!-- Cerrar sesión (parte inferior fija) -->
+      <div class="p-4 border-t bg-white">
         <a
           href="{{ url_for('auth_bp.logout') }}"
           class="w-full px-3 py-3 flex items-center space-x-4 justify-start text-gray-500 hover:bg-red-200 hover:text-red-600 rounded-lg group transition-colors"
@@ -168,10 +180,9 @@
       </div>
     </div>
 
-      <!-- Contenido principal -->
+    <!-- Contenido principal -->
     <main class="pt-20 md:ml-64 min-h-screen">
-      {% block content %}
-      {% endblock %}
+      {% block content %} {% endblock %}
     </main>
 
     <!-- Scripts -->
