@@ -100,7 +100,7 @@ def run_seed():
             },
             {
                 "nombre": "Leche",
-                "unidad": "lt",
+                "unidad": "ml",
                 "cantidad": 5000,
                 "cantidad_minima": 1000,
                 "estado_stock": "Disponible"

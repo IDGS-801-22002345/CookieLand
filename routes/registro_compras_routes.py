@@ -88,6 +88,10 @@ def compras():
             flash("El precio o la cantidad no son válidos", "danger")
             return redirect(url_for('registro_compras_bp.compras'))
 
+        # Asegurarnos de que 'carrito' es una lista
+        if not isinstance(session['carrito'], list):
+            session['carrito'] = []
+
         item = {
             'materia_prima_id': producto_id,
             'nombre': MateriaPrima.query.get(producto_id).nombre,
@@ -99,7 +103,7 @@ def compras():
             'total': total
         }
         
-        session['carrito'].append(item)
+        session['carrito'].append(item)  # Ahora sí es una lista
         session.modified = True
         flash('Producto agregado al carrito', 'success')
         return redirect(url_for('registro_compras_bp.compras'))
@@ -116,8 +120,32 @@ def compras():
 @registro_compras_bp.route('/get_unidad_base/<int:insumo_id>')
 def get_unidad_base(insumo_id):
     insumo = MateriaPrima.query.get_or_404(insumo_id)
+    
+    # Normaliza la unidad a minúsculas y sin espacios
+    unidad = insumo.unidad.strip().lower()
+    
+    # Mapeo de unidades alternativas
+    unidad_map = {
+        'gramos': 'gr',
+        'gramo': 'gr',
+        'g': 'gr',
+        'mililitros': 'ml',
+        'mililitro': 'ml',
+        'litros': 'lt',
+        'litro': 'lt',
+        'piezas': 'pz',
+        'pieza': 'pz'
+    }
+    
+    # Si la unidad está en el mapeo, usa el valor correspondiente
+    unidad_base = unidad_map.get(unidad, unidad)
+    
+    # Asegúrate que solo devuelve 'gr', 'ml' o 'pz'
+    if unidad_base not in ['gr', 'ml', 'pz']:
+        unidad_base = 'gr'  # Valor por defecto si no coincide
+    
     return {
-        'unidad_base': insumo.unidad  # Asume que 'unidad' es 'gr', 'ml' o 'pz'
+        'unidad_base': unidad_base
     }
 
 @registro_compras_bp.route('/eliminar-producto', methods=['POST'])
