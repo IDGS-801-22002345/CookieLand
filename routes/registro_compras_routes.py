@@ -8,7 +8,7 @@ registro_compras_bp = Blueprint('registro_compras_bp', __name__, url_prefix='/')
 def convertir_a_unidad_base(cantidad, unidad_medida):
     conversiones = {
         'kg': 1000,   # 1 kilo = 1000 gramos
-        'g': 1,     # 1 gramo = 1 gramo
+        'gr': 1,     # 1 gramo = 1 gramo
         'lt': 1000,  # 1 litro = 1000 mililitros
         'ml': 1, # 1 mililitro = 1 mililitro
         'pz': 1,      # 1 pieza = 1 pieza
@@ -117,7 +117,7 @@ def compras():
 def get_unidad_base(insumo_id):
     insumo = MateriaPrima.query.get_or_404(insumo_id)
     return {
-        'unidad_base': insumo.unidad  # Asume que 'unidad' es 'g', 'ml' o 'pz'
+        'unidad_base': insumo.unidad  # Asume que 'unidad' es 'gr', 'ml' o 'pz'
     }
 
 @registro_compras_bp.route('/eliminar-producto', methods=['POST'])
