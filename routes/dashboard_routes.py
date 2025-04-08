@@ -19,6 +19,12 @@ def obtener_total_compras_dia():
 def calcular_total_caja(fondo_inicial, total_ventas, total_compras):
     return fondo_inicial + total_ventas - total_compras
 
+def obtener_ventas_mes():
+    hoy = date.today()
+    primer_dia_mes = hoy.replace(day=1)
+    ventas = Venta.query.filter(Venta.fechaCreacion >= primer_dia_mes).all()
+    return sum(v.total for v in ventas)
+
 
 @dashboard_bp.route("/")
 @login_required
@@ -37,6 +43,10 @@ def index():
         InventarioMateria.cantidad < InventarioMateria.cantidad_minima
     ).all()
 
+    galletas_bajo_inventario = Galleta.query.filter(
+        Galleta.stock.between(0, 10)
+    ).order_by(Galleta.stock.asc()).all()
+
     # 📦 Pedidos para hoy (por ahora simulados)
     pedidos_hoy = [
         {"cliente_nombre": "Juan Pérez", "producto": "Caja de Galletas de Chocolate", "fecha_entrega": "2025-04-05"},
@@ -48,6 +58,7 @@ def index():
     ventas_dia = obtener_total_ventas_dia()
     compras_dia = obtener_total_compras_dia()
     total_caja = calcular_total_caja(fondo_inicial, ventas_dia, compras_dia)
+    ventas_mes = obtener_ventas_mes()
 
     return render_template(
         "dashboard/dashboard.html",
@@ -58,5 +69,7 @@ def index():
         top_5_galletas=top_5_galletas,
         inventario_critico=inventario_critico,
         pedidos_hoy=pedidos_hoy,
+        galletas_bajo_inventario=galletas_bajo_inventario,
+        ventas_mes=ventas_mes,
         galletas_producidas_hoy=300  # <- lo puedes automatizar después también
     )
