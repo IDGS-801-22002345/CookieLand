@@ -77,6 +77,20 @@
         </div>
       </div>
 
+      <!-- Pedidos para Hoy -->
+      <div class="mb-6">
+        <h2 class="text-2xl font-semibold text-blue-800 mb-4">Pedidos para Hoy</h2>
+        {% if pedidos_hoy %}
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+          {% for pedido in pedidos_hoy %}
+          <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-md">
+            <h3 class="text-xl font-semibold text-gray-700">{{ pedido.cliente_nombre }}</h3>
+            <p class="text-lg font-medium text-green-600">Pedido: {{ pedido.producto }}</p>
+            <p class="text-lg font-medium text-gray-600">Fecha de entrega: {{ pedido.fecha_entrega }}</p>
+          </div>
+          {% endfor %}
+      </div>
+
       <div>
         <!-- Insumos Críticos -->
         <div class="mb-6">
@@ -113,7 +127,7 @@
                 <p class="text-center text-lg text-gray-600">Todas las galletas tienen stock suficiente.</p>
                 {% endif %}
             </div>
-        </div>
+      </div>
     </div>
     </div>
   </div>

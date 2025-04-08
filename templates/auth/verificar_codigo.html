@@ -10,11 +10,10 @@
 </head>
 <body class="bg-[#D2B48C] flex items-center justify-center min-h-screen">
 
-    <!-- Mensajes flash personalizados -->
-    {% import "_macros.html" as macros %}   
-    {{ macros.mostrar_flash() }}  
-  
-  <div class="bg-white py-12 px-12 rounded-2xl shadow-xl w-96 max-w-md mx-auto relative">
+  {% import "_macros.html" as macros %}
+  {{ macros.mostrar_flash() }}
+
+  <div class="bg-white py-12 px-12 rounded-2xl shadow-xl w-full max-w-md mx-auto text-center relative">
     <a href="{{ url_for('cliente_bp.index') }}" class="absolute top-4 left-4 text-[#8B5A2B] hover:text-[#A0522D] transition-all">
       <i class="fas fa-home text-2xl"></i>
     </a>
@@ -24,19 +23,19 @@
       <h1 class="text-3xl font-bold text-[#5A3E1B] mt-4">Verificar Cuenta</h1>
     </div>
 
-    <p class="text-sm text-gray-600 text-center mt-2">
+    <p class="text-sm text-gray-600 mt-2">
       Ingresa el código de 6 dígitos que te enviamos por correo electrónico.
     </p>
 
-    <form method="POST" class="space-y-6 mt-6">
+    <form method="POST" class="space-y-6 mt-6" onsubmit="return validarCodigo();">
       {{ form.hidden_tag() }}
 
       <!-- Estilo tipo OTP -->
-      <div class="flex justify-between gap-2 text-center">
+      <div class="flex justify-center gap-2 text-center">
         {% for i in range(6) %}
           <input type="text" maxlength="1" pattern="[0-9]" inputmode="numeric"
-                 class="w-12 h-12 border border-[#8B5A2B] rounded-lg text-center text-lg font-semibold focus:ring-2 focus:ring-[#A0522D] focus:outline-none otp-input"
-                 oninput="moveFocus(event)" />
+                 class="otp-input w-12 h-12 border border-[#8B5A2B] rounded-lg text-center text-lg font-semibold focus:ring-2 focus:ring-[#A0522D] focus:outline-none"
+                 oninput="handleInput(event)" onpaste="handlePaste(event)" />
         {% endfor %}
       </div>
 
@@ -96,23 +95,53 @@
   </style>
 
   <script>
-    function moveFocus(e) {
+    function handleInput(e) {
       const inputs = document.querySelectorAll('.otp-input');
-      const hiddenInput = document.getElementById('codigo-input');
       const input = e.target;
+      const hiddenInput = document.getElementById('codigo-input');
 
-      // Solo permite números
-      if (!/^[0-9]$/.test(input.value)) {
+      // Solo números
+      if (!/^\d$/.test(input.value)) {
         input.value = '';
         return;
       }
 
-      if (input.value.length === 1) {
-        const next = input.nextElementSibling;
-        if (next) next.focus();
+      // Mover foco al siguiente
+      const next = input.nextElementSibling;
+      if (next && next.classList.contains('otp-input')) {
+        next.focus();
       }
 
+      // Actualizar el campo oculto
       hiddenInput.value = Array.from(inputs).map(i => i.value).join('');
+    }
+
+    function handlePaste(e) {
+      const pasteData = e.clipboardData.getData('text').trim();
+      const inputs = document.querySelectorAll('.otp-input');
+
+      if (/^\d{6}$/.test(pasteData)) {
+        pasteData.split('').forEach((num, i) => {
+          if (inputs[i]) inputs[i].value = num;
+        });
+
+        document.getElementById('codigo-input').value = pasteData;
+        inputs[5].focus(); // Foco al último
+        e.preventDefault();
+      }
+    }
+
+    function validarCodigo() {
+      const inputs = document.querySelectorAll('.otp-input');
+      const code = Array.from(inputs).map(i => i.value).join('');
+
+      if (code.length !== 6 || !/^\d{6}$/.test(code)) {
+        alert("El código debe tener 6 dígitos numéricos.");
+        return false;
+      }
+
+      document.getElementById('codigo-input').value = code;
+      return true;
     }
   </script>
 

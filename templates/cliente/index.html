@@ -2,6 +2,9 @@
 {% block title %}Inicio - Maicookies{% endblock %}
 {% block content %}
 
+    {% import "_macros.html" as macros %}
+    {{ macros.mostrar_flash() }}
+
     <!-- Hero -->
     <div class="relative">
         <img class="h-auto max-w-full w-full" src="{{ url_for('static', filename='img/fondo.jpg') }}" alt="image description">
@@ -16,7 +19,7 @@
     </div>
 
     <!-- Acerca de Maicookies -->
-    <section class="py-12 bg-white">
+    <section class="py-12 bg-[#e1d9ce]">
         <div class="gap-16 items-center py-8 px-4 mx-auto max-w-screen-xl lg:grid lg:grid-cols-2 lg:py-16 lg:px-6">
             <div class="font-light text-dark text-lg dark:text-dark">
                 <h2 class="mb-4 text-5xl tracking-tight font-extrabold text-[#5A3E1B]">Somos un lugar al que llamar hogar</h2>
@@ -30,7 +33,7 @@
 
     
     <!-- Ventajas de Maicookies -->
-    <section class="py-20 bg-white" id="ventajas">
+    <section class="py-20 bg-[#e1d9ce] mt-10" id="ventajas">
         <div class="container mx-auto px-6">
             <div class="text-center mb-16">
                 <h2 class="mb-4 text-5xl tracking-tight font-extrabold text-[#5A3E1B]">¿Por qué elegir Maicookies?</h2>
@@ -63,7 +66,7 @@
     </section>  
 
 
-    <section class="py-20 tracking-tight font-light text-dark text-lg bg-white" id="testimonials">
+    <section class="py-20 tracking-tight font-light text-dark text-lg bg-[#e1d9ce] mt-24" id="testimonials">
         <div class="container mx-auto px-6">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
     
