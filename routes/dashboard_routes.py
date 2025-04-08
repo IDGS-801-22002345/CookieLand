@@ -4,7 +4,7 @@ from datetime import date
 from models.models import Galleta, Compra, Venta, db
 from sqlalchemy import func
 
-dashboard_bp = Blueprint('dashboard_bp', __name__, url_prefix='/dashboard')
+dashboard_bp = Blueprint('dashboard_bp', __name__, url_prefix='/mk_dashboard')
 
 def obtener_total_ventas_dia():
     hoy = date.today()

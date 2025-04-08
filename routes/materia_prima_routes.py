@@ -10,7 +10,7 @@ materia_prima_bp = Blueprint('materia_prima_bp', __name__, url_prefix='/')
 @materia_prima_bp.route('/mk_materia-prima', methods=['GET', 'POST'])
 @login_required
 @log_excepciones
-@role_required('admin')
+@role_required('admin', 'produccion')
 def index():
     create_form = MateriaPrimaForm(request.form)
     # Consulta que une materia_prima con inventario_materia
@@ -27,7 +27,7 @@ def index():
 @registrar_accion("Agrego materia prima")
 @login_required
 @log_excepciones
-@role_required('admin')
+@role_required('admin', 'produccion')
 def agregar():
     create_form = MateriaPrimaForm(request.form)
     
@@ -80,7 +80,7 @@ def agregar():
 @registrar_accion("Modifico materia prima")
 @login_required
 @log_excepciones
-@role_required('admin')
+@role_required('admin', 'produccion')
 def modificar():
     create_form = MateriaPrimaForm(request.form)
     

@@ -9,7 +9,7 @@ ventasDetalles_bp = Blueprint('ventasDetalles_bp', __name__, url_prefix='/ventas
 @ventasDetalles_bp.route("/")
 @login_required
 @log_excepciones
-@role_required('admin')
+@role_required('admin', 'vendedor')
 def index():
     ventaForm = VentaForm()
     ventas = Venta.query.options(

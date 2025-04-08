@@ -1,99 +1,122 @@
-{% extends "layout.html" %}
-{% block content %}
+{% extends "layout.html" %} {% block content %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/output.css') }}">
 
-<div class="flex flex-col w-full px-4 md:px-10">
-  <div class="w-full p-4 text-center bg-white border border-gray-200 rounded-lg shadow-sm">
-    <div class="flex items-center justify-between mb-6">
-      <form method="GET" class="flex gap-2">
-        <input type="text" name="search" placeholder="Buscar por # Orden" value="{{ request.args.get('search', '') }}" class="p-2 border rounded-lg text-sm"/>
-        <button type="submit" class="bg-[#5A3E1B] text-white px-4 py-2 rounded-lg text-sm">Buscar</button>
-      </form>
-      <h1 class="text-4xl font-extrabold text-center text-[#5A3E1B] flex-1">Pedidos</h1>
-    </div>
 
-    <div class="bg-white text-lg shadow-md rounded-xl overflow-x-auto mt-10">
-      <table class="w-full text-left table-auto border-collapse mb-4 font-light text-dark text-lg dark:text-dark">
-        <thead class="bg-[#5A3E1B] text-white text-sm uppercase">
-          <tr>
-            <th class="px-6 py-4">Orden</th>
-            <th class="px-6 py-4">Fecha Pedido</th>
-            <th class="px-6 py-4">Fecha Recoger</th>
-            <th class="px-6 py-4">Hora Recoger</th>
-            <th class="px-6 py-4">Estatus</th>
-            <th class="px-6 py-4">Detalles</th>
-          </tr>
-        </thead>
-        <tbody class="text-gray-700 text-sm">
-          {% for pedido in pedidos %}
-          <tr class="border-b hover:bg-[#ececec]">
-            <td class="px-6 py-4 font-semibold">#{{ '%05d' % pedido.id }}</td>
-            <td class="px-6 py-4">{{ pedido.fecha_pedido.strftime('%d/%m/%Y') }}</td>
-            <td class="px-6 py-4">{{ pedido.fecha_recoleccion.strftime('%d/%m/%Y') }}</td>
-            <td class="px-6 py-4">{{ pedido.hora_recoleccion }}</td>
-            <td class="px-6 py-4 font-semibold text-{{ 
-              'yellow-600' if pedido.estatus == 'En proceso' else 
-              'green-600' if pedido.estatus == 'Listo para recoger' else 
-              'red-600' }}">{{ pedido.estatus }}</td>
-            <td class="px-6 py-4 text-center">
-              <button data-modal-target="modalDetallePedido{{ pedido.id }}" data-modal-toggle="modalDetallePedido{{ pedido.id }}" 
-                      class="text-[#5A3E1B] hover:text-[#3b2611]" title="Ver Detalle">
-                <i class="fas fa-cookie-bite text-2xl"></i>
-              </button>
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-  </div>
+<div class="flex flex-col w-full px-4 md:px-10">
+	<div class="w-full p-4 text-center bg-white border border-gray-200 rounded-lg shadow-sm">
+		<!-- Título alineado a la izquierd -->
+		<div class="flex justify-between pb-5">
+			<div>
+				<h1 class="text-4xl font-medium text-gray-800">Pedidos</h1>
+			</div>
+		</div>
+
+		<div class="flex items-center border border-gray-300 rounded-md w-96 p-2">
+			<i class="fas fa-search text-gray-500 px-2"></i>
+			<input type="search" id="search-input" class="w-full outline-none" placeholder="Buscar pedido" />
+		</div>
+
+		<!-- Tabla -->
+		<div class="overflow-x-auto overflow-y-auto max-h-[500px] mt-4">
+			<table class="w-full text-sm text-left text-gray-500">
+				<thead class="text-xs text-white uppercase sticky top-0" style="background-color: #7c5454 !important; z-index: 10;">
+					<tr>
+						<th class="px-6 py-4">Orden</th>
+						<th class="px-6 py-4">Fecha Pedido</th>
+						<th class="px-6 py-4">Fecha Recoger</th>
+						<th class="px-6 py-4">Hora Recoger</th>
+						<th class="px-6 py-4">Estatus</th>
+						<th class="px-6 py-4">Detalles</th>
+					</tr>
+				</thead>
+				<tbody class="text-gray-700 text-sm">
+					{% for pedido in pedidos %}
+					<tr class="border-b hover:bg-[#ececec]">
+						<td class="px-6 py-4 font-semibold">#{{ '%05d' % pedido.id }}</td>
+						<td class="px-6 py-4">{{ pedido.fecha_pedido.strftime('%d/%m/%Y') }}</td>
+						<td class="px-6 py-4">{{ pedido.fecha_recoleccion.strftime('%d/%m/%Y') }}</td>
+						<td class="px-6 py-4">{{ pedido.hora_recoleccion }}</td>
+						<td class="px-6 py-4 font-semibold text-{{ 
+                        'yellow-600' if pedido.estatus == 'En proceso' else 
+                        'green-600' if pedido.estatus == 'Listo para recoger' else 
+                        'red-600' }}">{{ pedido.estatus }}</td>
+						<td class="px-6 py-4 text-center">
+							<button data-modal-target="modalDetallePedido{{ pedido.id }}" data-modal-toggle="modalDetallePedido{{ pedido.id }}" class="text-[#5A3E1B] hover:text-[#3b2611]" title="Ver Detalle">
+                          <i class="fas fa-cookie-bite text-2xl"></i>
+                        </button>
+						</td>
+					</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+	</div>
 </div>
 
 {% for pedido in pedidos %}
 <div id="modalDetallePedido{{ pedido.id }}" tabindex="-1" aria-hidden="true" class="hidden fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black bg-opacity-50">
-  <div class="relative p-4 w-full max-w-4xl">
-    <div class="relative bg-white rounded-lg shadow dark:bg-white">
-      <div class="flex justify-between items-center p-4 border-b rounded-t">
-        <h3 class="text-xl font-semibold text-[#5A3E1B]">Detalle del pedido #{{ '%05d' % pedido.id }}</h3>
-        <button type="button" class="text-red-500 bg-red-100 hover:bg-red-200 hover:text-red-600 rounded-full p-2 ml-auto" data-modal-hide="modalDetallePedido{{ pedido.id }}">
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
-            <path fill-rule="evenodd" d="M10 8.586L4.707 3.293a1 1 0 00-1.414 1.414L8.586 10l-5.293 5.293a1 1 0 001.414 1.414L10 11.414l5.293 5.293a1 1 0 001.414-1.414L11.414 10l5.293-5.293a1 1 0 00-1.414-1.414L10 8.586z" clip-rule="evenodd"/>
-        </svg>
-        </button>
-      </div>
-      <div class="p-6 space-y-4">
-        <table class="w-full text-sm text-left border rounded-lg overflow-hidden shadow-md">
-          <thead class="bg-[#F5E8D6] text-[#5A3E1B] font-semibold">
-            <tr>
-              <th class="py-2 px-4"></th>
-              <th class="py-2 px-4">Producto</th>
-              <th class="py-2 px-4 text-center">Cantidad</th>
-              <th class="py-2 px-4 text-center">Precio Unitario</th>
-              <th class="py-2 px-4 text-right">Subtotal</th>
-            </tr>
-          </thead>
-          <tbody class="bg-white text-sm">
-            {% for item in pedido.detalles %}
-            <tr class="border-b hover:bg-[#f9f9f9]">
-              <td class="py-2 px-4">
-                <img src="{{ url_for('cliente_bp.mostrar_imagen', galleta_id=item.galleta.id) }}" class="w-14 h-14 rounded-lg border object-cover" alt="Galleta">
-              </td>
-              <td class="py-2 px-4">{{ item.galleta.nombre }}</td>
-              <td class="py-2 px-4 text-center">{{ item.cantidad }}</td>
-              <td class="py-2 px-4 text-center">${{ '%.2f'|format(item.precio_unitario) }}</td>
-              <td class="py-2 px-4 text-right">${{ '%.2f'|format(item.precio_unitario * item.cantidad) }}</td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-        <div class="text-right text-lg font-bold text-[#5A3E1B] mt-4">
-          Total del pedido: ${{ '%.2f'|format(pedido.total) }}
-        </div>
-      </div>
-    </div>
-  </div>
+	<div class="relative p-4 w-full max-w-4xl">
+		<div class="relative bg-white rounded-lg shadow dark:bg-white">
+			<div class="flex justify-between items-center p-4 border-b rounded-t">
+				<h3 class="text-xl font-semibold text-[#5A3E1B]">Detalle del pedido #{{ '%05d' % pedido.id }}</h3>
+				<button type="button" class="text-red-500 bg-red-100 hover:bg-red-200 hover:text-red-600 rounded-full p-2 ml-auto" data-modal-hide="modalDetallePedido{{ pedido.id }}">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M10 8.586L4.707 3.293a1 1 0 00-1.414 1.414L8.586 10l-5.293 5.293a1 1 0 001.414 1.414L10 11.414l5.293 5.293a1 1 0 001.414-1.414L11.414 10l5.293-5.293a1 1 0 00-1.414-1.414L10 8.586z" clip-rule="evenodd"/>
+          </svg>
+          </button>
+			</div>
+			<div class="p-6 space-y-4">
+				<table class="w-full text-sm text-left border rounded-lg overflow-hidden shadow-md">
+					<thead class="bg-[#F5E8D6] text-[#5A3E1B] font-semibold">
+						<tr>
+							<th class="py-2 px-4"></th>
+							<th class="py-2 px-4">Producto</th>
+							<th class="py-2 px-4 text-center">Cantidad</th>
+							<th class="py-2 px-4 text-center">Precio Unitario</th>
+							<th class="py-2 px-4 text-right">Subtotal</th>
+						</tr>
+					</thead>
+					<tbody class="bg-white text-sm">
+						{% for item in pedido.detalles %}
+						<tr class="border-b hover:bg-[#f9f9f9]">
+							<td class="py-2 px-4">
+								<img src="{{ url_for('cliente_bp.mostrar_imagen', galleta_id=item.galleta.id) }}" class="w-14 h-14 rounded-lg border object-cover" alt="Galleta">
+							</td>
+							<td class="py-2 px-4">{{ item.galleta.nombre }}</td>
+							<td class="py-2 px-4 text-center">{{ item.cantidad }}</td>
+							<td class="py-2 px-4 text-center">${{ '%.2f'|format(item.precio_unitario) }}</td>
+							<td class="py-2 px-4 text-right">${{ '%.2f'|format(item.precio_unitario * item.cantidad) }}</td>
+						</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+				<div class="text-right text-lg font-bold text-[#5A3E1B] mt-4">
+					Total del pedido: ${{ '%.2f'|format(pedido.total) }}
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
 </div>
 {% endfor %}
+
+<script>
+	document.addEventListener("DOMContentLoaded", function () {
+			    const searchInput = document.getElementById("search-input");
+			    const tableRows = document.querySelectorAll("tbody tr");
+			
+			    searchInput.addEventListener("input", function () {
+			      const searchTerm = searchInput.value.toLowerCase();
+			
+			      tableRows.forEach((row) => {
+			        const rowText = row.textContent.toLowerCase();
+			        const match = rowText.includes(searchTerm);
+			        row.style.display = match ? "" : "none";
+			      });
+			    });
+			  });
+</script>
+
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
 {% endblock %}
