@@ -33,64 +33,69 @@
        <div class="overflow-x-auto overflow-y-auto max-h-[500px] mt-4">
        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
-    <table id="mermas-table" class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-        <thead class="text-xs text-white uppercase sticky top-0" style="background-color: #7c5454; z-index: 10;">
-            <tr>
-                <th scope="col" class="px-6 py-3">Descripción</th>
-                <th scope="col" class="px-6 py-3">Cantidad</th>
-                <th scope="col" class="px-6 py-3">Fecha y Hora</th>
-                <th scope="col" class="px-6 py-3">Nombre</th>
-                <th scope="col" class="px-6 py-3">Tipo Merma</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% if mermas %}  
-                {% for merma in mermas %}
-                <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200 relative">
-                    <th scope="row" class="px-6 py-4 font-medium text-gray-900 dark:text-white">
-                        {{ merma.descripcion }}
-                    </th>
-                    <td class="px-6 py-4">{{ merma.cantidad }}</td>
-                    <td>{{ merma.fecha.strftime('%d/%m/%Y %H:%M') }}</td>                    
-                    <td class="px-6 py-4">
-                        {% if merma.tipo_merma == 'insumo' and merma.inventario_materia %}
-                    {{ merma.inventario_materia.materia_prima.nombre }}
-                    {% elif merma.tipo_merma == 'galleta' and merma.galleta %}
-                        {{ merma.galleta.nombre }}
-                    {% else %}
-                        Sin nombre
+            <table id="mermas-table" class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                <thead class="text-xs text-white uppercase sticky top-0" style="background-color: #7c5454; z-index: 10;">
+                    <tr>
+                        <th scope="col" class="px-6 py-3">Descripción</th>
+                        <th scope="col" class="px-6 py-3">Cantidad</th>
+                        <th scope="col" class="px-6 py-3">Unidad</th>
+                        <th scope="col" class="px-6 py-3">Fecha y Hora</th>
+                        <th scope="col" class="px-6 py-3">Nombre</th>
+                        <th scope="col" class="px-6 py-3">Tipo Merma</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if mermas %}  
+                        {% for merma in mermas %}
+                        <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200 relative">
+                            <th scope="row" class="px-6 py-4 font-medium text-gray-900 dark:text-white">
+                                {{ merma.descripcion }}
+                            </th>
+                            <td class="px-6 py-4">{{ merma.cantidad }}</td>
+                            <td class="px-6 py-4">
+                                {% if merma.tipo_merma == 'insumo' and merma.inventario_materia and merma.inventario_materia.materia_prima %}
+                                    {{ merma.inventario_materia.materia_prima.unidad }}
+                                {% elif merma.tipo_merma == 'galleta' %}
+                                    pz
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                            <td>{{ merma.fecha.strftime('%d/%m/%Y %H:%M') }}</td>                    
+                            <td class="px-6 py-4">
+                                {% if merma.tipo_merma == 'insumo' and merma.inventario_materia %}
+                                    {{ merma.inventario_materia.materia_prima.nombre }}
+                                {% elif merma.tipo_merma == 'galleta' and merma.galleta %}
+                                    {{ merma.galleta.nombre }}
+                                {% else %}
+                                    Sin nombre
+                                {% endif %}
+                            </td>
+                            <td class="px-6 py-4">{{ merma.tipo_merma }}</td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}  
+                        <tr>
+                            <td colspan="6" class="text-center py-8 bg-gray-50 rounded-lg">
+                                <i class="fas fa-info-circle text-gray-400 text-4xl mb-3"></i>
+                                <p class="text-gray-500">No hay mermas registradas aún</p>
+                                <p class="text-sm text-gray-400 mt-1">
+                                    Agregue mermas usando el formulario
+                                </p>
+                            </td>
+                        </tr>
                     {% endif %}
-                    </td>
-                    <td class="px-6 py-4">{{ merma.tipo_merma }}</td>
-                </tr>
-                {% endfor %}
-            {% else %}  
-                <tr>
-                    <td colspan="5" class="text-center py-8 bg-gray-50 rounded-lg">
-                        <i class="fas fa-info-circle text-gray-400 text-4xl mb-3"></i>
-                        <p class="text-gray-500">No hay mermas registradas aún</p>
-                        <p class="text-sm text-gray-400 mt-1">
-                            Agregue mermas usando el formulario
-                        </p>
-                    </td>
-                </tr>
-            {% endif %}
-        </tbody>
-    </table>
-</div>
+                </tbody>
+            </table>
+        </div>
     </div>
-</div>
 </div>
 
 <div id="modal-backdrop" class="{% if modal_error %} {% else %}hidden{% endif %} fixed inset-0 bg-black bg-opacity-50 z-40"></div>
 
 <!-- Modal para Agregar Merma -->
-<div 
-id="crud-modal" 
-tabindex="-1" 
-aria-hidden="true"
-class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 flex justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full"
->
+<div id="crud-modal" tabindex="-1" aria-hidden="true"
+    class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 flex justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
     <div class="relative p-4 w-full max-w-md max-h-full">
         <!-- Modal content -->
         <div class="relative bg-gray-100 rounded-lg shadow-sm dark:bg-gray-700">
@@ -102,18 +107,8 @@ class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 
                 <button type="button"
                     class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
                     data-modal-hide="crud-modal">
-                    <svg 
-                    class="w-3 h-3" 
-                    aria-hidden="true" 
-                    xmlns="http://www.w3.org/2000/svg" 
-                    fill="none" 
-                    viewBox="0 0 14 14">
-                        <path 
-                        stroke="currentColor" 
-                        stroke-linecap="round" 
-                        stroke-linejoin="round" 
-                        stroke-width="2" 
-                        d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
                     </svg>
                     <span class="sr-only">Cerrar modal</span>
                 </button>
@@ -153,14 +148,18 @@ class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 
                                 onchange="toggleMermaFields(this.value)") }}
                         </div>
             
-                        <!-- Campo Cantidad -->
-                        <div class="md:col-span-1">
-                            <label class="block mb-1 text-sm font-medium text-gray-900">{{ form.cantidad.label.text }}</label>
-                            {{ form.cantidad(class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500",
-                                placeholder="Ej. 5") }}
+                        <!-- Campo Cantidad con unidad -->
+                        <div class="md:col-span-2 flex gap-2">
+                            <div class="flex-1">
+                                <label class="block mb-1 text-sm font-medium text-gray-900">{{ form.cantidad.label.text }}</label>
+                                {{ form.cantidad(class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500",
+                                    placeholder="Ej. 5") }}
+                            </div>
+                            <div id="unidad-container" class="hidden flex-1">
+                                <label class="block mb-1 text-sm font-medium text-gray-900">Unidad</label>
+                                <input type="text" id="unidad-medida" class="w-full p-2.5 border border-gray-300 rounded-lg bg-gray-100" readonly>
+                            </div>
                         </div>
-            
-                        <div class="md:col-span-1"></div>
                     </div>
             
                     <!-- Campos ocultos dependiento del tipo de merma -->
@@ -168,18 +167,17 @@ class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 
                         <!-- Campo Insumo -->
                         <div id="insumo-field" class="hidden">
                             <label class="block mb-1 text-sm font-medium text-gray-900">{{ form.inventario_materia_id.label.text }}</label>
-                            {{ form.inventario_materia_id(class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500") }}
+                            {{ form.inventario_materia_id(class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500",
+                                onchange="actualizarUnidad(this.value)") }}
                         </div>
             
                         <!-- Campo Galleta -->
-                       <!-- Campo Galleta -->
-                       <div id="galleta-field" class="hidden">
-                        <label class="block mb-1 text-sm font-medium text-gray-900">
-                            {{ form.galleta_id.label.text }}
-                        </label>
-                        {{ form.galleta_id(class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500") }}
-                    </div>
-
+                        <div id="galleta-field" class="hidden">
+                            <label class="block mb-1 text-sm font-medium text-gray-900">
+                                {{ form.galleta_id.label.text }}
+                            </label>
+                            {{ form.galleta_id(class="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500") }}
+                        </div>
                     </div>
                 </div>
 
@@ -204,32 +202,93 @@ class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 
 </div>
 
 <script>
-
-document.addEventListener("DOMContentLoaded", function () {
-    const searchInput = document.getElementById("search-input");
-    const table = document.getElementById("mermas-table");
-    const tbody = table.querySelector("tbody");
+    document.addEventListener("DOMContentLoaded", function () {
+        const searchInput = document.getElementById("search-input");
+        const table = document.getElementById("mermas-table");
+        const tbody = table.querySelector("tbody");
+        
+        if (searchInput && table && tbody) {
+            searchInput.addEventListener("input", function () {
+                const searchText = this.value.toLowerCase();
+                const rows = tbody.getElementsByTagName("tr"); 
     
-    searchInput.addEventListener("input", function () {
-        const searchText = this.value.toLowerCase();
-        const rows = tbody.getElementsByTagName("tr"); 
-
-        Array.from(rows).forEach(row => {
-            const cells = row.querySelectorAll("th, td"); 
-            let found = false;
-
-            cells.forEach(cell => {
-                const cellText = cell.textContent.toLowerCase();
-                if (cellText.includes(searchText)) {
-                    found = true;
+                Array.from(rows).forEach(row => {
+                    const cells = row.querySelectorAll("th, td"); 
+                    let found = false;
+    
+                    cells.forEach(cell => {
+                        const cellText = cell.textContent.toLowerCase();
+                        if (cellText.includes(searchText)) {
+                            found = true;
+                        }
+                    });
+    
+                    row.style.display = found ? "" : "none";
+                });
+            });
+        }
+    
+        const unidadesPorInsumo = JSON.parse('{{ unidades_materias|tojson|safe }}');
+        const unidadGalleta = "pz";
+    
+        window.actualizarUnidad = function(inventarioId) {
+            const unidadContainer = document.getElementById('unidad-container');
+            const unidadInput = document.getElementById('unidad-medida');
+            
+            if (unidadesPorInsumo[inventarioId]) {
+                unidadInput.value = unidadesPorInsumo[inventarioId];
+                unidadContainer.classList.remove('hidden');
+            } else {
+                unidadInput.value = '';
+                unidadContainer.classList.add('hidden');
+            }
+        };
+    
+        window.toggleMermaFields = function(tipoMerma) {
+            const insumoField = document.getElementById('insumo-field');
+            const galletaField = document.getElementById('galleta-field');
+            const unidadContainer = document.getElementById('unidad-container');
+            const unidadInput = document.getElementById('unidad-medida');
+            
+            if (tipoMerma === 'insumo') {
+                insumoField.classList.remove('hidden');
+                galletaField.classList.add('hidden');
+                unidadContainer.classList.remove('hidden');
+                const selectInsumo = document.querySelector('select[name="inventario_materia_id"]');
+                if (selectInsumo && selectInsumo.value) {
+                    actualizarUnidad(selectInsumo.value);
+                }
+            } else if (tipoMerma === 'galleta') {
+                insumoField.classList.add('hidden');
+                galletaField.classList.remove('hidden');
+                unidadContainer.classList.remove('hidden');
+                unidadInput.value = unidadGalleta;
+            } else {
+                insumoField.classList.add('hidden');
+                galletaField.classList.add('hidden');
+                unidadContainer.classList.add('hidden');
+            }
+        };
+    
+        const tipoMermaSelect = document.querySelector('select[name="tipo_merma"]');
+        if (tipoMermaSelect) {
+            toggleMermaFields(tipoMermaSelect.value);
+            
+            tipoMermaSelect.addEventListener('change', function() {
+                toggleMermaFields(this.value);
+            });
+        }
+    
+        const selectInsumo = document.querySelector('select[name="inventario_materia_id"]');
+        if (selectInsumo) {
+            selectInsumo.addEventListener('change', function() {
+                if (document.querySelector('select[name="tipo_merma"]').value === 'insumo') {
+                    actualizarUnidad(this.value);
                 }
             });
-
-            row.style.display = found ? "" : "none";
-        });
+        }
     });
-});
-</script>
+    </script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
 {% endblock %}
