@@ -6,129 +6,169 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
 
 <div class="flex flex-col w-full px-4 md:px-10">
-  <div class="w-full p-4 text-center bg-white border border-gray-200 rounded-lg shadow-sm">
-    <div class="flex flex-col self-start mt-10 w-full h-full">
-      <h1 class="text-3xl font-bold text-center align-middle mb-4">COMPRA</h1>
-      <div class="flex flex-col md:flex-row gap-8 mt-10 w-full h-full">
-        
+  <div
+    class="w-full p-4 text-center bg-white border border-gray-200 rounded-lg shadow-sm"
+  >
+    <div class="flex justify-between items-center mb-6">
+      <div>
+        <h1 class="text-4xl font-medium text-gray-800">Compra</h1>
+      </div>
+    </div>
+      
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <!-- Primer columna -->
+      <div class="bg-white rounded-lg border border-gray-200 p-6">
         <!-- Formulario -->
-        <div class="w-full md:w-5/12 bg-white p-6 rounded-lg shadow-lg border border-gray-300 flex-grow flex flex-col justify-between min-h-[400px]">
-          <h2 class="font-bold text-center mb-4">COMPRA DE INSUMOS</h2>
-          <form method="POST" novalidate class="w-full max-w-[1200px] mx-auto flex flex-col gap-6 mt-6">
-            {{ form.hidden_tag() }}
-  
-            <!-- Proveedor -->
-            <div class="mb-6">
-              <label class="block text-sm font-medium text-gray-700">{{ form.proveedor.label.text }}</label>
-              <div class="mt-1">
-                <select name="proveedor" class="block w-full border border-gray-300 rounded-md text-sm text-gray-400 font-semibold bg-white hover:bg-gray-50 focus:outline-none focus:ring-2">
-                  <option value="" disabled selected>Selecciona proveedor</option>
-                  {% for value, label in form.proveedor.choices %}
-                    <option value="{{ value }}">{{ label }}</option>
-                  {% endfor %}
-                </select>
-              </div>
-              {% if form.proveedor.errors %}
-                <ul class="text-red-500 text-xs mt-1">
-                  {% for error in form.proveedor.errors %}
-                    <li>{{ error }}</li>
-                  {% endfor %}
-                </ul>
-              {% endif %}
-            </div>
-  
-            <!-- Producto -->
-            <div class="mb-6">
-              <label class="block text-sm font-medium text-gray-700">{{ form.producto.label.text }}</label>
-              <div class="mt-1">
-                <select name="producto" class="block w-full border border-gray-300 rounded-md text-sm text-gray-400 font-semibold bg-white hover:bg-gray-50 focus:outline-none focus:ring-2">
-                  <option value="" disabled selected>Selecciona producto</option>
-                  {% for value, label in form.producto.choices %}
-                    <option value="{{ value }}">{{ label }}</option>
-                  {% endfor %}
-                </select>
-              </div>
-              {% if form.producto.errors %}
-                <ul class="text-red-500 text-xs mt-1">
-                  {% for error in form.producto.errors %}
-                    <li>{{ error }}</li>
-                  {% endfor %}
-                </ul>
-              {% endif %}
-            </div>
-  
-            <!-- Cantidad, Unidad de Medida y Precio Unitario -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <!-- Cantidad -->
-              <div class="flex flex-col">
-                <label for="cantidad" class="block text-sm font-medium text-gray-700">{{ form.cantidad.label.text }}</label>
-                <div class="mt-1">
-                  {{ form.cantidad(class="block w-full border text-gray-700 border-gray-300 rounded-md pl-2 text-sm", placeholder="Cantidad") }}
+        <form 
+          method="POST" 
+          novalidate 
+        >
+          {{ form.hidden_tag() }}
+
+          <div class="flex flex-col gap-8">
+            <div class="border border-gray-200 rounded-lg p-5 bg-gray-50">
+              <h2 class="text-lg font-semibold text-gray-800 mb-4">
+                Detalles de Compra
+              </h2>
+            
+                <!-- Proveedor -->
+                <div class="mb-6">
+                  <label class="block mb-2 text-sm font-medium text-gray-900">{{ form.proveedor.label.text }}<span class="text-red-500"> *</span></label>
+                  <div class="mt-1">
+                    <select name="proveedor" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5">
+                      <option value="" disabled selected>Selecciona proveedor</option>
+                      {% for value, label in form.proveedor.choices %}
+                        <option value="{{ value }}">{{ label }}</option>
+                      {% endfor %}
+                    </select>
+                  </div>
+                  {% if form.proveedor.errors %}
+                    <ul class="text-red-500 text-xs mt-1">
+                      {% for error in form.proveedor.errors %}
+                        <li>{{ error }}</li>
+                      {% endfor %}
+                    </ul>
+                  {% endif %}
                 </div>
-                {% if form.cantidad.errors %}
-                  <ul class="text-red-500 text-xs mt-1">
-                    {% for error in form.cantidad.errors %}
-                      <li>{{ error }}</li>
-                    {% endfor %}
-                  </ul>
-                {% endif %}
-              </div>
-  
-              <!-- Unidad de Medida -->
-              <div class="flex flex-col">
-                <label for="unidad_medida" class="block text-sm font-medium text-gray-700">{{ form.unidad_medida.label.text }}</label>
-                <div class="mt-1">
-                  <select name="unidad_medida" class="block w-full border border-gray-300 rounded-md text-sm text-gray-400 font-semibold bg-white hover:bg-gray-50 focus:outline-none focus:ring-2">
-                    <option value="" disabled selected class="text-gray-400">Selecciona unidad</option>
-                    {% for value, label in form.unidad_medida.choices %}
-                      <option value="{{ value }}">{{ label }}</option>
-                    {% endfor %}
-                  </select>
+
+                <!-- Producto -->
+                <div class="mb-6">
+                  <label class="block mb-2 text-sm font-medium text-gray-900">{{ form.producto.label.text }}<span class="text-red-500"> *</span></label>
+                  <div class="mt-1">
+                    <select name="producto" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5">>
+                      <option value="" disabled selected>Selecciona </option>
+                      {% for value, label in form.producto.choices %}
+                        <option value="{{ value }}">{{ label }}</option>
+                      {% endfor %}
+                    </select>
+                  </div>
+                  {% if form.producto.errors %}
+                    <ul class="text-red-500 text-xs mt-1">
+                      {% for error in form.producto.errors %}
+                        <li>{{ error }}</li>
+                      {% endfor %}
+                    </ul>
+                  {% endif %}
                 </div>
-                {% if form.unidad_medida.errors %}
-                  <ul class="text-red-500 text-xs mt-1">
-                    {% for error in form.unidad_medida.errors %}
-                      <li>{{ error }}</li>
-                    {% endfor %}
-                  </ul>
-                {% endif %}
-              </div>
-  
-              <!-- Precio Unitario -->
-              <div class="flex flex-col">
-                <label for="precio_unitario" class="block text-sm font-medium text-gray-700">{{ form.precio_unitario.label.text }}</label>
-                <div class="mt-1 flex items-center space-x-2">
-                  <span class="text-gray-400 text-lg">$</span>
-                  {{ form.precio_unitario(class="block w-full border text-gray-700 text-sm border-gray-300 rounded-md pl-2", placeholder="Precio") }}
+
+                <!-- Cantidad -->
+                <div class="mb-6">
+                  <label for="cantidad" class="block mb-2 text-sm font-medium text-gray-900">
+                    {{ form.cantidad.label.text }}
+                    <span class="text-red-500"> *</span>  
+                  </label>
+                  <div class="mt-1">
+                    {{ form.cantidad(class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5", placeholder="Ejemplo: 1") }}
+                    <p class="text-xs text-gray-500 mt-1">
+                      Indica cuánta cantidad del insumo estás registrando.
+                    </p>
+                  </div>
+                  {% if form.cantidad.errors %}
+                    <ul class="text-red-500 text-xs mt-1">
+                      {% for error in form.cantidad.errors %}
+                        <li>{{ error }}</li>
+                      {% endfor %}
+                    </ul>
+                  {% endif %}
                 </div>
-                {% if form.precio_unitario.errors %}
-                  <ul class="text-red-500 text-xs mt-1">
-                    {% for error in form.precio_unitario.errors %}
-                      <li>{{ error }}</li>
-                    {% endfor %}
-                  </ul>
-                {% endif %}
-              </div>
-            </div>
-  
-            <!-- Botón de Enviar -->
-            <div class="flex justify-center mt-6">
-              <button type="submit" class="flex w-full text-white justify-center bg-blue-700 hover:bg-blue-900 focus:outline-none focus:ring-4 focus:ring-blue-900 font-medium rounded-lg text-sm px-5 py-2.5 text-center">
-                Agregar +
-              </button>
-            </div>
-          </form>      
+
+                <!-- Unidad de Medida -->
+                <div class="mb-6">
+                  <label for="unidad_medida" class="block mb-2 text-sm font-medium text-gray-900">
+                    {{ form.unidad_medida.label.text }}
+                    <span class="text-red-500"> *</span>
+                  </label>
+                  <div class="mt-1">
+                    <select name="unidad_medida" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5">
+                      <option value="" disabled selected class="text-gray-400">Selecciona unidad</option>
+                      {% for value, label in form.unidad_medida.choices %}
+                        <option value="{{ value }}">{{ label }}</option>
+                      {% endfor %}
+                    </select>
+                    <p class="text-xs text-gray-500 mt-1">
+                      Selecciona la unidad correspondiente a la cantidad ingresada. Asegúrate de que coincida con la presentación del insumo.
+                    </p>
+                  </div>
+                  {% if form.unidad_medida.errors %}
+                    <ul class="text-red-500 text-xs mt-1">
+                      {% for error in form.unidad_medida.errors %}
+                        <li>{{ error }}</li>
+                      {% endfor %}
+                    </ul>
+                  {% endif %}
+                </div>
+
+                <!-- Precio Total -->
+                <div class="mb-6">
+                  <label for="precio_unitario" class="block text-sm font-medium text-gray-700">
+                    {{ form.precio_unitario.label.text }}
+                    <span class="text-red-500"> *</span>
+                  </label>
+                  <div class="mt-1 flex items-center space-x-2">
+                    <span class="text-gray-400 text-lg">$</span>
+                    {{ form.precio_unitario(class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5", placeholder="Ejemplo: 100.00") }}
+                  </div>
+                  <p class="text-xs text-gray-500 mt-1">
+                    Escribe el costo total del isumo que estas registrando.
+                  </p>
+                  {% if form.precio_unitario.errors %}
+                    <ul class="text-red-500 text-xs mt-1">
+                      {% for error in form.precio_unitario.errors %}
+                        <li>{{ error }}</li>
+                      {% endfor %}
+                    </ul>
+                  {% endif %}
+                </div>
+
+                <!-- Botón de Enviar -->
+                <div class="flex justify-center mt-6">
+                  <button type="submit" class="flex w-full text-white justify-center bg-blue-700 hover:bg-blue-900 focus:outline-none focus:ring-4 focus:ring-blue-900 font-medium rounded-lg text-sm px-5 py-2.5 text-center">
+                    Agregar +
+                  </button>
+                </div>
+          </div>
+        </form>      
+        </div>
+      </div>  
+
+      <!-- Segunda columna -->
+      <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
+        <!-- Tabla de compras (Carrito) -->
+        <div class="text-white p-4" style="background-color: #7b3f0f">
+          <h2 class="text-xl font-semibold">
+            <i class="fas fa-cart-plus mr-2"></i>
+            Carrito de Insumos
+          </h2>
         </div>
         
-        <!-- Tabla de compras (Carrito) -->
-        <div class="w-full md:w-7/12 bg-white p-6 rounded-lg shadow-lg border border-gray-300 flex-grow flex flex-col">
-          <h1 class="text-2xl font-bold text-center mb-4 flex items-center" style="color: #7c5454;">
-            <img src="{{ url_for('static', filename='icons/carrito-de-compras.svg') }}" alt="Carrito de Compras" class="mr-2 w-6 h-6" />
-            Carrito de Materia Prima
-          </h1>
-          <div class="relative overflow-x-auto flex-grow">
-            <table id="tabla_carrito" class="w-full text-sm text-left rtl:text-right text-gray-500">
-              <thead class="text-xs text-white uppercase sticky top-0" style="background-color: #7c5454 !important; z-index: 10;">
+        <div class="p-4">
+          {% if compras %}
+          <div class="overflow-x-auto">
+            <table id="tabla_carrito" class="w-full text-sm text-left text-gray-600">
+              <thead 
+                class="text-xs text-white"
+                style="background-color: #44250b"
+              >
                 <tr>
                   <th class="px-6 py-3">Insumo</th>
                   <th class="px-6 py-3">Proveedor</th>
@@ -138,9 +178,9 @@
                   <th class="px-6 py-3">Acciones</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody class="divide-y divide-gray-200">
                 {% for compra in compras %}
-                <tr class="bg-white border-b border-gray-200">
+                <tr class="bg-white border-b border-gray-200 hover:bg-gray-50">
                   <td class="px-6 py-4">{{ compra.nombre }}</td>
                   <td class="px-6 py-4">{{ compra.proveedor }}</td>
                   <td class="px-6 py-4">{{ compra.cantidad }}</td>
@@ -150,13 +190,14 @@
                     <form action="{{ url_for('registro_compras_bp.eliminar_producto') }}" method="POST" style="display:inline;">
                       {{ form.hidden_tag() }}  <!-- token CSRF -->
                       <input type="hidden" name="producto_index" value="{{ loop.index0 }}">
-                      <button type="submit" class="text-red-600 hover:text-red-800 focus:outline-none">Eliminar</button>
+                      <button
+                          type="submit"
+                          class="text-red-500 hover:text-red-700 transition-colors"
+                        >
+                          <i class="fas fa-trash-alt"></i>
+                      </button>
                     </form>
                   </td>
-                </tr>
-                {% else %}
-                <tr>
-                  <td colspan="6" class="text-center py-4">No hay articulos</td>
                 </tr>
                 {% endfor %}
               </tbody>
@@ -170,10 +211,6 @@
 
               <!-- Botones de Cancelar y Finalizar Compra -->
               <div class="flex space-x-4 mt-4">
-                <!-- Botón de Cancelar -->
-                <button type="button" class="w-full md:w-1/2 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-800 focus:outline-none" onclick="cancelarCompra()">
-                  Cancelar
-                </button>
                 <!-- Botón de Finalizar Compra -->
                 <form method="POST" action="{{ url_for('registro_compras_bp.finalizar_compra') }}" class="w-full md:w-1/2">
                   {{ form.hidden_tag() }}
@@ -182,28 +219,109 @@
                   </button>
                 </form>
               </div>
+              {% else %}
+              <div class="text-center py-8 bg-gray-50 rounded-lg">
+                <i class="fas fa-info-circle text-gray-400 text-4xl mb-3"></i>
+                <p class="text-gray-500">No hay insumos agregados aún</p>
+                <p class="text-sm text-gray-400 mt-1">
+                  Agregue insumos usando el formulario
+                </p>
+              </div>
+              {% endif %}
             </div>
           </div>
         </div>
-
-        <script>
-          function cancelarCompra() {
-            // Obtener la tabla por su ID
-            var tabla = document.getElementById("tabla_carrito");
-
-            // Eliminar todas las filas excepto la cabecera
-            var filas = tabla.getElementsByTagName("tbody")[0].getElementsByTagName("tr");
-            for (var i = filas.length - 1; i >= 0; i--) {
-              filas[i].remove();
-            }
-
-            // Opcional: Puedes actualizar el total también
-            document.querySelector('.text-lg.font-bold.text-gray-700').innerText = "Total: $0.00";
-          }
-        </script>
       </div>
     </div>
   </div>
 </div>
+
+<script>
+  function cancelarCompra() {
+    // Obtener la tabla por su ID
+    var tabla = document.getElementById("tabla_carrito");
+
+    // Eliminar todas las filas excepto la cabecera
+    var filas = tabla.getElementsByTagName("tbody")[0].getElementsByTagName("tr");
+    for (var i = filas.length - 1; i >= 0; i--) {
+      filas[i].remove();
+    }
+
+    // Opcional: Puedes actualizar el total también
+    document.querySelector('.text-lg.font-bold.text-gray-700').innerText = "Total: $0.00";
+  }
+
+  // =============================================
+  // CÓDIGO PARA FILTRAR UNIDADES DE MEDIDA - VERSIÓN CORREGIDA
+  // =============================================
+  document.addEventListener('DOMContentLoaded', function() {
+      // Mapeo de unidades base a unidades permitidas
+      const unidadesPermitidas = {
+          'g':  [['g', 'Gramos (g)'], ['kg', 'Kilos (kg)']],      // Gramos → g, kg
+          'ml': [['ml', 'Mililitros (ml)'], ['lt', 'Litros (l)']],  // Mililitros → ml, l
+          'pz': [['pz', 'Piezas (pz)']]                           // Piezas → solo pz
+      };
+
+      // Obtener elementos del DOM
+      const productoSelect = document.querySelector('select[name="producto"]');
+      const unidadMedidaSelect = document.querySelector('select[name="unidad_medida"]');
+
+      // Evento al cambiar el producto
+      if (productoSelect && unidadMedidaSelect) {
+          productoSelect.addEventListener('change', async function() {
+              const productoId = this.value;
+              if (!productoId) {
+                  // Restaurar todas las opciones si no hay producto seleccionado
+                  resetUnidadMedidaSelect();
+                  return;
+              }
+
+              // Obtener la unidad base del producto (vía AJAX)
+              try {
+                  const response = await fetch(`/get_unidad_base/${productoId}`);
+                  if (!response.ok) {
+                      throw new Error('Error en la respuesta del servidor');
+                  }
+                  const data = await response.json();
+                  
+                  // Validar que tenemos datos correctos
+                  if (!data || !data.unidad_base || !unidadesPermitidas[data.unidad_base]) {
+                      throw new Error('Datos de unidad base no válidos');
+                  }
+
+                  // Limpiar select de unidades y agregar opción por defecto
+                  unidadMedidaSelect.innerHTML = '<option value="" disabled selected class="text-gray-400">Selecciona unidad</option>';
+
+                  // Agregar opciones permitidas
+                  unidadesPermitidas[data.unidad_base].forEach(([value, label]) => {
+                      const option = document.createElement('option');
+                      option.value = value;
+                      option.textContent = label;
+                      option.className = 'text-gray-700';
+                      unidadMedidaSelect.appendChild(option);
+                  });
+
+              } catch (error) {
+                  console.error("Error al obtener unidad base:", error);
+                  // Restaurar todas las opciones si hay error
+                  resetUnidadMedidaSelect();
+              }
+          });
+      }
+
+      // Función para resetear el select a todas las opciones
+      function resetUnidadMedidaSelect() {
+          unidadMedidaSelect.innerHTML = `
+              <option value="" disabled selected class="text-gray-400">Selecciona unidad</option>
+              <option value="g" class="text-gray-700">Gramos (g)</option>
+              <option value="kg" class="text-gray-700">Kilos (kg)</option>
+              <option value="ml" class="text-gray-700">Mililitros (ml)</option>
+              <option value="lt" class="text-gray-700">Litros (l)</option>
+              <option value="pz" class="text-gray-700">Piezas (pz)</option>
+          `;
+      }
+  });
+  
+</script>
 
 {% endblock %}
