@@ -93,33 +93,76 @@ def run_seed():
         materias_primas = [
             {
                 "nombre": "Harina de trigo",
-                "unidad": "g",
-                "cantidad": 100,
-                "cantidad_minima": 20,
-                "estado_stock": "DISPONIBLE"
+                "unidad": "gr",
+                "cantidad": 5000,
+                "cantidad_minima": 1000,
+                "estado_stock": "Disponible"
+            },
+            {
+                "nombre": "Leche",
+                "unidad": "lt",
+                "cantidad": 5000,
+                "cantidad_minima": 1000,
+                "estado_stock": "Disponible"
             },
             {
                 "nombre": "Azúcar",
-                "unidad": "g",
-                "cantidad": 50,
-                "cantidad_minima": 10,
-                "estado_stock": "DISPONIBLE"
+                "unidad": "gr",
+                "cantidad": 1200,
+                "cantidad_minima": 1000,
+                "estado_stock": "Disponible"
             },
             {
                 "nombre": "Huevo",
                 "unidad": "pz",
-                "cantidad": 200,
-                "cantidad_minima": 50,
-                "estado_stock": "DISPONIBLE"
+                "cantidad": 50,
+                "cantidad_minima": 30,
+                "estado_stock": "Disponible"
             },
             {
                 "nombre": "Mantequilla",
-                "unidad": "g",
-                "cantidad": 30,
-                "cantidad_minima": 5,
-                "estado_stock": "DISPONIBLE"
+                "unidad": "gr",
+                "cantidad": 500,
+                "cantidad_minima": 1000,
+                "estado_stock": "Disponible"
+            },
+            {
+                "nombre": "Polvo para hornear",
+                "unidad": "gr",
+                "cantidad": 800,
+                "cantidad_minima": 1000,
+                "estado_stock": "Disponible"
+            },
+            {
+                "nombre": "Esencia de vainilla",
+                "unidad": "ml",
+                "cantidad": 250,
+                "cantidad_minima": 1000,
+                "estado_stock": "Disponible"
+            },
+            {
+                "nombre": "Chispas de chocolate",
+                "unidad": "gr",
+                "cantidad": 1000,
+                "cantidad_minima": 1000,
+                "estado_stock": "Disponible"
+            },
+            {
+                "nombre": "Cacao en polvo",
+                "unidad": "gr",
+                "cantidad": 700,
+                "cantidad_minima": 1000,
+                "estado_stock": "Disponible"
+            },
+            {
+                "nombre": "Nueces",
+                "unidad": "gr",
+                "cantidad": 600,
+                "cantidad_minima": 1000,
+                "estado_stock": "Disponible"
             }
         ]
+
         
         for mp_data in materias_primas:
             if not MateriaPrima.query.filter_by(nombre=mp_data["nombre"]).first():

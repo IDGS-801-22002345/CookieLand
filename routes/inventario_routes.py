@@ -11,5 +11,10 @@ inventario_bp = Blueprint('inventario_bp', __name__, url_prefix='/')
 @log_excepciones
 @role_required('admin')
 def index():
-    inventario = db.session.query(MateriaPrima).outerjoin(InventarioMateria).all()
+    inventario = (
+        db.session.query(MateriaPrima)
+        .outerjoin(InventarioMateria)
+        .order_by(MateriaPrima.nombre.asc())
+        .all()
+    )
     return render_template('inventario/inventario.html', inventario=inventario)

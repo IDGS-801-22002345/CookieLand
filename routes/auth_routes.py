@@ -87,7 +87,7 @@ def login():
                 flash('¡Inicio de sesión exitoso!', 'success')
 
                 if user.has_role('admin'):
-                    return redirect(url_for('personal_bp.dashboard'))
+                    return redirect(url_for('dashboard_bp.index'))
                 return redirect(url_for('cliente_bp.index'))
 
             else:

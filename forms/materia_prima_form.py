@@ -16,7 +16,7 @@ class MateriaPrimaForm(FlaskForm):
     ])
     
     unidad = SelectField('Unidad de medida', choices=[
-        ('g', 'Gramos'),
+        ('gr', 'Gramos'),
         ('ml', 'Mililitros'),
         ('pz', 'Piezas')
     ], validators=[validators.DataRequired(message='La unidad de medida es requerida')])
