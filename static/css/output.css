@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-/*! tailwindcss v4.0.15 | MIT License | https://tailwindcss.com */
-=======
 /*! tailwindcss v4.0.17 | MIT License | https://tailwindcss.com */
->>>>>>> main
 @layer theme, base, components, utilities;
 @layer theme {
   :root, :host {
@@ -10,10 +6,7 @@
       "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
     --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
       "Courier New", monospace;
-<<<<<<< HEAD
     --color-red-50: #FEF2F2;
-=======
->>>>>>> main
     --color-red-100: #FEE2E2;
     --color-red-200: #FECACA;
     --color-red-300: #FCA5A5;
@@ -22,13 +15,9 @@
     --color-red-600: #DC2626;
     --color-red-700: #B91C1C;
     --color-red-800: #991B1B;
-    --color-red-900: #7F1D1D;
     --color-amber-500: oklch(0.769 0.188 70.08);
     --color-amber-600: oklch(0.666 0.179 58.318);
-<<<<<<< HEAD
     --color-yellow-50: #FFFBEB;
-=======
->>>>>>> main
     --color-yellow-100: #FEF3C7;
     --color-yellow-200: #FDE68A;
     --color-yellow-300: #FCD34D;
@@ -44,10 +33,7 @@
     --color-green-600: #059669;
     --color-green-700: #047857;
     --color-green-800: #065F46;
-<<<<<<< HEAD
     --color-blue-50: #EFF6FF;
-=======
->>>>>>> main
     --color-blue-200: #BFDBFE;
     --color-blue-300: #93C5FD;
     --color-blue-500: #3B82F6;
@@ -329,8 +315,14 @@
   .right-5 {
     right: calc(var(--spacing) * 5);
   }
+  .right-10 {
+    right: calc(var(--spacing) * 10);
+  }
   .bottom-0 {
     bottom: calc(var(--spacing) * 0);
+  }
+  .bottom-12 {
+    bottom: calc(var(--spacing) * 12);
   }
   .-left-64 {
     left: calc(var(--spacing) * -64);
@@ -388,6 +380,9 @@
   }
   .mx-2 {
     margin-inline: calc(var(--spacing) * 2);
+  }
+  .mx-4 {
+    margin-inline: calc(var(--spacing) * 4);
   }
   .mx-auto {
     margin-inline: auto;
@@ -551,18 +546,18 @@
   .h-70 {
     height: calc(var(--spacing) * 70);
   }
+  .h-72 {
+    height: calc(var(--spacing) * 72);
+  }
   .h-80 {
     height: calc(var(--spacing) * 80);
   }
   .h-96 {
     height: calc(var(--spacing) * 96);
   }
-<<<<<<< HEAD
   .h-\[550px\] {
     height: 550px;
   }
-=======
->>>>>>> main
   .h-\[calc\(100\%-1rem\)\] {
     height: calc(100% - 1rem);
   }
@@ -650,12 +645,9 @@
   .w-64 {
     width: calc(var(--spacing) * 64);
   }
-<<<<<<< HEAD
   .w-72 {
     width: calc(var(--spacing) * 72);
   }
-=======
->>>>>>> main
   .w-80 {
     width: calc(var(--spacing) * 80);
   }
@@ -783,9 +775,6 @@
   }
   .list-disc {
     list-style-type: disc;
-  }
-  .list-none {
-    list-style-type: none;
   }
   .grid-cols-1 {
     grid-template-columns: repeat(1, minmax(0, 1fr));
@@ -1002,27 +991,21 @@
   .border-\[\#E5E7EB\] {
     border-color: #E5E7EB;
   }
-<<<<<<< HEAD
   .border-blue-200 {
     border-color: var(--color-blue-200);
   }
-=======
->>>>>>> main
   .border-gray-200 {
     border-color: var(--color-gray-200);
   }
   .border-gray-300 {
     border-color: var(--color-gray-300);
   }
-<<<<<<< HEAD
   .border-green-300 {
     border-color: var(--color-green-300);
   }
   .border-red-200 {
     border-color: var(--color-red-200);
   }
-=======
->>>>>>> main
   .border-red-400 {
     border-color: var(--color-red-400);
   }
@@ -1157,9 +1140,6 @@
   .object-center {
     object-position: center;
   }
-  .p-1 {
-    padding: calc(var(--spacing) * 1);
-  }
   .p-2 {
     padding: calc(var(--spacing) * 2);
   }
@@ -1250,6 +1230,9 @@
   .pt-20 {
     padding-top: calc(var(--spacing) * 20);
   }
+  .pr-2 {
+    padding-right: calc(var(--spacing) * 2);
+  }
   .pr-8 {
     padding-right: calc(var(--spacing) * 8);
   }
@@ -1328,9 +1311,6 @@
   .text-xs {
     font-size: var(--text-xs);
     line-height: var(--tw-leading, var(--text-xs--line-height));
-  }
-  .text-\[15px\] {
-    font-size: 15px;
   }
   .text-\[17px\] {
     font-size: 17px;
@@ -1443,12 +1423,9 @@
   .text-red-700 {
     color: var(--color-red-700);
   }
-<<<<<<< HEAD
   .text-red-800 {
     color: var(--color-red-800);
   }
-=======
->>>>>>> main
   .text-white {
     color: var(--color-white);
   }
@@ -1629,16 +1606,6 @@
   .\[ticket\:10782\] {
     ticket: 10782;
   }
-  .hover\:scale-105 {
-    &:hover {
-      @media (hover: hover) {
-        --tw-scale-x: 105%;
-        --tw-scale-y: 105%;
-        --tw-scale-z: 105%;
-        scale: var(--tw-scale-x) var(--tw-scale-y);
-      }
-    }
-  }
   .hover\:bg-\[\#4E3417\] {
     &:hover {
       @media (hover: hover) {
@@ -1751,7 +1718,6 @@
       }
     }
   }
-<<<<<<< HEAD
   .hover\:bg-red-100 {
     &:hover {
       @media (hover: hover) {
@@ -1759,8 +1725,6 @@
       }
     }
   }
-=======
->>>>>>> main
   .hover\:bg-red-200 {
     &:hover {
       @media (hover: hover) {
@@ -2204,6 +2168,11 @@
       grid-template-columns: repeat(4, minmax(0, 1fr));
     }
   }
+  .lg\:flex-row {
+    @media (width >= 64rem) {
+      flex-direction: row;
+    }
+  }
   .lg\:px-6 {
     @media (width >= 64rem) {
       padding-inline: calc(var(--spacing) * 6);
@@ -2239,13 +2208,6 @@
   .rtl\:text-right {
     &:where(:dir(rtl), [dir="rtl"], [dir="rtl"] *) {
       text-align: right;
-    }
-  }
-  .dark\:divide-gray-600 {
-    @media (prefers-color-scheme: dark) {
-      :where(& > :not(:last-child)) {
-        border-color: var(--color-gray-600);
-      }
     }
   }
   .dark\:border-gray-600 {
@@ -2380,15 +2342,6 @@
       &:hover {
         @media (hover: hover) {
           background-color: var(--color-red-800);
-        }
-      }
-    }
-  }
-  .dark\:hover\:bg-red-900 {
-    @media (prefers-color-scheme: dark) {
-      &:hover {
-        @media (hover: hover) {
-          background-color: var(--color-red-900);
         }
       }
     }

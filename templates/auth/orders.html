@@ -1,77 +1,92 @@
-{% extends "cliente/layout.html" %} 
-{% block title %}Mis pedidos - Maicookies{% endblock %} 
+{% extends "cliente/layout.html" %}
+{% block title %}Mis pedidos - Maicookies{% endblock %}
+
 {% block content %}
 
-<body class="bg-[#e1d9ce] text-gray-900 flex-col min-h-screen">
-<section class="bg-[] py-16 min-h-screen font-light text-dark text-lg dark:text-dark">
-	<div class="max-w-6xl mx-auto px-6">
-		<div class="flex items-center justify-between mb-6">
-			<div>
-				<a href="{{ url_for('cliente_bp.index') }}" class="text-dark">
-					<i class="fas fa-home text-2xl"></i>
-				</a>
-			</div>
-			<h1 class="text-4xl font-extrabold text-center text-[#5A3E1B] flex-1">Mis pedidos</h1>
-		</div>
+{% import "_macros.html" as macros %}
+{{ macros.mostrar_flash() }}
 
+<section class=" bg-[#e1d9ce] py-16 min-h-screen font-light text-dark text-lg mt-24 ">
+  <div class="max-w-6xl mx-auto px-6">
+    <div class="flex items-center justify-between mb-6">
+      <a href="{{ url_for('cliente_bp.index') }}" class="text-dark">
+        <i class="fas fa-home text-2xl"></i>
+      </a>
+      <h1 class="text-4xl font-extrabold text-center text-[#5A3E1B] flex-1">Mis pedidos</h1>
+    </div>
 
-		<div class="bg-white text-lg shadow-md rounded-xl overflow-x-auto mt-10">
-			<table class="w-full text-left table-auto border-collapse mb-4 font-light text-dark text-lg dark:text-dark">
-				<thead class="bg-[#5A3E1B] text-white text-sm uppercase">
-					<tr>
-						<th class="px-6 py-4"># Orden</th>
-						<th class="px-6 py-4">Fecha Pedido</th>
-						<th class="px-6 py-4">Fecha Recoger</th>
-						<th class="px-6 py-4">Hora Recoger</th>
-						<th class="px-6 py-4">Total</th>
-						<th class="px-6 py-4">Estatus</th>
-                        <th class="px-6 py-4">Más detalles</th>
-					</tr>
-				</thead>
-				<tbody class="text-gray-700 text-sm">
-					<tr class="border-b hover:bg-[#ececec]">
-						<td class="px-6 py-4 font-semibold">#00125</td>
-						<td class="px-6 py-4">21/03/2025</td>
-						<td class="px-6 py-4">23/03/2025</td>
-						<td class="px-6 py-4">11:00 AM</td>
-						<td class="px-6 py-4">$112.00</td>
-						<td class="px-6 py-4 text-green-600 font-semibold">Listo para recoger</td>
-                        <td class="px-6 py-4">
-                            <a href="#" class="text-[#5A3E1B] ml-4">
-                                <i class="fas fa-cookie-bite text-2xl"></i>
-                            </a>
-                        </td>
-					</tr>
-					<tr class="border-b hover:bg-[#ececec]">
-						<td class="px-6 py-4 font-semibold">#00124</td>
-						<td class="px-6 py-4">20/03/2025</td>
-						<td class="px-6 py-4">22/03/2025</td>
-						<td class="px-6 py-4">10:30 AM</td>
-						<td class="px-6 py-4">$84.00</td>
-						<td class="px-6 py-4 text-yellow-600 font-semibold">En proceso</td>
-                        <td class="px-6 py-4">
-                            <a href="#" class="text-[#5A3E1B] ml-4">
-                                <i class="fas fa-cookie-bite text-2xl"></i>
-                            </a>
-                        </td>
-					</tr>
-					<tr class="hover:bg-[#ececec]">
-						<td class="px-6 py-4 font-semibold">#00123</td>
-						<td class="px-6 py-4">15/03/2025</td>
-						<td class="px-6 py-4">17/03/2025</td>
-						<td class="px-6 py-4">01:00 PM</td>
-						<td class="px-6 py-4">$65.00</td>
-						<td class="px-6 py-4 text-red-600 font-semibold">Finalizado</td>
-                        <td class="px-6 py-4">
-                            <a href="#" class="text-[#5A3E1B] ml-4">
-                                <i class="fas fa-cookie-bite text-2xl"></i>
-                            </a>
-                        </td>
-					</tr>
-				</tbody>
-			</table>
-		</div>
-	</div>
+    <div class="bg-white shadow-md rounded-xl overflow-x-auto mt-10">
+      <table class="w-full text-left table-auto border-collapse mb-4 font-light text-dark text-sm">
+        <thead class="bg-[#5A3E1B] text-white text-sm uppercase">
+          <tr>
+            <th class="px-6 py-4"># Orden</th>
+            <th class="px-6 py-4">Fecha Pedido</th>
+            <th class="px-6 py-4">Fecha Recoger</th>
+            <th class="px-6 py-4">Hora Recoger</th>
+            <th class="px-6 py-4">Total</th>
+            <th class="px-6 py-4">Estatus</th>
+            <th class="px-6 py-4">Más detalles</th>
+          </tr>
+        </thead>
+        <tbody class="text-gray-700">
+          {% for pedido in pedidos %}
+          <tr class="border-b hover:bg-[#ececec]">
+            <td class="px-6 py-4 font-semibold">#{{ '%05d' % pedido.id }}</td>
+            <td class="px-6 py-4">{{ pedido.fecha_pedido.strftime('%d/%m/%Y') }}</td>
+            <td class="px-6 py-4">{{ pedido.fecha_recoleccion.strftime('%d/%m/%Y') }}</td>
+            <td class="px-6 py-4">{{ pedido.hora_recoleccion }}</td>
+            <td class="px-6 py-4">${{ '%.2f' % pedido.total }}</td>
+            <td class="px-6 py-4 font-semibold text-{{ 
+              'yellow-600' if pedido.estatus == 'En proceso' else 
+              'green-600' if pedido.estatus == 'Listo para recoger' else 
+              'red-600' }}">{{ pedido.estatus }}</td>
+            <td class="px-6 py-4">
+              <a href="#" onclick="verDetallesPedido({{ pedido.id }})" class="text-[#5A3E1B] ml-4">
+                <i class="fas fa-cookie-bite text-2xl"></i>
+              </a>
+            </td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="7" class="px-6 py-8 text-center text-gray-500">
+              <i class="fas fa-info-circle"></i> Aún no has realizado ningún pedido.
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
 </section>
 
+<!-- Modal Detalle Pedido -->
+<div id="modal-detalle-pedido" class="fixed inset-0 z-50 hidden bg-black bg-opacity-60 flex items-center justify-center px-4">
+  <div class="bg-white rounded-2xl shadow-3xl w-full max-w-3xl sm:max-w-4xl md:max-w-4xl lg:max-w-4xl xl:max-w-4xl">
+    <div class="flex justify-end p-4">
+      <button onclick="cerrarModal()" class="text-gray-600 hover:text-red-600 text-2xl font-bold">&times;</button>
+    </div>
+    <div id="contenido-detalle" class="px-6 pb-6 overflow-y-auto max-h-[80vh]">
+      <!-- Aquí se cargan los detalles por JS -->
+    </div>
+  </div>
+</div>
+
+
+<script>
+  function verDetallesPedido(id) {
+    fetch(`/detalle-pedido/${id}`)
+      .then(response => response.text())
+      .then(html => {
+        document.getElementById('contenido-detalle').innerHTML = html;
+        document.getElementById('modal-detalle-pedido').classList.remove('hidden');
+      })
+      .catch(error => {
+        console.error('Error al cargar el detalle del pedido:', error);
+      });
+  }
+
+  function cerrarModal() {
+    document.getElementById('modal-detalle-pedido').classList.add('hidden');
+  }
+</script>
 {% endblock %}

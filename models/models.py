@@ -195,8 +195,6 @@ class Merma(db.Model):
     
     galleta = db.relationship('Galleta', back_populates='mermas')  
     inventario_materia = db.relationship('InventarioMateria', back_populates='mermas')
-
-    
     
 class Auditoria(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -207,6 +205,41 @@ class Auditoria(db.Model):
     def __repr__(self):
         return f'<Auditoria {self.id} - {self.accion}>'
 
+class Pedido(db.Model):
+    __tablename__ = 'pedidos'
+    id = db.Column(db.Integer, primary_key=True)
+    usuario_id = db.Column(db.Integer, db.ForeignKey('usuarios.id'), nullable=False)
+    fecha_recoleccion = db.Column(db.Date, nullable=False)
+    hora_recoleccion = db.Column(db.String(20), nullable=False)
+    total = db.Column(db.Float, nullable=False)
+    fecha_pedido = db.Column(db.DateTime, default=datetime.datetime.now)
+    estatus = db.Column(db.String(30), nullable=False, default="En proceso")
+    detalles = db.relationship('DetallePedido', back_populates='pedido')
+    usuario = db.relationship('Usuario', backref='pedidos')
+
+class DetallePedido(db.Model):
+    __tablename__ = 'detalle_pedido'
+    id = db.Column(db.Integer, primary_key=True)
+    pedido_id = db.Column(db.Integer, db.ForeignKey('pedidos.id'), nullable=False)
+    galleta_id = db.Column(db.Integer, db.ForeignKey('galletas.id'), nullable=False)
+    cantidad = db.Column(db.Integer, nullable=False)
+    precio_unitario = db.Column(db.Float, nullable=False)
+    presentacion = db.Column(db.String(20), nullable=True) 
+
+    pedido = db.relationship('Pedido', back_populates='detalles')
+    galleta = db.relationship('Galleta')
+
+        
+class CarritoTemporal(db.Model):
+    __tablename__ = 'carrito_temporal'
+    id = db.Column(db.Integer, primary_key=True)
+    usuario_id = db.Column(db.Integer, db.ForeignKey('usuarios.id'))
+    galleta_id = db.Column(db.Integer, db.ForeignKey('galletas.id'))
+    cantidad = db.Column(db.Integer, nullable=False)
+    presentacion = db.Column(db.String(20), nullable=False)
+
+    galleta = db.relationship('Galleta', backref='carritos_temporales')
+    usuario = db.relationship('Usuario', backref='carritos_temporales')
 
 class Venta(db.Model):
     __tablename__ = 'ventas'
