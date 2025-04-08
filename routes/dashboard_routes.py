@@ -4,7 +4,7 @@ from datetime import date
 from models.models import Galleta, Compra, Venta, db
 from sqlalchemy import func
 
-dashboard_bp = Blueprint('dashboard_bp', __name__, url_prefix='/dashboard')
+dashboard_bp = Blueprint('dashboard_bp', __name__, url_prefix='/mk_dashboard')
 
 def obtener_total_ventas_dia():
     hoy = date.today()
@@ -18,6 +18,12 @@ def obtener_total_compras_dia():
 
 def calcular_total_caja(fondo_inicial, total_ventas, total_compras):
     return fondo_inicial + total_ventas - total_compras
+
+def obtener_ventas_mes():
+    hoy = date.today()
+    primer_dia_mes = hoy.replace(day=1)
+    ventas = Venta.query.filter(Venta.fechaCreacion >= primer_dia_mes).all()
+    return sum(v.total for v in ventas)
 
 
 @dashboard_bp.route("/")
@@ -37,17 +43,16 @@ def index():
         InventarioMateria.cantidad < InventarioMateria.cantidad_minima
     ).all()
 
-    # 📦 Pedidos para hoy (por ahora simulados)
-    pedidos_hoy = [
-        {"cliente_nombre": "Juan Pérez", "producto": "Caja de Galletas de Chocolate", "fecha_entrega": "2025-04-05"},
-        {"cliente_nombre": "María López", "producto": "Caja de Galletas de Vainilla", "fecha_entrega": "2025-04-05"}
-    ]
+    galletas_bajo_inventario = Galleta.query.filter(
+        Galleta.stock.between(0, 10)
+    ).order_by(Galleta.stock.asc()).all()
 
     # 💵 Métricas reales del día
     fondo_inicial = 1500
     ventas_dia = obtener_total_ventas_dia()
     compras_dia = obtener_total_compras_dia()
     total_caja = calcular_total_caja(fondo_inicial, ventas_dia, compras_dia)
+    ventas_mes = obtener_ventas_mes()
 
     return render_template(
         "dashboard/dashboard.html",
@@ -57,6 +62,7 @@ def index():
         total_caja=total_caja,
         top_5_galletas=top_5_galletas,
         inventario_critico=inventario_critico,
-        pedidos_hoy=pedidos_hoy,
+        galletas_bajo_inventario=galletas_bajo_inventario,
+        ventas_mes=ventas_mes,
         galletas_producidas_hoy=300  # <- lo puedes automatizar después también
     )

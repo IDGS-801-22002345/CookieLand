@@ -21,16 +21,14 @@
       rel="stylesheet"
       href="{{ url_for('static', filename='css/output.css') }}"
     />
-    <!-- Contenedor principal con margen superior -->
-    <div class="flex flex-col w-full px-10">
-      <!-- Botón para abrir el modal de agregar -->
-      <div
-        class="pl-28 p-4 text-center bg-white border border-gray-300 rounded-lg shadow-sm sm:p-8 dark:bg-gray-800 dark:border-gray-700"
-      >
-      <h1 class="text-3xl font-bold text-center mb-4">Administración de proveedores</h1>
-
-        <div class="flex justify-end">
-          <button
+    <div class="flex flex-col w-full px-4 md:px-10">
+        <div class="w-full p-4 text-center bg-white border border-gray-200 rounded-lg shadow-sm">
+            <!-- Título alineado a la izquierd -->
+            <div class="flex justify-between pb-5">
+                <div>
+                    <h1 class="text-4xl font-medium text-gray-800">Proveedores</h1>
+                </div>
+                <button
             data-modal-target="crud-modal"
             data-modal-toggle="crud-modal"
             class="flex items-center gap-2 text-white focus:outline-none bg-green-500 hover:bg-green-500 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-1dark:bg-green-600 dark:hover:bg-[#3b82f6]"
@@ -38,7 +36,8 @@
             <i class="fas fa-truck"></i>
             Agregar
           </button>
-        </div>
+            </div>
+
         <div
           class="flex items-center border border-gray-300 rounded-md w-96 p-2"
         >

@@ -32,25 +32,38 @@
               </h2>
             
                 <!-- Proveedor -->
-                <div class="mb-6">
-                  <label class="block mb-2 text-sm font-medium text-gray-900">{{ form.proveedor.label.text }}<span class="text-red-500"> *</span></label>
-                  <div class="mt-1">
-                    <select name="proveedor" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5">
-                      <option value="" disabled selected>Selecciona proveedor</option>
-                      {% for value, label in form.proveedor.choices %}
-                        <option value="{{ value }}">{{ label }}</option>
-                      {% endfor %}
-                    </select>
-                  </div>
-                  {% if form.proveedor.errors %}
-                    <ul class="text-red-500 text-xs mt-1">
-                      {% for error in form.proveedor.errors %}
-                        <li>{{ error }}</li>
-                      {% endfor %}
-                    </ul>
-                  {% endif %}
+              <div class="mb-6">
+                <label class="block mb-2 text-sm font-medium text-gray-900">{{ form.proveedor.label.text }}<span class="text-red-500"> *</span></label>
+                <div class="mt-1">
+                  <select 
+                    name="proveedor" 
+                    id="proveedor"
+                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5"
+                    {% if compras %}disabled{% endif %}
+                  >
+                    <option value="" disabled selected>Selecciona proveedor</option>
+                    {% for value, label in form.proveedor.choices %}
+                      <option value="{{ value }}" {% if form.proveedor.data == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                  </select>
                 </div>
-
+                {% if form.proveedor.errors %}
+                  <ul class="text-red-500 text-xs mt-1">
+                    {% for error in form.proveedor.errors %}
+                      <li>{{ error }}</li>
+                    {% endfor %}
+                  </ul>
+                {% endif %}
+                
+                <!-- Mensaje cuando el proveedor está bloqueado -->
+                {% if compras %}
+                <div class="mt-2 text-sm text-blue-600 bg-blue-50 p-2 rounded">
+                  <i class="fas fa-info-circle mr-1"></i>
+                  El proveedor está bloqueado porque ya hay productos en el carrito. 
+                  Para cambiar de proveedor, elimina todos los productos o finaliza la compra.
+                </div>
+                {% endif %}
+              </div>
                 <!-- Producto -->
                 <div class="mb-6">
                   <label class="block mb-2 text-sm font-medium text-gray-900">{{ form.producto.label.text }}<span class="text-red-500"> *</span></label>
@@ -205,16 +218,19 @@
 
             <!-- Total y botones -->
             <div class="flex flex-col justify-between mt-4 space-y-4 flex-grow">
-              <div class="flex justify-between items-center">
-                <label class="text-lg font-bold text-gray-700">Total: ${{ total_general }}</label>
+              <div class="mt-6 p-4 bg-white border border-gray-200 rounded-lg shadow-md">
+                <div class="flex justify-between items-center">
+                  <span class="text-lg font-semibold text-gray-700">Total de la compra:</span>
+                  <span class="text-2xl font-bold  text-gray-700">${{ "%.2f"|format(total_general) }}</span>
+                </div>
               </div>
 
               <!-- Botones de Cancelar y Finalizar Compra -->
-              <div class="flex space-x-4 mt-4">
+              <div class="flex space-x-4">
                 <!-- Botón de Finalizar Compra -->
-                <form method="POST" action="{{ url_for('registro_compras_bp.finalizar_compra') }}" class="w-full md:w-1/2">
+                <form method="POST" action="{{ url_for('registro_compras_bp.finalizar_compra') }}" class="w-full">
                   {{ form.hidden_tag() }}
-                  <button type="submit" class="w-full bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-800 focus:outline-none">
+                  <button type="submit" class="w-50 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-800 focus:outline-none">
                     Finalizar Compra
                   </button>
                 </form>
@@ -252,75 +268,98 @@
   }
 
   // =============================================
-  // CÓDIGO PARA FILTRAR UNIDADES DE MEDIDA - VERSIÓN CORREGIDA
+  // CÓDIGO PARA FILTRAR UNIDADES DE MEDIDA
   // =============================================
   document.addEventListener('DOMContentLoaded', function() {
-      // Mapeo de unidades base a unidades permitidas
-      const unidadesPermitidas = {
-          'g':  [['g', 'Gramos (g)'], ['kg', 'Kilos (kg)']],      // Gramos → g, kg
-          'ml': [['ml', 'Mililitros (ml)'], ['lt', 'Litros (l)']],  // Mililitros → ml, l
-          'pz': [['pz', 'Piezas (pz)']]                           // Piezas → solo pz
-      };
+    const unidadesConfig = {
+        'gr': {
+            label: 'Gramos',
+            opciones: [
+                {value: 'gr', label: 'Gramos (gr)'},
+                {value: 'kg', label: 'Kilos (kg)'}
+            ]
+        },
+        'ml': {
+            label: 'Mililitros',
+            opciones: [
+                {value: 'ml', label: 'Mililitros (ml)'},
+                {value: 'lt', label: 'Litros (lt)'}
+            ]
+        },
+        'pz': {
+            label: 'Piezas',
+            opciones: [
+                {value: 'pz', label: 'Piezas (pz)'}
+            ]
+        }
+    };
 
-      // Obtener elementos del DOM
-      const productoSelect = document.querySelector('select[name="producto"]');
-      const unidadMedidaSelect = document.querySelector('select[name="unidad_medida"]');
+    const productoSelect = document.querySelector('select[name="producto"]');
+    const unidadMedidaSelect = document.querySelector('select[name="unidad_medida"]');
 
-      // Evento al cambiar el producto
-      if (productoSelect && unidadMedidaSelect) {
-          productoSelect.addEventListener('change', async function() {
-              const productoId = this.value;
-              if (!productoId) {
-                  // Restaurar todas las opciones si no hay producto seleccionado
-                  resetUnidadMedidaSelect();
-                  return;
-              }
+    if (productoSelect && unidadMedidaSelect) {
+        productoSelect.addEventListener('change', async function() {
+            const productoId = this.value;
+            
+            if (!productoId) {
+                resetUnidadMedidaSelect();
+                return;
+            }
 
-              // Obtener la unidad base del producto (vía AJAX)
-              try {
-                  const response = await fetch(`/get_unidad_base/${productoId}`);
-                  if (!response.ok) {
-                      throw new Error('Error en la respuesta del servidor');
-                  }
-                  const data = await response.json();
-                  
-                  // Validar que tenemos datos correctos
-                  if (!data || !data.unidad_base || !unidadesPermitidas[data.unidad_base]) {
-                      throw new Error('Datos de unidad base no válidos');
-                  }
+            try {
+                const response = await fetch(`/get_unidad_base/${productoId}`);
+                
+                if (!response.ok) {
+                    throw new Error(`Error HTTP: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                console.log('Unidad base recibida:', data.unidad_base);
+                
+                if (!data.unidad_base || !unidadesConfig[data.unidad_base]) {
+                    console.error('Unidad base no soportada:', data.unidad_base);
+                    resetUnidadMedidaSelect();
+                    return;
+                }
 
-                  // Limpiar select de unidades y agregar opción por defecto
-                  unidadMedidaSelect.innerHTML = '<option value="" disabled selected class="text-gray-400">Selecciona unidad</option>';
+                // Limpiar y poblar el select
+                unidadMedidaSelect.innerHTML = '';
+                const defaultOption = new Option('Selecciona unidad', '', true, true);
+                defaultOption.disabled = true;
+                unidadMedidaSelect.add(defaultOption);
+                
+                unidadesConfig[data.unidad_base].opciones.forEach(opcion => {
+                    const option = new Option(opcion.label, opcion.value);
+                    unidadMedidaSelect.add(option);
+                });
 
-                  // Agregar opciones permitidas
-                  unidadesPermitidas[data.unidad_base].forEach(([value, label]) => {
-                      const option = document.createElement('option');
-                      option.value = value;
-                      option.textContent = label;
-                      option.className = 'text-gray-700';
-                      unidadMedidaSelect.appendChild(option);
-                  });
+            } catch (error) {
+                console.error("Error al obtener unidad base:", error);
+                resetUnidadMedidaSelect();
+            }
+        });
+    }
 
-              } catch (error) {
-                  console.error("Error al obtener unidad base:", error);
-                  // Restaurar todas las opciones si hay error
-                  resetUnidadMedidaSelect();
-              }
-          });
-      }
-
-      // Función para resetear el select a todas las opciones
-      function resetUnidadMedidaSelect() {
-          unidadMedidaSelect.innerHTML = `
-              <option value="" disabled selected class="text-gray-400">Selecciona unidad</option>
-              <option value="g" class="text-gray-700">Gramos (g)</option>
-              <option value="kg" class="text-gray-700">Kilos (kg)</option>
-              <option value="ml" class="text-gray-700">Mililitros (ml)</option>
-              <option value="lt" class="text-gray-700">Litros (l)</option>
-              <option value="pz" class="text-gray-700">Piezas (pz)</option>
-          `;
-      }
-  });
+    function resetUnidadMedidaSelect() {
+        if (!unidadMedidaSelect) return;
+        
+        unidadMedidaSelect.innerHTML = '';
+        const defaultOption = new Option('Selecciona unidad', '', true, true);
+        defaultOption.disabled = true;
+        unidadMedidaSelect.add(defaultOption);
+        
+        // Todas las opciones
+        [
+            {value: 'gr', label: 'Gramos (gr)'},
+            {value: 'kg', label: 'Kilos (kg)'},
+            {value: 'ml', label: 'Mililitros (ml)'},
+            {value: 'lt', label: 'Litros (lt)'},
+            {value: 'pz', label: 'Piezas (pz)'}
+        ].forEach(opcion => {
+            unidadMedidaSelect.add(new Option(opcion.label, opcion.value));
+        });
+    }
+});
   
 </script>
 

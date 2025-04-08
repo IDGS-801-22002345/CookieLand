@@ -88,8 +88,15 @@ def login():
 
                 if user.has_role('admin'):
                     return redirect(url_for('dashboard_bp.index'))
-                return redirect(url_for('cliente_bp.index'))
 
+                elif user.has_role('vendedor'):
+                    return redirect(url_for('ventas_bp.index'))
+
+                elif user.has_role('produccion'):
+                    return redirect(url_for('produccion_bp.index'))
+
+                else:
+                    return redirect(url_for('cliente_bp.index'))
             else:
                 intentos.incrementar_intento()
                 

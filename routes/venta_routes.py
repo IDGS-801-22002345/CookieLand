@@ -49,7 +49,7 @@ venta_actual = VentaActual()
 @ventas_bp.route("/")
 @login_required
 @log_excepciones
-@role_required('admin')
+@role_required('admin', 'vendedor')
 def index():
     ventaForm = VentaForm()
     pedidoForm = PedidoListoForm()
@@ -81,7 +81,7 @@ def mostrar_imagen(galleta_id):
 @ventas_bp.route("/eliminar_galleta", methods=["POST"])
 @login_required
 @log_excepciones
-@role_required('admin')
+@role_required('admin', 'vendedor')
 def eliminar_galleta():
     try:
         galleta_id = int(request.form.get('galleta_id'))
@@ -105,7 +105,7 @@ def eliminar_galleta():
 @ventas_bp.route("/add_galleta", methods=["POST"])
 @login_required
 @log_excepciones
-@role_required('admin')
+@role_required('admin', 'vendedor')
 def add_galleta():
     ventaForm = VentaForm(request.form)
     if not ventaForm.validate():
@@ -164,7 +164,7 @@ def add_galleta():
 @ventas_bp.route("/limpiar_venta", methods=["POST"])
 @login_required
 @log_excepciones
-@role_required('admin')
+@role_required('admin', 'vendedor')
 def limpiar_venta():
     try:
         venta_actual.limpiar_venta()
@@ -178,7 +178,7 @@ def limpiar_venta():
 @ventas_bp.route("/realizar_venta", methods=["POST"])
 @login_required
 @log_excepciones
-@role_required('admin')
+@role_required('admin', 'vendedor')
 def realizar_venta():
     try:
         if not venta_actual.detalles:

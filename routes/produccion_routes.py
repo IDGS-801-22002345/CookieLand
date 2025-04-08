@@ -14,7 +14,7 @@ produccion_bp = Blueprint('produccion_bp', __name__, url_prefix='/produccion')
 @produccion_bp.route("/")
 @login_required
 @log_excepciones
-@role_required('admin')
+@role_required('admin', 'produccion')
 def index():
     galletas = Galleta.query.options(
         db.joinedload(Galleta.receta)
@@ -26,6 +26,9 @@ def index():
     return render_template("produccion/produccion.html", galletas=galletas)
 
 @produccion_bp.route('/imagen/<int:galleta_id>')
+@login_required
+@log_excepciones
+@role_required('admin', 'produccion')
 def mostrar_imagen(galleta_id):
     galleta = Galleta.query.get_or_404(galleta_id)
     if not galleta.foto:
@@ -139,7 +142,7 @@ def cerrar_modal():
 @produccion_bp.route("/produccion-prod")
 @login_required
 @log_excepciones
-@role_required('admin')
+@role_required('admin', 'produccion')
 def prod():
     form = ProduccionForm()
     galletas = Galleta.query.options(
@@ -171,7 +174,7 @@ def prod():
 @produccion_bp.route("/producir", methods=["POST"])
 @login_required
 @log_excepciones
-@role_required('admin')
+@role_required('admin', 'produccion')
 def producir():
     form = ProduccionForm()
     if not form.validate_on_submit():
@@ -241,7 +244,7 @@ def producir():
 @produccion_bp.route("/horneado", methods=["POST"])
 @login_required
 @log_excepciones
-@role_required('admin')
+@role_required('admin', 'produccion')
 def horneado():
     form = ProduccionForm()
     
@@ -275,7 +278,7 @@ def horneado():
 @produccion_bp.route("/finalizar", methods=["POST"])
 @login_required
 @log_excepciones
-@role_required('admin')
+@role_required('admin', 'produccion')
 def finalizar():
 
     form = ProduccionForm()
