@@ -27,26 +27,63 @@ def compras():
 
     # Cargar proveedores y productos desde la base de datos
     proveedores = Proveedores.query.all()
-    form.proveedor.choices = [(str(prov.id), prov.nombre) for prov in proveedores] + [("otro", "Otro")]
-    
     productos = MateriaPrima.query.all()
     form.producto.choices = [(str(prod.id), prod.nombre) for prod in productos]
 
+    # Inicializar carrito si no existe
     if 'carrito' not in session:
         session['carrito'] = []
+        session['proveedor_id'] = None
 
+    # Configurar las opciones del proveedor
+    if session['carrito']:
+        # Si hay items en el carrito, usar el proveedor almacenado
+        proveedor_id = session.get('proveedor_id')
+        
+        if proveedor_id is not None:
+            proveedor = Proveedores.query.get(proveedor_id)
+            if proveedor:
+                # Configurar el select con solo el proveedor actual
+                form.proveedor.choices = [(str(proveedor.id), proveedor.nombre)]
+                form.proveedor.data = str(proveedor.id)
+            else:
+                # Si el proveedor no existe, limpiar el carrito
+                session['carrito'] = []
+                session['proveedor_id'] = None
+                flash("El proveedor seleccionado ya no existe", "warning")
+                return redirect(url_for('registro_compras_bp.compras'))
+        else:
+            # Proveedor es "Otro"
+            form.proveedor.choices = [("otro", "Otro")]
+            form.proveedor.data = "otro"
+    else:
+        # Si no hay items, permitir seleccionar cualquier proveedor
+        form.proveedor.choices = [(str(prov.id), prov.nombre) for prov in proveedores] + [("otro", "Otro")]
+
+    # Resto del código de manejo del formulario...
     if form.validate_on_submit():
         proveedor_id = form.proveedor.data
-        proveedor_nombre = "Otro" if proveedor_id == "otro" else Proveedores.query.get(proveedor_id).nombre
+        
+        # Manejar el proveedor "Otro"
+        if proveedor_id == "otro":
+            proveedor_nombre = "Otro"
+            session['proveedor_id'] = None
+        else:
+            proveedor = Proveedores.query.get(proveedor_id)
+            if not proveedor:
+                flash("Proveedor no válido", "danger")
+                return redirect(url_for('registro_compras_bp.compras'))
+            
+            proveedor_nombre = proveedor.nombre
+            session['proveedor_id'] = int(proveedor_id)
+
+        # Resto del código para agregar al carrito...
         producto_id = form.producto.data
-        cantidad = int(form.cantidad.data or 0)
+        cantidad = float(form.cantidad.data or 0)
         unidad_medida = form.unidad_medida.data
         precio_unitario = float(form.precio_unitario.data or 0)
+        total = precio_unitario
 
-        # Aquí ya no se convierte la cantidad a la unidad base para el total
-        total = precio_unitario  # El total es solo el precio unitario del producto
-
-        # Verificamos que el total no sea 0 para evitar agregar productos vacíos
         if total <= 0:
             flash("El precio o la cantidad no son válidos", "danger")
             return redirect(url_for('registro_compras_bp.compras'))
@@ -55,22 +92,26 @@ def compras():
             'materia_prima_id': producto_id,
             'nombre': MateriaPrima.query.get(producto_id).nombre,
             'proveedor': proveedor_nombre,
+            'proveedor_id': session['proveedor_id'],
             'cantidad': cantidad,
             'unidad_medida': unidad_medida,
             'precio_unitario': precio_unitario,
-            'total': total  # Guardamos el total calculado como solo el precio unitario
+            'total': total
         }
+        
         session['carrito'].append(item)
-        session.modified = True  # Guardar cambios en sesión
-
+        session.modified = True
         flash('Producto agregado al carrito', 'success')
         return redirect(url_for('registro_compras_bp.compras'))
 
-    # ✅ Evitar error KeyError asegurando que 'carrito' existe
     compras = session.get('carrito', [])
-    total_general = sum(item.get('total', 0) for item in compras)  # Sumamos los totales de cada item, usando get para evitar KeyError
+    total_general = sum(item.get('total', 0) for item in compras)
 
-    return render_template('compras/registro_compras.html', form=form, compras=compras, total_general=total_general)
+    return render_template('compras/registro_compras.html', 
+                         form=form, 
+                         compras=compras, 
+                         total_general=total_general,
+                         proveedor_fijo=bool(session.get('carrito')))
 
 @registro_compras_bp.route('/get_unidad_base/<int:insumo_id>')
 def get_unidad_base(insumo_id):
@@ -79,18 +120,21 @@ def get_unidad_base(insumo_id):
         'unidad_base': insumo.unidad  # Asume que 'unidad' es 'g', 'ml' o 'pz'
     }
 
-
-
 @registro_compras_bp.route('/eliminar-producto', methods=['POST'])
 def eliminar_producto():
     producto_index = int(request.form['producto_index'])  
 
     if 'carrito' in session and 0 <= producto_index < len(session['carrito']):
         session['carrito'].pop(producto_index)
-        session.modified = True  
+        session.modified = True
+        
+        # Si el carrito quedó vacío, limpiar el proveedor
+        if not session['carrito']:
+            session.pop('proveedor_id', None)
+            
         flash('Producto eliminado del carrito', 'success')
     
-    return redirect(url_for('registro_compras_bp.compras'))  
+    return redirect(url_for('registro_compras_bp.compras'))
 
 @registro_compras_bp.route('/finalizar-compra', methods=['POST'])
 def finalizar_compra():
@@ -98,52 +142,38 @@ def finalizar_compra():
         flash("No hay productos en el carrito", "warning")
         return redirect(url_for('registro_compras_bp.compras'))
 
-    # Calcular total de la compra, utilizando .get para evitar KeyError
-    total_general = sum(item.get('total', 0) for item in session['carrito'])  # Sumamos los totales de cada item
+    # Usar el proveedor_id almacenado en la sesión
+    proveedor_id = session.get('proveedor_id')
+    total_general = sum(item.get('total', 0) for item in session['carrito'])
 
-    # Obtener proveedor_id si existe en la BD
-    proveedor_id = None
-    for item in session['carrito']:
-        if item['proveedor'] != "Otro":
-            proveedor = Proveedores.query.filter_by(nombre=item['proveedor']).first()
-            if proveedor:
-                proveedor_id = proveedor.id
-            break  # Solo tomamos el primer proveedor
-
-    # Crear la compra con los productos en JSON
     nueva_compra = Compra(
         total=total_general,
         proveedor_id=proveedor_id,
-        materias_primas=session['carrito']  # Se guarda directamente como JSON
+        materias_primas=session['carrito']
     )
     db.session.add(nueva_compra)
     db.session.commit()
 
-    # Actualizar el inventario
+    # Actualizar inventario
     for item in session['carrito']:
-        # Asegúrate de que el producto existe en la base de datos
         materia_prima = MateriaPrima.query.get(item['materia_prima_id'])
         if materia_prima:
-            # Convertimos la cantidad a la unidad base (gramos o mililitros)
             cantidad_convertida = convertir_a_unidad_base(item['cantidad'], item['unidad_medida'])
-
-            # Verificamos si ya existe el producto en el inventario
             inventario = InventarioMateria.query.filter_by(material_id=materia_prima.id).first()
             if inventario:
-                # Si ya existe, actualizamos la cantidad
                 inventario.cantidad += cantidad_convertida
             else:
-                # Si no existe, lo creamos
                 inventario = InventarioMateria(
                     material_id=materia_prima.id,
                     cantidad=cantidad_convertida,
                     estado_stock="Disponible"
                 )
                 db.session.add(inventario)
+            db.session.commit()
 
-        db.session.commit()  # Guardar todos los cambios en la BD
-
-    session.pop('carrito', None)  # Vaciar carrito
+    # Limpiar carrito y proveedor
+    session.pop('carrito', None)
+    session.pop('proveedor_id', None)
     flash("Compra finalizada con éxito", "success")
     
     return redirect(url_for('registro_compras_bp.compras'))
