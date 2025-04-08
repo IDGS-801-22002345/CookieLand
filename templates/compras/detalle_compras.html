@@ -31,7 +31,7 @@
             <table id="compras-table" class="w-full text-sm text-left text-gray-500">
                 <thead class="text-xs text-white uppercase sticky top-0" style="background-color: #7c5454 !important; z-index: 10;">
                     <tr>
-                        <th class="px-6 py-3">No. Compra</th>
+                        <th class="px-6 py-3">Compra</th>
                         <th class="px-6 py-3">Fecha</th>
                         <th class="px-6 py-3">Total</th>
                         <th class="px-6 py-3">Productos</th>
@@ -43,7 +43,7 @@
                     {% for compra in compras %}
                     <tr class="bg-white border-b border-gray-200">
                         <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                            {{ compra.id }}
+                            #{{ compra.id }}
                         </th>
                         <td class="px-6 py-4">{{ compra.create_date.strftime('%d-%m-%Y %H:%M') }}</td>
                         <td class="px-6 py-4">${{ compra.total }}</td>

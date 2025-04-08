@@ -72,6 +72,13 @@ def compras():
 
     return render_template('compras/registro_compras.html', form=form, compras=compras, total_general=total_general)
 
+@registro_compras_bp.route('/get_unidad_base/<int:insumo_id>')
+def get_unidad_base(insumo_id):
+    insumo = MateriaPrima.query.get_or_404(insumo_id)
+    return {
+        'unidad_base': insumo.unidad  # Asume que 'unidad' es 'g', 'ml' o 'pz'
+    }
+
 
 
 @registro_compras_bp.route('/eliminar-producto', methods=['POST'])
@@ -130,7 +137,6 @@ def finalizar_compra():
                 inventario = InventarioMateria(
                     material_id=materia_prima.id,
                     cantidad=cantidad_convertida,
-                    cantidad_minima=0,
                     estado_stock="Disponible"
                 )
                 db.session.add(inventario)

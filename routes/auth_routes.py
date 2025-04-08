@@ -9,6 +9,7 @@ from flask_mail import Message # type: ignore
 import random
 from datetime import datetime, timedelta  
 import pytz
+import routes.dashboard_routes as dashboard_routes
 
 auth_bp = Blueprint('auth_bp', __name__, url_prefix='/auth')
 
