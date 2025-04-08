@@ -154,7 +154,7 @@ def dashboard():
 @personal_bp.route('/mk_pedidos')  
 @log_excepciones
 @login_required
-@role_required('admin')
+@role_required('admin', 'produccion', 'vendedor')
 def pedidos():
     pedidos = Pedido.query.options(
         joinedload(Pedido.detalles).joinedload(DetallePedido.galleta)

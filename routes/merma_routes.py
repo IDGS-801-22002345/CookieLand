@@ -10,7 +10,7 @@ merma_bp = Blueprint('merma_bp', __name__, url_prefix='/mk_merma')
 @merma_bp.route("/")
 @login_required
 @log_excepciones
-@role_required('admin')
+@role_required('admin', 'produccion', 'vendedor')
 def index():
     create_form = MermaForm(request.form)
 
@@ -58,7 +58,7 @@ def obtener_unidad(inventario_id):
 @registrar_accion("Agrego merma")
 @login_required
 @log_excepciones
-@role_required('admin')
+@role_required('admin', 'produccion', 'vendedor')
 def crear():
     create_form = MermaForm(request.form)
     

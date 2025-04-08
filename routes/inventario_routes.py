@@ -9,7 +9,7 @@ inventario_bp = Blueprint('inventario_bp', __name__, url_prefix='/')
 @inventario_bp.route('/mk_inventario', methods=['GET', 'POST'])
 @login_required
 @log_excepciones
-@role_required('admin')
+@role_required('admin', 'produccion')
 def index():
     inventario = (
         db.session.query(MateriaPrima)

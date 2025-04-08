@@ -32,39 +32,38 @@
               </h2>
             
                 <!-- Proveedor -->
-<div class="mb-6">
-  <label class="block mb-2 text-sm font-medium text-gray-900">{{ form.proveedor.label.text }}<span class="text-red-500"> *</span></label>
-  <div class="mt-1">
-    <select 
-      name="proveedor" 
-      id="proveedor"
-      class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5"
-      {% if compras %}disabled{% endif %}
-    >
-      <option value="" disabled selected>Selecciona proveedor</option>
-      {% for value, label in form.proveedor.choices %}
-        <option value="{{ value }}" {% if form.proveedor.data == value %}selected{% endif %}>{{ label }}</option>
-      {% endfor %}
-    </select>
-  </div>
-  {% if form.proveedor.errors %}
-    <ul class="text-red-500 text-xs mt-1">
-      {% for error in form.proveedor.errors %}
-        <li>{{ error }}</li>
-      {% endfor %}
-    </ul>
-  {% endif %}
-  
-  <!-- Mensaje cuando el proveedor está bloqueado -->
-  {% if compras %}
-  <div class="mt-2 text-sm text-blue-600 bg-blue-50 p-2 rounded">
-    <i class="fas fa-info-circle mr-1"></i>
-    El proveedor está bloqueado porque ya hay productos en el carrito. 
-    Para cambiar de proveedor, elimina todos los productos o finaliza la compra.
-  </div>
-  {% endif %}
-</div>
-
+              <div class="mb-6">
+                <label class="block mb-2 text-sm font-medium text-gray-900">{{ form.proveedor.label.text }}<span class="text-red-500"> *</span></label>
+                <div class="mt-1">
+                  <select 
+                    name="proveedor" 
+                    id="proveedor"
+                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5"
+                    {% if compras %}disabled{% endif %}
+                  >
+                    <option value="" disabled selected>Selecciona proveedor</option>
+                    {% for value, label in form.proveedor.choices %}
+                      <option value="{{ value }}" {% if form.proveedor.data == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+                {% if form.proveedor.errors %}
+                  <ul class="text-red-500 text-xs mt-1">
+                    {% for error in form.proveedor.errors %}
+                      <li>{{ error }}</li>
+                    {% endfor %}
+                  </ul>
+                {% endif %}
+                
+                <!-- Mensaje cuando el proveedor está bloqueado -->
+                {% if compras %}
+                <div class="mt-2 text-sm text-blue-600 bg-blue-50 p-2 rounded">
+                  <i class="fas fa-info-circle mr-1"></i>
+                  El proveedor está bloqueado porque ya hay productos en el carrito. 
+                  Para cambiar de proveedor, elimina todos los productos o finaliza la compra.
+                </div>
+                {% endif %}
+              </div>
                 <!-- Producto -->
                 <div class="mb-6">
                   <label class="block mb-2 text-sm font-medium text-gray-900">{{ form.producto.label.text }}<span class="text-red-500"> *</span></label>
