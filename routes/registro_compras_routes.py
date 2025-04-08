@@ -2,6 +2,8 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from models.models import Proveedores, MateriaPrima, Compra, InventarioMateria, db
 from forms.compra_forms import FormCompra
 import datetime
+from utils.decoradores import *
+
 
 registro_compras_bp = Blueprint('registro_compras_bp', __name__, url_prefix='/')
 
@@ -22,6 +24,9 @@ def convertir_a_unidad_base(cantidad, unidad_medida):
     return cantidad * conversiones[unidad_medida]
 
 @registro_compras_bp.route('/registro-compras', methods=['GET', 'POST'])
+@login_required
+@log_excepciones
+@role_required('admin')
 def compras():
     form = FormCompra()
 
@@ -73,6 +78,9 @@ def compras():
     return render_template('compras/registro_compras.html', form=form, compras=compras, total_general=total_general)
 
 @registro_compras_bp.route('/get_unidad_base/<int:insumo_id>')
+@login_required
+@log_excepciones
+@role_required('admin')
 def get_unidad_base(insumo_id):
     insumo = MateriaPrima.query.get_or_404(insumo_id)
     return {
@@ -82,6 +90,9 @@ def get_unidad_base(insumo_id):
 
 
 @registro_compras_bp.route('/eliminar-producto', methods=['POST'])
+@login_required
+@log_excepciones
+@role_required('admin')
 def eliminar_producto():
     producto_index = int(request.form['producto_index'])  
 
@@ -93,6 +104,9 @@ def eliminar_producto():
     return redirect(url_for('registro_compras_bp.compras'))  
 
 @registro_compras_bp.route('/finalizar-compra', methods=['POST'])
+@login_required
+@log_excepciones
+@role_required('admin')
 def finalizar_compra():
     if 'carrito' not in session or not session['carrito']:
         flash("No hay productos en el carrito", "warning")

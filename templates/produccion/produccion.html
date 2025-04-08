@@ -1,10 +1,13 @@
-{% extends "layout.html" %} 
-{% block content %}
+{% extends "layout.html" %} {% block content %}
 <div class="flex flex-col w-full px-10">
-  <div class="w-full p-4 text-center border border-gray-300 rounded-lg shadow-sm">
+  <div
+    class="w-full p-4 text-center border border-gray-300 rounded-lg shadow-sm"
+  >
     <div class="flex justify-between pb-5">
       <div>
-        <h1 class="text-4xl font-medium text-gray-800">Producción de Galletas</h1>
+        <h1 class="text-4xl font-medium text-gray-800">
+          Producción de Galletas
+        </h1>
       </div>
       <a
         href="produccion-prod"
@@ -27,8 +30,14 @@
     <!-- Contenedor de la tabla con scroll -->
     <div class="overflow-x-auto overflow-y-auto max-h-[500px] mt-4">
       {% if galletas %}
-      <table id="recetas-table" class="w-full text-sm text-left rtl:text-right text-gray-500">
-        <thead class="text-xs text-white uppercase sticky top-0" style="background-color: #7c5454; z-index: 10">
+      <table
+        id="recetas-table"
+        class="w-full text-sm text-left rtl:text-right text-gray-500"
+      >
+        <thead
+          class="text-xs text-white uppercase sticky top-0"
+          style="background-color: #7c5454; z-index: 10"
+        >
           <tr>
             <th scope="col" class="px-6 py-3">Imagen</th>
             <th scope="col" class="px-6 py-3">Galleta</th>
@@ -61,15 +70,22 @@
             </th>
             <th scope="row" class="px-6 py-4 font-medium text-gray-900">
               {% if galleta.estadoStock == 'Completo' %}
-              <span class="rounded-full bg-green-600 text-white px-2 py-1 font-medium pr-2 pb-2">
+              <span
+                class="rounded-full bg-green-600 text-white px-2 py-1 font-medium pr-2 pb-2"
+              >
                 {{ galleta.estadoStock }}
               </span>
               {% elif galleta.estadoStock == 'Bajo' %}
-              <span class="rounded-full text-white px-2 py-1 font-medium pr-2 pb-2" style="background-color: #e17100">
+              <span
+                class="rounded-full text-white px-2 py-1 font-medium pr-2 pb-2"
+                style="background-color: #e17100"
+              >
                 {{ galleta.estadoStock }}
               </span>
               {% else %}
-              <span class="rounded-full bg-red-600 text-white px-2 py-2 font-medium pr-2 pb-2">
+              <span
+                class="rounded-full bg-red-600 text-white px-2 py-2 font-medium pr-2 pb-2"
+              >
                 {{ galleta.estadoStock }}
               </span>
               {% endif %}
@@ -78,14 +94,19 @@
           {% endfor %}
         </tbody>
       </table>
-      
+
       <!-- Mensaje cuando no hay resultados de búsqueda -->
-      <div id="no-results" class="hidden text-center py-8 bg-gray-50 rounded-lg">
+      <div
+        id="no-results"
+        class="hidden text-center py-8 bg-gray-50 rounded-lg"
+      >
         <i class="fas fa-search-minus text-gray-400 text-4xl mb-3"></i>
         <p class="text-gray-500">No se encontraron galletas</p>
-        <p class="text-sm text-gray-400 mt-1">Intenta con otros términos de búsqueda</p>
+        <p class="text-sm text-gray-400 mt-1">
+          Intenta con otros términos de búsqueda
+        </p>
       </div>
-      
+
       {% else %}
       <!-- Mensaje cuando no hay datos -->
       <div class="text-center py-8 bg-gray-50 rounded-lg">
@@ -105,19 +126,19 @@
     const searchInput = document.getElementById("search-input");
     const tableBody = document.getElementById("table-body");
     const noResults = document.getElementById("no-results");
-    
+
     if (searchInput && tableBody) {
       const rows = tableBody.getElementsByTagName("tr");
-      
+
       searchInput.addEventListener("input", function () {
         const searchText = this.value.toLowerCase();
         let hasResults = false;
 
-        Array.from(rows).forEach(row => {
-          const cells = row.querySelectorAll("th, td"); 
+        Array.from(rows).forEach((row) => {
+          const cells = row.querySelectorAll("th, td");
           let rowMatches = false;
 
-          cells.forEach(cell => {
+          cells.forEach((cell) => {
             const cellText = cell.textContent.toLowerCase();
             if (cellText.includes(searchText)) {
               rowMatches = true;
