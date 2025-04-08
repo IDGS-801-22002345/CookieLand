@@ -272,73 +272,95 @@
   // CÓDIGO PARA FILTRAR UNIDADES DE MEDIDA
   // =============================================
   document.addEventListener('DOMContentLoaded', function() {
-      // Mapeo de unidades base a unidades permitidas
-      const unidadesPermitidas = {
-          'gr':  [['gr', 'Gramos (g)'], ['kg', 'Kilos (kg)']],      // Gramos → g, kg
-          'ml': [['ml', 'Mililitros (ml)'], ['lt', 'Litros (l)']],  // Mililitros → ml, l
-          'pz': [['pz', 'Piezas (pz)']]                           // Piezas → solo pz
-      };
+    const unidadesConfig = {
+        'gr': {
+            label: 'Gramos',
+            opciones: [
+                {value: 'gr', label: 'Gramos (gr)'},
+                {value: 'kg', label: 'Kilos (kg)'}
+            ]
+        },
+        'ml': {
+            label: 'Mililitros',
+            opciones: [
+                {value: 'ml', label: 'Mililitros (ml)'},
+                {value: 'lt', label: 'Litros (lt)'}
+            ]
+        },
+        'pz': {
+            label: 'Piezas',
+            opciones: [
+                {value: 'pz', label: 'Piezas (pz)'}
+            ]
+        }
+    };
 
-      // Obtener elementos del DOM
-      const productoSelect = document.querySelector('select[name="producto"]');
-      const unidadMedidaSelect = document.querySelector('select[name="unidad_medida"]');
+    const productoSelect = document.querySelector('select[name="producto"]');
+    const unidadMedidaSelect = document.querySelector('select[name="unidad_medida"]');
 
-      // Evento al cambiar el producto
-      if (productoSelect && unidadMedidaSelect) {
-          productoSelect.addEventListener('change', async function() {
-              const productoId = this.value;
-              if (!productoId) {
-                  // Restaurar todas las opciones si no hay producto seleccionado
-                  resetUnidadMedidaSelect();
-                  return;
-              }
+    if (productoSelect && unidadMedidaSelect) {
+        productoSelect.addEventListener('change', async function() {
+            const productoId = this.value;
+            
+            if (!productoId) {
+                resetUnidadMedidaSelect();
+                return;
+            }
 
-              // Obtener la unidad base del producto (vía AJAX)
-              try {
-                  const response = await fetch(`/get_unidad_base/${productoId}`);
-                  if (!response.ok) {
-                      throw new Error('Error en la respuesta del servidor');
-                  }
-                  const data = await response.json();
-                  
-                  // Validar que tenemos datos correctos
-                  if (!data || !data.unidad_base || !unidadesPermitidas[data.unidad_base]) {
-                      throw new Error('Datos de unidad base no válidos');
-                  }
+            try {
+                const response = await fetch(`/get_unidad_base/${productoId}`);
+                
+                if (!response.ok) {
+                    throw new Error(`Error HTTP: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                console.log('Unidad base recibida:', data.unidad_base);
+                
+                if (!data.unidad_base || !unidadesConfig[data.unidad_base]) {
+                    console.error('Unidad base no soportada:', data.unidad_base);
+                    resetUnidadMedidaSelect();
+                    return;
+                }
 
-                  // Limpiar select de unidades y agregar opción por defecto
-                  unidadMedidaSelect.innerHTML = '<option value="" disabled selected class="text-gray-400">Selecciona unidad</option>';
+                // Limpiar y poblar el select
+                unidadMedidaSelect.innerHTML = '';
+                const defaultOption = new Option('Selecciona unidad', '', true, true);
+                defaultOption.disabled = true;
+                unidadMedidaSelect.add(defaultOption);
+                
+                unidadesConfig[data.unidad_base].opciones.forEach(opcion => {
+                    const option = new Option(opcion.label, opcion.value);
+                    unidadMedidaSelect.add(option);
+                });
 
-                  // Agregar opciones permitidas
-                  unidadesPermitidas[data.unidad_base].forEach(([value, label]) => {
-                      const option = document.createElement('option');
-                      option.value = value;
-                      option.textContent = label;
-                      option.className = 'text-gray-700';
-                      unidadMedidaSelect.appendChild(option);
-                  });
+            } catch (error) {
+                console.error("Error al obtener unidad base:", error);
+                resetUnidadMedidaSelect();
+            }
+        });
+    }
 
-              } catch (error) {
-                  console.error("Error al obtener unidad base:", error);
-                  // Restaurar todas las opciones si hay error
-                  resetUnidadMedidaSelect();
-              }
-          });
-      }
-
-      // Función para resetear el select a todas las opciones
-      function resetUnidadMedidaSelect() {
-          unidadMedidaSelect.innerHTML = `
-              <option value="" disabled selected class="text-gray-400">Selecciona unidad</option>
-              <option value="g" class="text-gray-700">Gramos (g)</option>
-              <option value="kg" class="text-gray-700">Kilos (kg)</option>
-              <option value="ml" class="text-gray-700">Mililitros (ml)</option>
-              <option value="lt" class="text-gray-700">Litros (l)</option>
-              <option value="pz" class="text-gray-700">Piezas (pz)</option>
-          `;
-      }
-  });
-
+    function resetUnidadMedidaSelect() {
+        if (!unidadMedidaSelect) return;
+        
+        unidadMedidaSelect.innerHTML = '';
+        const defaultOption = new Option('Selecciona unidad', '', true, true);
+        defaultOption.disabled = true;
+        unidadMedidaSelect.add(defaultOption);
+        
+        // Todas las opciones
+        [
+            {value: 'gr', label: 'Gramos (gr)'},
+            {value: 'kg', label: 'Kilos (kg)'},
+            {value: 'ml', label: 'Mililitros (ml)'},
+            {value: 'lt', label: 'Litros (lt)'},
+            {value: 'pz', label: 'Piezas (pz)'}
+        ].forEach(opcion => {
+            unidadMedidaSelect.add(new Option(opcion.label, opcion.value));
+        });
+    }
+});
   
 </script>
 
