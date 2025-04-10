@@ -38,6 +38,9 @@ def mostrar_imagen(galleta_id):
 # Pagina de Produccion-prod
 
 @produccion_bp.route("/abrirmodal", methods=["POST"])
+@login_required
+@log_excepciones
+@role_required('admin')
 def abrir_modal():
     form = ProduccionForm()
     galletas = Galleta.query.options(
@@ -47,7 +50,15 @@ def abrir_modal():
     ).order_by(
         Galleta.nombre.asc()  
     )
-    
+    pedidos_pendientes = Pedido.query.options(
+        db.joinedload(Pedido.usuario),
+        db.joinedload(Pedido.detalles).joinedload(DetallePedido.galleta)
+    ).filter(
+        Pedido.estatus == 'En proceso'
+    ).order_by(
+        Pedido.fecha_recoleccion.asc(),
+        Pedido.hora_recoleccion.asc()
+    ).all()
     producciones = Produccion.query.options(
         db.joinedload(Produccion.galleta)
     ).filter(
@@ -56,11 +67,75 @@ def abrir_modal():
     
     return render_template("produccion/produccionProd.html", 
                          galletas=galletas, 
-                         form=form, 
+                         form=form,
+                         modalPedido = False,
+                         pedidos_pendientes=pedidos_pendientes,
                          modal=True, 
                          producciones=producciones)
 
+
+from collections import defaultdict
+
+@produccion_bp.route("/abrirmodalPedido", methods=["POST"])
+@login_required
+@log_excepciones
+@role_required('admin')
+def abrir_modalPedido():
+    form = ProduccionForm()
+    pedido_id = int(request.form.get('pedido_id'))
+
+    galletas = Galleta.query.options(
+        db.joinedload(Galleta.receta)
+    ).filter(
+        Galleta.estatus == 1  
+    ).order_by(
+        Galleta.nombre.asc()
+    )
+
+    pedidos_pendientes = Pedido.query.options(
+        db.joinedload(Pedido.usuario),
+        db.joinedload(Pedido.detalles).joinedload(DetallePedido.galleta)
+    ).filter(
+        Pedido.estatus == 'En proceso'
+    ).order_by(
+        Pedido.fecha_recoleccion.asc(),
+        Pedido.hora_recoleccion.asc()
+    ).all()
+
+    pedido_especifico = Pedido.query.options(
+        db.joinedload(Pedido.usuario),
+        db.joinedload(Pedido.detalles).joinedload(DetallePedido.galleta)
+    ).get(pedido_id)
+
+    galletas_agrupadas = {}
+    for detalle in pedido_especifico.detalles:
+        galleta = detalle.galleta
+        galleta_id = galleta.id
+
+        if galleta_id not in galletas_agrupadas:
+            galletas_agrupadas[galleta_id] = {
+                "galleta": galleta,
+                "cantidad": detalle.cantidad,
+                "subtotal": detalle.cantidad * galleta.precio
+            }
+        else:
+            galletas_agrupadas[galleta_id]["cantidad"] += detalle.cantidad
+            galletas_agrupadas[galleta_id]["subtotal"] += detalle.cantidad * galleta.precio
+
+    return render_template("produccion/produccionProd.html",
+                           galletas=galletas,
+                           form=form,
+                           modalPedido=True,
+                           pedidos_pendientes=pedidos_pendientes,
+                           modal=False,
+                           pedido_especifico=pedido_especifico,
+                           galletas_agrupadas=list(galletas_agrupadas.values()))
+
+
 @produccion_bp.route("/cerrarmodal", methods=["POST"])
+@login_required
+@log_excepciones
+@role_required('admin')
 def cerrar_modal():
  return redirect(url_for('produccion_bp.prod'))
 
@@ -77,10 +152,23 @@ def prod():
     ).order_by(
         Galleta.nombre.asc()  
     )
+    pedidos_pendientes = Pedido.query.options(
+        db.joinedload(Pedido.usuario),
+        db.joinedload(Pedido.detalles).joinedload(DetallePedido.galleta)
+    ).filter(
+        Pedido.estatus == 'En proceso'
+    ).order_by(
+        Pedido.fecha_recoleccion.asc(),
+        Pedido.hora_recoleccion.asc()
+    ).all()
     producciones = Produccion.query.options(
         db.joinedload(Produccion.galleta)
     ).all()
-    return render_template("produccion/produccionProd.html",galletas=galletas, form=form, modal=False, producciones=producciones)
+    return render_template("produccion/produccionProd.html",
+                           galletas=galletas,
+                           modalPedido=False,
+                            form=form, modal=False,
+                            producciones=producciones, pedidos_pendientes=pedidos_pendientes)
 
 
 @produccion_bp.route("/producir", methods=["POST"])
@@ -192,6 +280,7 @@ def horneado():
 @log_excepciones
 @role_required('admin', 'produccion')
 def finalizar():
+
     form = ProduccionForm()
     
     if not form.validate_on_submit():
@@ -220,5 +309,24 @@ def finalizar():
     except Exception as e:
         db.session.rollback()
         flash(f"Error al finalizar la producción: {str(e)}", "error")
+    
+    return redirect(url_for('produccion_bp.prod'))
+
+
+
+@produccion_bp.route("/pedidoListo", methods=["POST"])
+@login_required
+@log_excepciones
+@role_required('admin')
+def pedidoListo():
+    pedido_id = int(request.form.get('pedido_id'))
+    
+    pedido = Pedido.query.get(pedido_id)
+    if pedido:
+        pedido.estatus = 'Listo para recoger' 
+        db.session.commit()
+        flash('El estado del pedido esta Listo para recoger', 'success')
+    else:
+        flash('Pedido no encontrado', 'error')
     
     return redirect(url_for('produccion_bp.prod'))

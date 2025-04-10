@@ -28,22 +28,23 @@
     <nav
       class="fixed top-0 left-0 right-0 bg-white shadow-md z-30 md:left-64 transition-all duration-300"
     >
-    <div class="flex flex-col p-4">
-      <div class="flex justify-end gap-5">
-        <div class="flex items-center gap-5 cursor-pointer group relative">
-          <div class="relative">
-            <i class="fa fa-user text-black text-lg"></i>
-            <!-- Punto verde de estado -->
-            <span class="absolute -top-1 -right-1 block w-2.5 h-2.5 bg-green-500 border-2 border-white rounded-full"></span>
+      <div class="flex flex-col p-4">
+        <div class="flex justify-end gap-5">
+          <div class="flex items-center gap-5 cursor-pointer group relative">
+            <div class="relative">
+              <i class="fa fa-user text-black text-lg"></i>
+              <!-- Punto verde de estado -->
+              <span
+                class="absolute -top-1 -right-1 block w-2.5 h-2.5 bg-green-500 border-2 border-white rounded-full"
+              ></span>
+            </div>
+            <span class="text-dark font-semibold hidden md:inline">
+              {{ current_user.nombre }}
+            </span>
           </div>
-          <span class="text-dark font-semibold hidden md:inline">
-            {{ current_user.nombre }}
-          </span>
         </div>
       </div>
-    </div>    
     </nav>
-
 
     <!-- Barra lateral -->
     <div
@@ -62,116 +63,149 @@
       <!-- Contenedor de módulos con scroll -->
       <div class="flex-1 overflow-y-auto">
         <div class="p-2 space-y-2">
-      
           {% set rol = current_user.rol.role_name %}
-      
+
           <!-- Dashboard (solo Admin) -->
           {% if rol == 'admin' %}
-          <a href="{{ url_for('dashboard_bp.index') }}"
-             class="w-full px-3 py-3 flex items-center gap-7 justify-start text-gray-500 hover:bg-blue-200 hover:text-blue-600 rounded-lg transition-colors">
+          <a
+            href="{{ url_for('dashboard_bp.index') }}"
+            class="w-full px-3 py-3 flex items-center gap-7 justify-start text-gray-500 hover:bg-blue-200 hover:text-blue-600 rounded-lg transition-colors"
+          >
             <i class="fas fa-tachometer-alt"></i>
             <span class="font-medium">Dashboard</span>
           </a>
-          {% endif %}
-          {% if rol == 'admin' %}
+          {% endif %} {% if rol == 'admin' %}
           <!-- Tienda en línea (para todos) -->
-          <a href="{{ url_for('cliente_bp.index') }}"
-             class="w-full px-3 py-3 flex items-center gap-7 justify-start text-gray-500 hover:bg-blue-200 hover:text-blue-600 rounded-lg transition-colors">
+          <a
+            href="{{ url_for('cliente_bp.index') }}"
+            class="w-full px-3 py-3 flex items-center gap-7 justify-start text-gray-500 hover:bg-blue-200 hover:text-blue-600 rounded-lg transition-colors"
+          >
             <i class="fas fa-store"></i>
             <span class="font-medium">Tienda en línea</span>
           </a>
-      
+
           <!-- Usuarios y Proveedores (solo Admin) -->
-          <a href="{{ url_for('personal_bp.usuarios') }}"
-             class="w-full px-3 py-3 flex items-center gap-7 justify-start text-gray-500 hover:bg-blue-200 hover:text-blue-600 rounded-lg transition-colors">
+          <a
+            href="{{ url_for('personal_bp.usuarios') }}"
+            class="w-full px-3 py-3 flex items-center gap-7 justify-start text-gray-500 hover:bg-blue-200 hover:text-blue-600 rounded-lg transition-colors"
+          >
             <i class="fas fa-users"></i>
             <span class="font-medium">Usuarios</span>
           </a>
-      
-          <a href="{{ url_for('provedor_bp.index') }}"
-             class="w-full px-3 py-3 flex items-center gap-7 justify-start text-gray-500 hover:bg-blue-200 hover:text-blue-600 rounded-lg transition-colors">
+
+          <a
+            href="{{ url_for('provedor_bp.index') }}"
+            class="w-full px-3 py-3 flex items-center gap-7 justify-start text-gray-500 hover:bg-blue-200 hover:text-blue-600 rounded-lg transition-colors"
+          >
             <i class="fas fa-truck"></i>
             <span class="font-medium">Proveedores</span>
           </a>
+
+          <a
+            href="{{ url_for('materia_prima_bp.index') }}"
+            class="w-full px-3 py-3 flex items-center gap-7 justify-start text-gray-500 hover:bg-blue-200 hover:text-blue-600 rounded-lg transition-colors"
+          >
+            <i class="fas fa-boxes"></i>
+            <span class="font-medium">Materia prima</span>
+          </a>
           {% endif %}
-      
+
           <!-- Ventas y Detalle Ventas (Admin y Ventas) -->
           {% if rol in ['admin', 'vendedor'] %}
-          <a href="{{ url_for('ventas_bp.index') }}"
-             class="w-full px-3 py-3 flex items-center gap-7 justify-start text-gray-500 hover:bg-blue-200 hover:text-blue-600 rounded-lg transition-colors">
-            <i class="fas fa-shopping-cart text-base min-w-[20px] text-center"></i>
+          <a
+            href="{{ url_for('ventas_bp.index') }}"
+            class="w-full px-3 py-3 flex items-center gap-7 justify-start text-gray-500 hover:bg-blue-200 hover:text-blue-600 rounded-lg transition-colors"
+          >
+            <i
+              class="fas fa-shopping-cart text-base min-w-[20px] text-center"
+            ></i>
             <span class="font-medium">Ventas</span>
           </a>
-      
-          <a href="{{ url_for('ventasDetalles_bp.index') }}"
-             class="w-full px-3 py-3 flex items-center gap-7 justify-start text-gray-500 hover:bg-blue-200 hover:text-blue-600 rounded-lg transition-colors">
+
+          <a
+            href="{{ url_for('ventasDetalles_bp.index') }}"
+            class="w-full px-3 py-3 flex items-center gap-7 justify-start text-gray-500 hover:bg-blue-200 hover:text-blue-600 rounded-lg transition-colors"
+          >
             <i class="fas fa-receipt"></i>
             <span class="font-medium">Detalles Ventas</span>
           </a>
           {% endif %}
-      
+
           <!-- Compras y Detalle Compras (Admin, Ventas, Producción) -->
           {% if rol in ['admin', 'vendedor', 'produccion'] %}
-          <a href="{{ url_for('registro_compras_bp.compras') }}"
-             class="w-full px-3 py-3 flex items-center gap-8 justify-start text-gray-500 hover:bg-blue-200 hover:text-blue-600 rounded-lg transition-colors">
+          <a
+            href="{{ url_for('registro_compras_bp.compras') }}"
+            class="w-full px-3 py-3 flex items-center gap-8 justify-start text-gray-500 hover:bg-blue-200 hover:text-blue-600 rounded-lg transition-colors"
+          >
             <i class="fas fa-shopping-bag"></i>
             <span class="font-medium">Compras</span>
           </a>
-      
-          <a href="{{ url_for('detalle_compras_bp.index') }}"
-             class="w-full px-3 py-3 flex items-center gap-7 justify-start text-gray-500 hover:bg-blue-200 hover:text-blue-600 rounded-lg transition-colors">
+
+          <a
+            href="{{ url_for('detalle_compras_bp.index') }}"
+            class="w-full px-3 py-3 flex items-center gap-7 justify-start text-gray-500 hover:bg-blue-200 hover:text-blue-600 rounded-lg transition-colors"
+          >
             <i class="fas fa-receipt"></i>
             <span class="font-medium">Detalles Compras</span>
           </a>
           {% endif %}
-      
+
           <!-- Recetas (Admin y Producción) -->
           {% if rol in ['admin', 'produccion'] %}
-          <a href="{{ url_for('galletas_bp.index') }}"
-             class="w-full px-3 py-3 flex items-center gap-8 justify-start text-gray-500 hover:bg-blue-200 hover:text-blue-600 rounded-lg transition-colors">
+          <a
+            href="{{ url_for('galletas_bp.index') }}"
+            class="w-full px-3 py-3 flex items-center gap-8 justify-start text-gray-500 hover:bg-blue-200 hover:text-blue-600 rounded-lg transition-colors"
+          >
             <i class="fas fa-utensils"></i>
             <span class="font-medium">Recetas</span>
           </a>
           {% endif %}
-      
+
           <!-- Producción (Admin y Producción) -->
           {% if rol in ['admin', 'produccion'] %}
-          <a href="{{ url_for('produccion_bp.index') }}"
-             class="w-full px-3 py-3 flex items-center gap-7 justify-start text-gray-500 hover:bg-blue-200 hover:text-blue-600 rounded-lg transition-colors">
+          <a
+            href="{{ url_for('produccion_bp.index') }}"
+            class="w-full px-3 py-3 flex items-center gap-7 justify-start text-gray-500 hover:bg-blue-200 hover:text-blue-600 rounded-lg transition-colors"
+          >
             <i class="fa-solid fa-cookie-bite"></i>
             <span class="font-medium">Producción</span>
           </a>
           {% endif %}
-      
+
           <!-- Inventario Insumos (Admin y Producción) -->
           {% if rol in ['admin', 'produccion'] %}
-          <a href="{{ url_for('inventario_bp.index') }}"
-             class="w-full px-3 py-3 flex items-center gap-7 justify-start text-gray-500 hover:bg-blue-200 hover:text-blue-600 rounded-lg transition-colors">
+          <a
+            href="{{ url_for('inventario_bp.index') }}"
+            class="w-full px-3 py-3 flex items-center gap-7 justify-start text-gray-500 hover:bg-blue-200 hover:text-blue-600 rounded-lg transition-colors"
+          >
             <i class="fas fa-warehouse"></i>
             <span class="font-medium">Inventario Insumos</span>
           </a>
           {% endif %}
-      
+
           <!-- Pedidos (Admin, Ventas, Producción) -->
           {% if rol in ['admin', 'vendedor', 'produccion'] %}
-          <a href="{{ url_for('personal_bp.pedidos') }}"
-             class="w-full px-3 py-3 flex items-center gap-7 justify-start text-gray-500 hover:bg-blue-200 hover:text-blue-600 rounded-lg transition-colors">
+          <a
+            href="{{ url_for('personal_bp.pedidos') }}"
+            class="w-full px-3 py-3 flex items-center gap-7 justify-start text-gray-500 hover:bg-blue-200 hover:text-blue-600 rounded-lg transition-colors"
+          >
             <i class="fas fa-clipboard-list"></i>
             <span class="font-medium">Pedidos</span>
           </a>
           {% endif %}
-      
+
           <!-- Merma (Admin, Ventas, Producción) -->
           {% if rol in ['admin', 'vendedor', 'produccion'] %}
-          <a href="{{ url_for('merma_bp.index') }}"
-             class="w-full px-3 py-3 flex items-center gap-7 justify-start text-gray-500 hover:bg-blue-200 hover:text-blue-600 rounded-lg transition-colors">
+          <a
+            href="{{ url_for('merma_bp.index') }}"
+            class="w-full px-3 py-3 flex items-center gap-7 justify-start text-gray-500 hover:bg-blue-200 hover:text-blue-600 rounded-lg transition-colors"
+          >
             <i class="fas fa-trash-alt"></i>
             <span class="font-medium">Merma</span>
           </a>
           {% endif %}
-      
         </div>
-      </div>      
+      </div>
 
       <!-- Cerrar sesión (parte inferior fija) -->
       <div class="p-4 border-t bg-white">

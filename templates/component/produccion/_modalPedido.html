@@ -1,0 +1,195 @@
+<div
+  tabindex="-1"
+  aria-hidden="true"
+  class="fixed inset-0 z-50 w-full h-full overflow-y-auto overflow-x-hidden transition-opacity duration-300"
+>
+  <div class="fixed inset-0 bg-black opacity-50"></div>
+
+  <div class="relative w-full h-full p-4 flex items-center justify-center">
+    <div
+      class="relative bg-white rounded-xl w-full max-w-2xl md:max-w-3xl shadow-xl transform transition-all duration-300 scale-95 opacity-0 animate-fade-in"
+    >
+      <div
+        class="flex items-center justify-between p-5 border-b border-gray-100"
+      >
+        <div>
+          <h3 class="text-2xl font-bold">
+            Detalles de pedido #{{ pedido_especifico.id }}
+          </h3>
+          <div class="mt-2 text-sm text-gray-600">
+            <p>
+              <strong>Cliente:</strong> {{ pedido_especifico.usuario.nombre }}
+            </p>
+            <p>
+              <strong>Fecha de recolección:</strong> {{
+              pedido_especifico.fecha_recoleccion.strftime('%d/%m/%Y') }} a las
+              {{ pedido_especifico.hora_recoleccion }}
+            </p>
+            <p>
+              <strong>Estado:</strong>
+              <span
+                class="px-2 py-1 text-xs rounded-full {% if pedido_especifico.estatus == 'En proceso' %}bg-yellow-100 text-yellow-800 {% elif pedido_especifico.estatus == 'Listo' %}bg-green-100 text-green-800 {% elif pedido_especifico.estatus == 'Cancelado' %}bg-red-100 text-red-800 {% endif %}"
+              >
+                {{ pedido_especifico.estatus }}
+              </span>
+            </p>
+          </div>
+        </div>
+        <form
+          method="POST"
+          action="{{ url_for('produccion_bp.cerrar_modal') }}"
+        >
+          {{ form.csrf_token }}
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+          <button
+            type="submit"
+            class="text-gray-500 hover:text-gray-700 transition-colors duration-200 rounded-full p-1 hover:bg-gray-100"
+            aria-label="Cerrar modal"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
+        </form>
+      </div>
+
+      <div class="p-5">
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th
+                  scope="col"
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Producto
+                </th>
+                <th
+                  scope="col"
+                  class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Cantidad
+                </th>
+
+                <th
+                  scope="col"
+                  class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Subtotal
+                </th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+              {% for item in galletas_agrupadas %}
+              <tr>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="flex items-center">
+                    <div class="ml-4">
+                      <div class="text-sm font-medium text-gray-900">
+                        {{ item.galleta.nombre }}
+                      </div>
+                    </div>
+                  </div>
+                </td>
+                <td
+                  class="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-500"
+                >
+                  {{ item.cantidad }}
+                </td>
+
+                <td
+                  class="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-500"
+                >
+                  ${{ '%.2f'|format(item.subtotal) }}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+            <tfoot class="bg-gray-50">
+              <tr>
+                <td
+                  colspan="2"
+                  class="px-6 py-4 text-right text-sm font-medium text-gray-900"
+                >
+                  Total:
+                </td>
+                <td
+                  class="px-6 py-4 text-right text-sm font-medium text-gray-900"
+                >
+                  ${{ "%.2f"|format(pedido_especifico.total) }}
+                </td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+
+      <div
+        class="flex justify-between items-center p-5 border-t border-gray-100"
+      >
+        {% if pedido_especifico.estatus == 'En proceso' %}
+        <form method="POST" action="{{ url_for('produccion_bp.pedidoListo') }}">
+          {{ form.csrf_token }}
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+          <input
+            type="hidden"
+            name="pedido_id"
+            value="{{ pedido_especifico.id }}"
+          />
+          <button
+            type="submit"
+            class="px-5 py-2.5 bg-green-600 text-white font-medium rounded-lg transition-colors duration-200 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+          >
+            Marcar como Listo
+          </button>
+        </form>
+
+        {% endif %}
+
+        <form
+          method="POST"
+          action="{{ url_for('produccion_bp.cerrar_modal') }}"
+          class="inline-flex"
+        >
+          {{ form.csrf_token }}
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+          <button
+            type="submit"
+            style="background-color: #7c5454"
+            class="px-5 py-2.5 text-white font-medium rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+          >
+            Cerrar
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    .animate-fade-in {
+      animation: fadeIn 0.3s ease-out forwards;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(-10px) scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+  </style>
+</div>

@@ -1,7 +1,8 @@
-{% extends "layout.html" %} 
-{% block content %}
+{% extends "layout.html" %} {% block content %}
 <div class="flex flex-col w-full px-10">
-  <div class="w-full p-4 text-center border border-gray-300 rounded-lg shadow-sm">
+  <div
+    class="w-full p-4 text-center border border-gray-300 rounded-lg shadow-sm"
+  >
     <div class="flex justify-between pb-5">
       <div>
         <h1 class="text-4xl font-medium text-gray-800">Ventas</h1>
@@ -14,18 +15,30 @@
         id="search-input"
         class="w-full outline-none"
         placeholder="Buscar venta"
-        {% if not ventas %}disabled{% endif %}
+        {%
+        if
+        not
+        ventas
+        %}disabled{%
+        endif
+        %}
       />
     </div>
 
     <div class="overflow-x-auto overflow-y-auto max-h-[500px] mt-4">
       {% if ventas %}
-      <table id="ventas-table" class="w-full text-sm text-left rtl:text-right text-gray-500">
-        <thead style="background-color: #7c5454" class="text-xs text-white uppercase sticky top-0">
+      <table
+        id="ventas-table"
+        class="w-full text-sm text-left rtl:text-right text-gray-500"
+      >
+        <thead
+          style="background-color: #7c5454"
+          class="text-xs text-white uppercase sticky top-0"
+        >
           <tr>
             <th scope="col" class="px-6 py-3">Venta</th>
             <th scope="col" class="px-6 py-3">Fecha</th>
-            <th scope="col" class="px-6 py-3">Usuario</th>
+            <th scope="col" class="px-6 py-3">Cliente</th>
             <th scope="col" class="px-6 py-3">Total</th>
             <th scope="col" class="px-6 py-3">Productos</th>
             <th scope="col" class="px-6 py-3">Acciones</th>
@@ -35,16 +48,31 @@
           {% for venta in ventas %}
           <tr class="bg-white border-b hover:bg-gray-50">
             <td class="px-6 py-4 font-medium text-gray-900">#{{ venta.id }}</td>
-            <td class="px-6 py-4">{{ venta.fechaCreacion.strftime('%d/%m/%Y %H:%M') }}</td>
-            <td class="px-6 py-4">{{ venta.usuario.nombre if venta.usuario else 'Anónimo' }}</td>
-            <td class="px-6 py-4 font-bold">${{ "%.2f"|format(venta.total) }}</td>
+            <td class="px-6 py-4">
+              {{ venta.fechaCreacion.strftime('%d/%m/%Y %H:%M') }}
+            </td>
+            <td class="px-6 py-4">
+              {{ venta.usuario.nombre if venta.usuario else 'Anónimo' }}
+            </td>
+            <td class="px-6 py-4 font-bold">
+              ${{ "%.2f"|format(venta.total) }}
+            </td>
             <td class="px-6 py-4">{{ venta.detalles|length }}</td>
             <td class="px-6 py-4">
-              <form method="POST" action="{{ url_for('ventasDetalles_bp.abrir_modal') }}">
+              <form
+                method="POST"
+                action="{{ url_for('ventasDetalles_bp.abrir_modal') }}"
+              >
                 {{ form.csrf_token }}
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                <input
+                  type="hidden"
+                  name="csrf_token"
+                  value="{{ csrf_token() }}"
+                />
                 <input type="hidden" name="venta_id" value="{{ venta.id }}" />
-                <button class="text-white py-2 px-3 rounded-full text-center bg-yellow-800 hover:bg-yellow-900">
+                <button
+                  class="text-white py-2 px-3 rounded-full text-center bg-yellow-800 hover:bg-yellow-900"
+                >
                   <i class="fas fa-eye"></i>
                 </button>
               </form>
@@ -53,13 +81,18 @@
           {% endfor %}
         </tbody>
       </table>
-      
-      <div id="no-results" class="hidden text-center py-8 bg-gray-50 rounded-lg">
+
+      <div
+        id="no-results"
+        class="hidden text-center py-8 bg-gray-50 rounded-lg"
+      >
         <i class="fas fa-search-minus text-gray-400 text-4xl mb-3"></i>
         <p class="text-gray-500">No se encontraron ventas</p>
-        <p class="text-sm text-gray-400 mt-1">Intenta con otros términos de búsqueda</p>
+        <p class="text-sm text-gray-400 mt-1">
+          Intenta con otros términos de búsqueda
+        </p>
       </div>
-      
+
       {% else %}
       <div class="text-center py-8 bg-gray-50 rounded-lg">
         <i class="fas fa-info-circle text-gray-400 text-4xl mb-3"></i>
@@ -70,49 +103,48 @@
   </div>
 </div>
 
-{% if modal %} 
-  {% include "component/venta/_modalDetalleVenta.html" %} 
-{% endif %}
+{% if modal %} {% include "component/venta/_modalDetalleVenta.html" %} {% endif
+%}
 
 <script>
-document.addEventListener("DOMContentLoaded", function() {
+  document.addEventListener("DOMContentLoaded", function () {
     const searchInput = document.getElementById("search-input");
     const ventasBody = document.getElementById("ventas-body");
     const noResults = document.getElementById("no-results");
-    
+
     if (searchInput && ventasBody) {
-        searchInput.addEventListener("input", function() {
-            const searchTerm = this.value.trim().toLowerCase();
-            const rows = ventasBody.getElementsByTagName("tr");
-            let hasResults = false;
+      searchInput.addEventListener("input", function () {
+        const searchTerm = this.value.trim().toLowerCase();
+        const rows = ventasBody.getElementsByTagName("tr");
+        let hasResults = false;
 
-            for (let row of rows) {
-                const cells = row.getElementsByTagName("td");
-                let rowMatches = false;
-                
-                for (let i = 0; i < cells.length - 1; i++) {
-                    if (cells[i].textContent.toLowerCase().includes(searchTerm)) {
-                        rowMatches = true;
-                        break;
-                    }
-                }
+        for (let row of rows) {
+          const cells = row.getElementsByTagName("td");
+          let rowMatches = false;
 
-                if (rowMatches) {
-                    row.style.display = "";
-                    hasResults = true;
-                } else {
-                    row.style.display = "none";
-                }
+          for (let i = 0; i < cells.length - 1; i++) {
+            if (cells[i].textContent.toLowerCase().includes(searchTerm)) {
+              rowMatches = true;
+              break;
             }
+          }
 
-            if (!hasResults && searchTerm.length > 0) {
-                noResults.classList.remove("hidden");
-            } else {
-                noResults.classList.add("hidden");
-            }
-        });
+          if (rowMatches) {
+            row.style.display = "";
+            hasResults = true;
+          } else {
+            row.style.display = "none";
+          }
+        }
+
+        if (!hasResults && searchTerm.length > 0) {
+          noResults.classList.remove("hidden");
+        } else {
+          noResults.classList.add("hidden");
+        }
+      });
     }
-});
+  });
 </script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>

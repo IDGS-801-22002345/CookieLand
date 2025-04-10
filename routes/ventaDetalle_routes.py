@@ -26,11 +26,12 @@ def index():
 
 
 @ventasDetalles_bp.route("/abrirmodal", methods=["POST"])
+@login_required
+@log_excepciones
+@role_required('admin')
 def abrir_modal():
      ventaForm = VentaForm()
      venta_id = int(request.form.get('venta_id'))
-     print('Entro')
-     print(venta_id)
      venta = Venta.query.options(
         db.joinedload(Venta.detalles).joinedload(DetalleVenta.galleta),
         db.joinedload(Venta.usuario)
@@ -48,6 +49,9 @@ def abrir_modal():
     )
 
 @ventasDetalles_bp.route("/cerrarmodal", methods=["POST"])
+@login_required
+@log_excepciones
+@role_required('admin')
 def cerrar_modal():
  return redirect(url_for('ventasDetalles_bp.index'))
 

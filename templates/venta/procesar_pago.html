@@ -1,0 +1,133 @@
+{% extends "layout.html" %} {% block content %}
+<div class="container mx-auto p-4">
+  <h1 class="text-2xl font-bold mb-4">
+    Procesar Pago - Pedido #{{ pedido.id }}
+  </h1>
+
+  <div class="bg-white rounded-lg shadow p-6 mb-6">
+    <h2 class="text-xl font-semibold mb-3">
+      Cliente: {{ pedido.usuario.nombre }}
+    </h2>
+
+    <table class="min-w-full bg-white mb-6">
+      <thead>
+        <tr class="border-b">
+          <th class="py-2 text-left">Producto</th>
+          <th class="py-2 text-center">Cantidad</th>
+          <th class="py-2 text-right">Precio</th>
+          <th class="py-2 text-right">Subtotal</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for producto in productos %}
+        <tr class="border-b">
+          <td class="py-2">{{ producto.nombre }}</td>
+          <td class="py-2 text-center">{{ producto.cantidad }}</td>
+          <td class="py-2 text-right">${{ "%.2f"|format(producto.precio) }}</td>
+          <td class="py-2 text-right">
+            ${{ "%.2f"|format(producto.subtotal) }}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+      <tfoot>
+        <tr class="bg-gray-50 font-bold">
+          <td colspan="3" class="py-2 text-right">Total:</td>
+          <td class="py-2 text-right">${{ "%.2f"|format(total) }}</td>
+        </tr>
+      </tfoot>
+    </table>
+
+    <div class="flex flex-col gap-4 mb-4 border-t">
+      <div class="grid grid-cols-1 md:grid-cols-2 pt-3 gap-4">
+        <div class="mb-3">
+          <label
+            for="monto-recibido"
+            class="block text-sm font-medium text-gray-700 mb-1"
+          >
+            Monto Recibido
+          </label>
+          <input
+            type="number"
+            id="monto-recibido"
+            class="w-full p-2 border rounded-lg text-right font-medium text-lg"
+            min="0"
+            step="0.01"
+            placeholder="0.00"
+          />
+        </div>
+
+        <div
+          class="flex justify-between items-center bg-amber-50 p-3 rounded-lg"
+        >
+          <span class="font-medium text-gray-700">Cambio:</span>
+          <span id="monto-cambio" class="text-xl font-bold text-green-600"
+            >$0.00</span
+          >
+        </div>
+      </div>
+      <div
+        id="leyenda-pago"
+        class="bg-blue-50 p-2 rounded text-center text-sm text-blue-700 border border-blue-100"
+      >
+        <i class="fas fa-info-circle mr-1"></i> Ingrese el monto recibido para
+        habilitar el pago
+      </div>
+      <form
+        method="POST"
+        action="{{ url_for('ventas_bp.realizar_venta_pedido') }}"
+      >
+        {{ form.csrf_token }}
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+        <input type="hidden" name="pedido_id" value="{{ pedido.id }}" />
+        <div class="flex items-end">
+          <button
+            id="btn-pagar"
+            type="submit"
+            class="w-full bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700 hidden"
+          >
+            Confirmar Pago
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const montoRecibido = document.getElementById("monto-recibido");
+    const montoCambio = document.getElementById("monto-cambio");
+    const totalVenta = parseFloat("{{ total|default(0) }}");
+    const leyendaPago = document.getElementById("leyenda-pago");
+    const btnPagar = document.getElementById("btn-pagar");
+
+    function calcularCambio() {
+      const recibido = parseFloat(montoRecibido.value) || 0;
+      const cambio = recibido - totalVenta;
+
+      if (cambio >= 0) {
+        montoCambio.textContent = "$" + cambio.toFixed(2);
+        montoCambio.classList.remove("text-red-600");
+        montoCambio.classList.add("text-green-600");
+        btnPagar.classList.remove("hidden");
+        leyendaPago.classList.add("hidden");
+      } else {
+        montoCambio.textContent = "-$" + Math.abs(cambio).toFixed(2);
+        montoCambio.classList.remove("text-green-600");
+        montoCambio.classList.add("text-red-600");
+        btnPagar.classList.add("hidden");
+        leyendaPago.classList.remove("hidden");
+      }
+    }
+
+    if (montoRecibido) {
+      montoRecibido.addEventListener("input", calcularCambio);
+      if (montoRecibido.value) {
+        calcularCambio();
+      }
+    }
+  });
+</script>
+
+{% endblock %}
