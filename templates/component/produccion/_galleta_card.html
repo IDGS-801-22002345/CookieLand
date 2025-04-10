@@ -24,6 +24,16 @@
     </div>
     <h2 class="font-semibold">{{ galleta.nombre }}</h2>
     <div class="flex items-center justify-center">
+      <span
+        style="background-color: #f5deb3; color: #8b4513"
+        class="text-xs font-semibold px-2.5 py-0.2 rounded-full"
+      >
+        <i class="fas fa-box-open mr-1"></i>
+        {{ galleta.stock }} disponibles
+      </span>
+    </div>
+
+    <div class="flex items-center justify-center">
       {{ macro.Input(form.cantidad) }}
     </div>
 

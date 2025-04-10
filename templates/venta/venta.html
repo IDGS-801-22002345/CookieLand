@@ -135,176 +135,186 @@
               </div>
             </div>
           </div>
-        </div>
 
-        <!-- Tabla de Detalle -->
-        <div class="overflow-auto mb-4" style="max-height: 40vh">
-          <table class="min-w-full bg-white border border-gray-200">
-            <thead class="bg-gray-100 sticky top-0">
-              <tr>
-                <th
-                  class="py-2 px-3 text-left text-xs font-medium text-gray-700 uppercase"
-                >
-                  Producto
-                </th>
-                <th
-                  class="py-2 px-3 text-center text-xs font-medium text-gray-700 uppercase"
-                >
-                  Cant.
-                </th>
-                <th
-                  class="py-2 px-3 text-right text-xs font-medium text-gray-700 uppercase"
-                >
-                  Precio
-                </th>
-                <th
-                  class="py-2 px-3 text-right text-xs font-medium text-gray-700 uppercase"
-                >
-                  Subtotal
-                </th>
-                <th
-                  class="py-2 px-3 text-right text-xs font-medium text-gray-700 uppercase"
-                ></th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-200">
-              {% if detalles_venta %} {% for item in detalles_venta %}
-              <tr>
-                <td class="py-2 px-3 text-left">{{ item.galleta }}</td>
-                <td class="py-2 px-3 text-center">{{ item.cantidad }}</td>
-                <td class="py-2 px-3 text-right">
-                  ${{ "%.2f"|format(item.precio) }}
-                </td>
-                <td class="py-2 px-3 text-right">
-                  ${{ "%.2f"|format(item.subtotal) }}
-                </td>
-                <td class="py-2 px-3 text-right">
-                  <form
-                    method="POST"
-                    action="{{ url_for('ventas_bp.eliminar_galleta') }}"
+          <!-- Tabla de Detalle -->
+          <div class="overflow-auto mb-4" style="max-height: 40vh">
+            <table class="min-w-full bg-white border border-gray-200">
+              <thead class="bg-gray-100 sticky top-0">
+                <tr>
+                  <th
+                    class="py-2 px-3 text-left text-xs font-medium text-gray-700 uppercase"
                   >
-                    <input
-                      type="hidden"
-                      name="csrf_token"
-                      value="{{ csrf_token() }}"
-                    />
-                    <input
-                      type="hidden"
-                      name="galleta_id"
-                      value="{{ item.id }}"
-                    />
-                    <button
-                      type="submit"
-                      class="text-red-500 hover:text-red-700 transition-colors"
+                    Producto
+                  </th>
+                  <th
+                    class="py-2 px-3 text-center text-xs font-medium text-gray-700 uppercase"
+                  >
+                    Cant.
+                  </th>
+                  <th
+                    class="py-2 px-3 text-right text-xs font-medium text-gray-700 uppercase"
+                  >
+                    Precio
+                  </th>
+                  <th
+                    class="py-2 px-3 text-right text-xs font-medium text-gray-700 uppercase"
+                  >
+                    Subtotal
+                  </th>
+                  <th
+                    class="py-2 px-3 text-right text-xs font-medium text-gray-700 uppercase"
+                  ></th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-200">
+                {% if detalles_venta %} {% for item in detalles_venta %}
+                <tr>
+                  <td class="py-2 px-3 text-left">{{ item.galleta }}</td>
+                  <td class="py-2 px-3 text-center">{{ item.cantidad }}</td>
+                  <td class="py-2 px-3 text-right">
+                    ${{ "%.2f"|format(item.precio) }}
+                  </td>
+                  <td class="py-2 px-3 text-right">
+                    ${{ "%.2f"|format(item.subtotal) }}
+                  </td>
+                  <td class="py-2 px-3 text-right">
+                    <form
+                      method="POST"
+                      action="{{ url_for('ventas_bp.eliminar_galleta') }}"
                     >
-                      <i class="fas fa-trash-alt"></i>
-                    </button>
-                  </form>
-                </td>
-              </tr>
-              {% endfor %} {% else %}
-              <tr>
-                <td colspan="5" class="py-4 text-center text-gray-500">
-                  No hay galletas agregadas
-                </td>
-              </tr>
-              {% endif %}
-            </tbody>
-          </table>
-        </div>
+                      <input
+                        type="hidden"
+                        name="csrf_token"
+                        value="{{ csrf_token() }}"
+                      />
+                      <input
+                        type="hidden"
+                        name="galleta_id"
+                        value="{{ item.id }}"
+                      />
+                      <button
+                        type="submit"
+                        class="text-red-500 hover:text-red-700 transition-colors"
+                      >
+                        <i class="fas fa-trash-alt"></i>
+                      </button>
+                    </form>
+                  </td>
+                </tr>
+                {% endfor %} {% else %}
+                <tr>
+                  <td colspan="5" class="py-4 text-center text-gray-500">
+                    No hay galletas agregadas
+                  </td>
+                </tr>
+                {% endif %}
+              </tbody>
+            </table>
+          </div>
 
-        <!-- Botones de Acción -->
-        <div class="space-y-3">
-          <form method="POST" action="{{ url_for('ventas_bp.limpiar_venta') }}">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-            <button
-              type="submit"
-              class="w-full py-2 px-4 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
+          <!-- Botones de Acción -->
+          <div class="space-y-3">
+            <form
+              method="POST"
+              action="{{ url_for('ventas_bp.limpiar_venta') }}"
             >
-              <i class="fas fa-trash-alt mr-2"></i> Limpiar Todo
-            </button>
-          </form>
+              <input
+                type="hidden"
+                name="csrf_token"
+                value="{{ csrf_token() }}"
+              />
+              <button
+                type="submit"
+                class="w-full py-2 px-4 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
+              >
+                <i class="fas fa-trash-alt mr-2"></i> Limpiar Todo
+              </button>
+            </form>
 
-          <form
-            method="POST"
-            action="{{ url_for('ventas_bp.realizar_venta') }}"
-          >
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-            <button
-              id="btn-pagar"
-              class="w-full py-3 px-4 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold hidden"
+            <form
+              method="POST"
+              action="{{ url_for('ventas_bp.realizar_venta') }}"
             >
-              <i class="fas fa-cash-register mr-2"></i> Procesar Pago
-            </button>
-          </form>
+              <input
+                type="hidden"
+                name="csrf_token"
+                value="{{ csrf_token() }}"
+              />
+              <button
+                id="btn-pagar"
+                class="w-full py-3 px-4 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold hidden"
+              >
+                <i class="fas fa-cash-register mr-2"></i> Procesar Pago
+              </button>
+            </form>
+          </div>
         </div>
       </div>
     </div>
   </div>
-</div>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const searchInput = document.getElementById("search-input");
+      const galletasContainer = document.getElementById("galletas-container");
+      const noResults = document.getElementById("no-results");
 
-<script>
-  document.addEventListener("DOMContentLoaded", function () {
-    const searchInput = document.getElementById("search-input");
-    const galletasContainer = document.getElementById("galletas-container");
-    const noResults = document.getElementById("no-results");
+      if (searchInput && galletasContainer) {
+        searchInput.addEventListener("input", function () {
+          const searchText = this.value.toLowerCase().trim();
+          const galletasCards = galletasContainer.children;
+          let hasResults = false;
 
-    if (searchInput && galletasContainer) {
-      searchInput.addEventListener("input", function () {
-        const searchText = this.value.toLowerCase().trim();
-        const galletasCards = galletasContainer.children;
-        let hasResults = false;
+          Array.from(galletasCards).forEach((card) => {
+            const cardText = card.textContent.toLowerCase();
+            if (cardText.includes(searchText)) {
+              card.style.display = "block";
+              hasResults = true;
+            } else {
+              card.style.display = "none";
+            }
+          });
 
-        Array.from(galletasCards).forEach((card) => {
-          const cardText = card.textContent.toLowerCase();
-          if (cardText.includes(searchText)) {
-            card.style.display = "block";
-            hasResults = true;
+          if (!hasResults && searchText.length > 0) {
+            noResults.classList.remove("hidden");
           } else {
-            card.style.display = "none";
+            noResults.classList.add("hidden");
           }
         });
+      }
 
-        if (!hasResults && searchText.length > 0) {
-          noResults.classList.remove("hidden");
+      const montoRecibido = document.getElementById("monto-recibido");
+      const montoCambio = document.getElementById("monto-cambio");
+      const totalVenta = parseFloat("{{ total|default(0) }}");
+      const leyendaPago = document.getElementById("leyenda-pago");
+      const btnPagar = document.getElementById("btn-pagar");
+
+      function calcularCambio() {
+        const recibido = parseFloat(montoRecibido.value) || 0;
+        const cambio = recibido - totalVenta;
+
+        if (cambio >= 0) {
+          montoCambio.textContent = "$" + cambio.toFixed(2);
+          montoCambio.classList.remove("text-red-600");
+          montoCambio.classList.add("text-green-600");
+          btnPagar.classList.remove("hidden");
+          leyendaPago.classList.add("hidden");
         } else {
-          noResults.classList.add("hidden");
+          montoCambio.textContent = "-$" + Math.abs(cambio).toFixed(2);
+          montoCambio.classList.remove("text-green-600");
+          montoCambio.classList.add("text-red-600");
+          btnPagar.classList.add("hidden");
+          leyendaPago.classList.remove("hidden");
         }
-      });
-    }
-
-    const montoRecibido = document.getElementById("monto-recibido");
-    const montoCambio = document.getElementById("monto-cambio");
-    const totalVenta = parseFloat("{{ total|default(0) }}");
-    const leyendaPago = document.getElementById("leyenda-pago");
-    const btnPagar = document.getElementById("btn-pagar");
-
-    function calcularCambio() {
-      const recibido = parseFloat(montoRecibido.value) || 0;
-      const cambio = recibido - totalVenta;
-
-      if (cambio >= 0) {
-        montoCambio.textContent = "$" + cambio.toFixed(2);
-        montoCambio.classList.remove("text-red-600");
-        montoCambio.classList.add("text-green-600");
-        btnPagar.classList.remove("hidden");
-        leyendaPago.classList.add("hidden");
-      } else {
-        montoCambio.textContent = "-$" + Math.abs(cambio).toFixed(2);
-        montoCambio.classList.remove("text-green-600");
-        montoCambio.classList.add("text-red-600");
-        btnPagar.classList.add("hidden");
-        leyendaPago.classList.remove("hidden");
       }
-    }
 
-    if (montoRecibido) {
-      montoRecibido.addEventListener("input", calcularCambio);
-      if (montoRecibido.value) {
-        calcularCambio();
+      if (montoRecibido) {
+        montoRecibido.addEventListener("input", calcularCambio);
+        if (montoRecibido.value) {
+          calcularCambio();
+        }
       }
-    }
-  });
-</script>
+    });
+  </script>
 
-{% endblock %}
+  {% endblock %}
+</div>
